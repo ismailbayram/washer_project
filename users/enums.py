@@ -2,11 +2,11 @@ from enumfields import Enum
 
 
 class UserType(Enum):
-    user = 'user'
+    normal = 'normal'
     washer = 'washer'
     worker = 'worker'
 
     class Labels:
-        user = 'User'
+        normal = 'Normal'
         washer = 'Washer'
         worker = 'Worker'

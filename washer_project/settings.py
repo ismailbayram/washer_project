@@ -65,8 +65,14 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
+        # 'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
     ),
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.WasherPageNumberPagination',
     'ORDERING_PARAM': 'sort',
@@ -76,7 +82,7 @@ REST_FRAMEWORK = {
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'api.permissions.IsAuthenticatedAndActivated',
+        'rest_framework.permissions.AllowAny',
     ),
     # 'EXCEPTION_HANDLER': 'oms.base.views.exception_handler',
 }
