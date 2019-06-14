@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'rest_framework',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -67,7 +68,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'api.pagination.OMSPageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.WasherPageNumberPagination',
     'ORDERING_PARAM': 'sort',
     'PAGINATE_BY': 10,
     'PAGE_SIZE': 10,
