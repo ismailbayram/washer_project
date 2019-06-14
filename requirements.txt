@@ -1,3 +1,7 @@
 Django==2.2.2
 django-rest-framework==0.1.0
 djangorestframework==3.9.4
+django-rest-framework==0.1.0
+psycopg2==2.8.3
+requests==2.22.0
+model-mommy==1.6.0
