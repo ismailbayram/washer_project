@@ -11,3 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+
+
+class AuthFirstStepSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
