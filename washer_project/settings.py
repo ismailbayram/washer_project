@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'rest_framework',
+    'rest_framework_swagger',
     'users',
 ]
 
@@ -97,6 +98,26 @@ JWT_AUTH = {
     'JWT_PAYLOAD_HANDLER': 'users.utils.jwt_payload_handler',
 }
 
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+SWAGGER_SETTINGS = {
+    'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'patch', 'put', 'options'],
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

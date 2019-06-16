@@ -4,14 +4,17 @@ from rest_framework.routers import DefaultRouter
 
 from users.resources.views import (UserViewSet, AuthView)
 
+from api.views import get_swagger_view
+schema_view = get_swagger_view(title='Washer Project API')
 
 # TODO: prevent /api/v1/ :GET
 router = DefaultRouter()
-router.register('users', UserViewSet)
+router.register('users', UserViewSet, 'users')
 
 app_name = 'api'
 
 urlpatterns = [
+    path('', include((router.urls, 'api'), namespace='api')),
     path('auth/', AuthView.as_view()),
-    path('', include(router.urls)),
+    path('docs/', schema_view),
 ]

@@ -10,7 +10,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ('pk', 'user_type', 'last_login', 'first_name',
+                  'last_name', 'date_joined', 'phone_number', 'is_active')
 
 
 class AuthFirstStepSerializer(serializers.Serializer):

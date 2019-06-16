@@ -39,3 +39,8 @@ class UserService(object):
         user.set_unusable_password()
 
         return user
+
+    def deactivate_user(self, user):
+        user.is_active = False
+        user.save()
+        return user
