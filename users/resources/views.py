@@ -5,7 +5,8 @@ from rest_framework.response import Response
 
 from api.permissions import IsAdminUser
 
-from users.resources.serializers import (UserSerializer, AuthFirstStepSerializer)
+from users.resources.serializers import (UserSerializer,
+                                         AuthFirstStepSerializer)
 from users.models import User
 from users.service import UserService
 

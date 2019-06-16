@@ -8,7 +8,7 @@ from rest_framework.views import exception_handler as rest_exception_handler
 class ProjectBaseException(Exception):
     code = {"code": "undefined", "en": "undefined exception code"}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         if not isinstance(self.code, dict):
             raise Exception('parameter type must be a dict')
         code = self.code.get('code', 'undefined')

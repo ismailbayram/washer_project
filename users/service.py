@@ -6,7 +6,7 @@ from users.enums import UserType
 from users.exceptions import UserDoesNotExistException
 
 
-class UserService(object):
+class UserService:
     def create_token(self, phone_number):
         """
         :param phone_number: str
