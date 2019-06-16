@@ -7,7 +7,6 @@ from users.resources.views import (UserViewSet, AuthView)
 from api.views import get_swagger_view
 schema_view = get_swagger_view(title='Washer Project API')
 
-# TODO: prevent /api/v1/ :GET
 router = DefaultRouter()
 router.register('users', UserViewSet, 'users')
 
