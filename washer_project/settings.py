@@ -85,7 +85,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
-    # 'EXCEPTION_HANDLER': 'oms.base.views.exception_handler',
+    'EXCEPTION_HANDLER': 'api.exceptions.exception_handler',
 }
 
 JWT_AUTH = {
