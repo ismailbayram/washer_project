@@ -1,51 +1,27 @@
 from django.db import models
-from django.utils import timezone
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import (PermissionsMixin, UserManager)
+from django.contrib.auth.models import AbstractUser
 
-from enumfields import EnumField
-
-from users.enums import UserType
+from users.enums import GroupType
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(max_length=30, blank=True, null=True)
-    last_name = models.CharField(max_length=150, blank=True, null=True)
-    date_joined = models.DateTimeField(default=timezone.now)
-    phone_number = models.CharField(max_length=255)
-    user_type = EnumField(UserType, default=UserType.normal, max_length=255)
-    username = models.CharField(max_length=255, unique=True)
-    is_active = models.BooleanField(default=True)
-
-    objects = UserManager()
-
-    USERNAME_FIELD = 'username'
-
-    class Meta:
-        unique_together = ('phone_number', 'user_type')
+class User(AbstractUser):
+    phone_number = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
-        return f'{self.full_name} - {self.user_type.value}'
-
-    def get_username(self):
-        return self.phone_number
-
-    @property
-    def full_name(self):
-        return f'{self.first_name} {self.last_name}'
+        return self.get_full_name()
 
     @property
     def protected_name(self):
         return f'{self.first_name} {self.last_name[0]}.'
 
     @property
-    def is_normal(self):
-        return self.user_type == UserType.normal
+    def is_customer(self):
+        return self.groups.filter(name=GroupType.customer.value).exists()
 
     @property
     def is_washer(self):
-        return self.user_type == UserType.washer
+        return self.groups.filter(name=GroupType.washer.value).exists()
 
     @property
     def is_worker(self):
-        return self.user_type == UserType.worker
+        return self.groups.filter(name=GroupType.worker.value).exists()

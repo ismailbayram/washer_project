@@ -79,10 +79,10 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser, )
 
-    def perform_destroy(self, instance):
-        service = UserService()
-        instance = service.deactivate_user(instance)
-        return instance
+    # def perform_destroy(self, instance):
+    #     service = UserService()
+    #     instance = service.deactivate_user(instance)
+    #     return instance
 
 
 class AuthView(APIView):
