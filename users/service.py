@@ -25,8 +25,8 @@ class UserService:
         return jwt_encode_handler(payload)
 
     @atomic
-    def create_user(self, phone_number, group_type=GroupType.customer,
-                    first_name=None, last_name=None):
+    def create_user(self, phone_number, first_name, last_name,
+                    group_type=GroupType.customer):
         """
         :param phone_number: str
         :param group_type: GroupType
@@ -41,13 +41,12 @@ class UserService:
                                    username=username)
         user.set_unusable_password()
         try:
-            group = Group.objects.get(name=group_type)
+            group = Group.objects.get(name=group_type.value)
         except Group.DoesNotExist:
             raise UserGroupTypeInvalidException
         user.groups.add(group)
-        token = self.create_token(user)
 
-        return user, token
+        return user
 
     def deactivate_user(self, user):
         user.is_active = False
