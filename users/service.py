@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.contrib.auth.models import Group
-from django.db import transaction
+from django.db.transaction import atomic
 from rest_framework_jwt.settings import api_settings as jwt_settings
 
 from users.models import (User, CustomerProfile, WasherProfile,
@@ -21,7 +21,7 @@ class UserService:
         # TODO: update last login
         return jwt_encode_handler(payload)
 
-    @transaction.atomic
+    @atomic
     def create_user(self, phone_number, first_name, last_name,
                     group_type=GroupType.customer):
         """
