@@ -35,21 +35,21 @@ class User(AbstractUser):
 
 
 class CustomerProfile(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.PROTECT)
+    user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='customer_profile')
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
 
 class WasherProfile(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.PROTECT)
+    user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='washer_profile')
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
 
 class WorkerProfile(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.PROTECT)
+    user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='worker_profile')
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
