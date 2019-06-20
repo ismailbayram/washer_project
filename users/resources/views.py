@@ -95,8 +95,9 @@ class UserViewSet(ModelViewSet):
 
 class AuthView(APIView):
     def post(self, request):
-        serializer = AuthFirstStepSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        service = UserService()
-        token = service.create_token(**serializer.validated_data)
-        return Response({'token': token}, status=status.HTTP_200_OK)
+        pass
+        # serializer = AuthFirstStepSerializer(data=request.data)
+        # serializer.is_valid(raise_exception=True)
+        # service = UserService()
+        # token = service._create_token(**serializer.validated_data)
+        # return Response({'token': token}, status=status.HTTP_200_OK)

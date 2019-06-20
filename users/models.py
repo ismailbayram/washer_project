@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ObjectDoesNotExist
 
 from users.enums import GroupType
 
@@ -9,6 +10,12 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.get_full_name()
+
+    def __getattribute__(self, item):
+        try:
+            return super().__getattribute__(item)
+        except ObjectDoesNotExist:
+            return None
 
     @property
     def protected_name(self):
@@ -30,11 +37,20 @@ class User(AbstractUser):
 class CustomerProfile(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT)
 
+    def __str__(self):
+        return f'{self.user.get_full_name()}'
+
 
 class WasherProfile(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT)
 
+    def __str__(self):
+        return f'{self.user.get_full_name()}'
+
 
 class WorkerProfile(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.user.get_full_name()}'
 
