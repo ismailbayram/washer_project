@@ -25,3 +25,16 @@ class User(AbstractUser):
     @property
     def is_worker(self):
         return self.groups.filter(name=GroupType.worker.value).exists()
+
+
+class CustomerProfile(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.PROTECT)
+
+
+class WasherProfile(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.PROTECT)
+
+
+class WorkerProfile(models.Model):
+    user = models.OneToOneField(to=User, on_delete=models.PROTECT)
+
