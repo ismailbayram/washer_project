@@ -13,4 +13,5 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AuthFirstStepSerializer(serializers.Serializer):
+    # TODO: make login scenario
     phone_number = serializers.CharField()

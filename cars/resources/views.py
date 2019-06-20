@@ -1,0 +1,26 @@
+from rest_framework import viewsets
+
+from api import permissions
+
+from users.enums import GroupType
+from cars.resources.serializers import CarSerializer
+from cars.models import Car
+
+class CarView(viewsets.ModelViewSet):
+    permission_classes = (permissions.HasGroupPermission,)
+
+    permission_groups = {
+        'list': [GroupType.customer, GroupType.washer, GroupType.worker],
+        'post':[GroupType.customer],
+    }
+
+    serializer_class = CarSerializer
+    queryset = Car.objects.all()
+
+    def get_queryset(self):
+        return self.queryset.filter(customer_profile=self.request.user.customerprofile)
+
+    def perform_create(self, serializer):
+        serializer.save(
+            customer_profile=self.request.user.customerprofile
+        )

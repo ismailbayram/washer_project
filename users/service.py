@@ -1,4 +1,5 @@
 from uuid import uuid4
+
 from django.contrib.auth.models import Group, update_last_login
 from django.db.transaction import atomic
 from django.db import IntegrityError
@@ -21,6 +22,7 @@ class UserService:
         jwt_encode_handler = jwt_settings.JWT_ENCODE_HANDLER
         payload = jwt_response_payload_handler(user)
         update_last_login(User, user)
+
         return jwt_encode_handler(payload)
 
     @atomic
@@ -45,6 +47,11 @@ class UserService:
                                    last_name=last_name,
                                    username=username)
         user.set_unusable_password()
+        try:
+            group = Group.objects.get(name=group_type.value)
+        except Group.DoesNotExist:
+            raise UserGroupTypeInvalidException
+        user.groups.add(group)
 
         try:
             group = Group.objects.get(name=group_type.value)

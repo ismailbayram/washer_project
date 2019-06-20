@@ -3,9 +3,13 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from users.resources.views import (UserViewSet, AuthView)
+
 from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
 from stores.resources.views import StoreViewSet, StoreListViewSet
+
+from cars.resources.views import (CarView)
+
 
 from api.views import get_swagger_view
 schema_view = get_swagger_view(title='Washer Project API')
@@ -27,5 +31,12 @@ app_name = 'api'
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
     path('auth/', AuthView.as_view()),
+    path('car/', CarView.as_view({
+        'get': 'list',
+        'post': 'create',
+    })),
+    path('car/<int:pk>/', CarView.as_view({
+        'get': 'retrieve'
+    })),
     path('docs/', schema_view),
 ]
