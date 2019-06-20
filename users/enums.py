@@ -1,12 +1,14 @@
+from django.utils.translation import ugettext_lazy as _
+
 from enumfields import Enum
 
 
-class UserType(Enum):
-    normal = 'normal'
+class GroupType(Enum):
+    customer = 'customer'
     washer = 'washer'
     worker = 'worker'
 
     class Labels:
-        normal = 'Normal'
-        washer = 'Washer'
-        worker = 'Worker'
+        customer = _('Müşteri')
+        washer = _('Yıkamacı')
+        worker = _('Yıkama Çalışanı')

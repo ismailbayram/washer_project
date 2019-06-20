@@ -26,13 +26,16 @@ class UserViewSet(ModelViewSet):
             "previous": null,
             "results": [
                     {
-                        "pk": 3,
-                        "user_type": "normal",
+                        "pk": 1,
+                        "date_joined": "2019-06-19T23:27:24.392652+03:00",
                         "last_login": null,
-                        "first_name": "ahmet",
-                        "last_name": "cetin",
-                        "date_joined": "2019-06-16T17:46:21.225910+03:00",
-                        "phone_number": "+905423037159"
+                        "first_name": "ismail",
+                        "last_name": "bayram",
+                        "phone_number": "+905423037159",
+                        "is_active": true,
+                        "is_customer": true,
+                        "is_washer": false,
+                        "is_worker": false
                     },
                     ...
                 ]
@@ -45,14 +48,16 @@ class UserViewSet(ModelViewSet):
            <br/>
 
            {
-                "pk": 3,
-                "user_type": "normal",
+                "pk": 1,
+                "date_joined": "2019-06-19T23:27:24.392652+03:00",
                 "last_login": null,
-                "first_name": "ahmet",
-                "last_name": "cetin",
-                "date_joined": "2019-06-16T17:46:21.225910+03:00",
+                "first_name": "ismail",
+                "last_name": "bayram",
                 "phone_number": "+905423037159",
-                "is_active': True
+                "is_active": true,
+                "is_customer": true,
+                "is_washer": false,
+                "is_worker": false
             }
 
        <br/>
@@ -78,6 +83,9 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.exclude(is_superuser=True)
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser, )
+    # permission_groups = {
+    #     'list': [GroupType.washer]
+    # }
 
     def perform_destroy(self, instance):
         service = UserService()
@@ -86,14 +94,6 @@ class UserViewSet(ModelViewSet):
 
 
 class AuthView(APIView):
-    """
-       Auth Resources
-       create:
-           Create a new Channel object with given json data.
-           If object successfully created, then you will get
-           status code; **201_CREATED** and created object in response body.
-
-       """
     def post(self, request):
         serializer = AuthFirstStepSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
