@@ -1,5 +1,6 @@
 from uuid import uuid4
 from django.contrib.auth.models import Group
+from django.db.transaction import atomic
 from rest_framework_jwt.settings import api_settings as jwt_settings
 
 from users.models import User
@@ -23,6 +24,7 @@ class UserService:
         # TODO: update last login
         return jwt_encode_handler(payload)
 
+    @atomic
     def create_user(self, phone_number, group_type=GroupType.customer,
                     first_name=None, last_name=None):
         """
@@ -43,8 +45,9 @@ class UserService:
         except Group.DoesNotExist:
             raise UserGroupTypeInvalidException
         user.groups.add(group)
+        token = self.create_token(user)
 
-        return user
+        return user, token
 
     def deactivate_user(self, user):
         user.is_active = False
