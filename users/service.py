@@ -1,5 +1,5 @@
 from uuid import uuid4
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, update_last_login
 from django.db.transaction import atomic
 from django.db import IntegrityError
 from rest_framework_jwt.settings import api_settings as jwt_settings
@@ -20,7 +20,7 @@ class UserService:
         jwt_response_payload_handler = jwt_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = jwt_settings.JWT_ENCODE_HANDLER
         payload = jwt_response_payload_handler(user)
-        # TODO: update last login
+        update_last_login(User, user)
         return jwt_encode_handler(payload)
 
     @atomic
@@ -57,6 +57,11 @@ class UserService:
         return user, token
 
     def _crete_profile(self, user, group):
+        """
+        :param user: User
+        :param group: Group
+        :return: Profile, None
+        """
         groups = {
             'customer': CustomerProfile,
             'washer': WasherProfile,
@@ -71,6 +76,19 @@ class UserService:
         return profile
 
     def deactivate_user(self, user):
+        """
+        :param user: User
+        :return: User
+        """
         user.is_active = False
+        user.save()
+        return user
+
+    def activate_user(self, user):
+        """
+        :param user: User
+        :return: User
+        """
+        user.is_active = True
         user.save()
         return user
