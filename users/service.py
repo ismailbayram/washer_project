@@ -46,11 +46,6 @@ class UserService:
                                    last_name=last_name,
                                    username=username)
         user.set_unusable_password()
-        try:
-            group = Group.objects.get(name=group_type.value)
-        except Group.DoesNotExist:
-            raise UserGroupTypeInvalidException
-        user.groups.add(group)
 
         try:
             group = Group.objects.get(name=group_type.value)
