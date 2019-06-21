@@ -1,0 +1,33 @@
+from rest_framework import serializers
+
+from address.models import Country, City, Township, Address
+
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ('pk', 'name', )
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ('pk', 'name', 'country')
+
+
+class TownshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Township
+        fields = ('pk', 'name', 'city')
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    country = CountrySerializer()
+    city = CitySerializer()
+    township = TownshipSerializer()
+    line = serializers.CharField(min_length=10)
+
+    class Meta:
+        model = Address
+        # TODO: add store
+        fields = ('pk', 'country', 'city', 'township', 'line', 'postcode', )
