@@ -15,7 +15,7 @@ class CarView(viewsets.ModelViewSet):
     }
 
     serializer_class = CarSerializer
-    queryset = Car.objects.all()
+    queryset = Car.objects.filter(is_active==True)
 
     def get_queryset(self):
         return self.queryset.filter(customer_profile=self.request.user.customerprofile)

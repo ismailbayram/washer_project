@@ -11,3 +11,4 @@ class Car(models.Model):
     car_type = EnumField(CarType)
     customer_profile = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE,
                                          related_name='cars')
+    is_active = models.BooleanField(default=True)
