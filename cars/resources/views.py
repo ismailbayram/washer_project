@@ -10,7 +10,6 @@ class CarView(viewsets.ModelViewSet):
     permission_classes = (permissions.HasGroupPermission,)
 
     permission_groups = {
-        'list': [GroupType.customer, GroupType.washer, GroupType.worker],
         'post':[GroupType.customer],
     }
 
