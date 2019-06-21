@@ -8,3 +8,8 @@ class UserDoesNotExistException(ProjectBaseException):
 
 class UserGroupTypeInvalidException(ProjectBaseException):
     code = codes.users_100_1
+
+
+class UserAlreadyExistException(ProjectBaseException):
+    code = codes.users_100_2
+
