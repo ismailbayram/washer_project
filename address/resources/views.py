@@ -6,7 +6,7 @@ from address.resources.serializers import (CountrySerializer,
                                            CitySerializer,
                                            TownshipSerializer,
                                            AddressSerializer)
-from address.filters import CityFilterSet
+from address.filters import CityFilterSet, TownshipFilterSet
 
 
 class CountryViewSet(viewsets.ModelViewSet):
@@ -35,6 +35,7 @@ class CityViewSet(viewsets.ModelViewSet):
 class TownshipViewSet(viewsets.ModelViewSet):
     queryset = Township.objects.filter(is_active=True).order_by('name')
     serializer_class = TownshipSerializer
+    filter_class = TownshipFilterSet
     permission_classes = (HasGroupPermission, )
     permission_groups = {
         'create': [],
