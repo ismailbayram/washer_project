@@ -6,7 +6,7 @@ class CarType(Enum):
     hatchback = 'hatchback'
     sedan = 'sedan'
     suv = 'suv'
-    ticari = 'ticari'
+    commercial = 'commercial'
     minibus = 'minibus'
 
     class Labels:
@@ -14,5 +14,5 @@ class CarType(Enum):
         hatchback = 'Hatchback'
         sedan = 'Sedan'
         suv = 'Suv'
-        ticari = 'Ticari'
+        commercial = 'Commercial'
         minibus = 'Minibus'
