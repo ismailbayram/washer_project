@@ -5,8 +5,10 @@ from enumfields import EnumField
 from users.models import CustomerProfile
 from cars.enums import CarType
 
+from base.models import StarterModel
 
-class Car(models.Model):
+
+class Car(StarterModel):
     licence_plate = models.CharField(max_length=9)
     car_type = EnumField(CarType)
     customer_profile = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE,
