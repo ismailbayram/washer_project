@@ -78,8 +78,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.WasherPageNumberPagination',
     'ORDERING_PARAM': 'sort',
-    'PAGINATE_BY': 10,
-    'PAGE_SIZE': 10,
+    'PAGINATE_BY': 20,
+    'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
