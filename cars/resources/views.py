@@ -17,7 +17,7 @@ class CarView(viewsets.ModelViewSet):
     queryset = Car.objects.filter(is_active=True)
 
     def get_queryset(self):
-        return self.queryset.filter(customer_profile=self.request.user.customerprofile)
+        return self.request.user.customer_profile.customer_profile.all()
 
     def perform_create(self, serializer):
         serializer.save(
