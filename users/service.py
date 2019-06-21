@@ -1,5 +1,4 @@
 from uuid import uuid4
-
 from django.contrib.auth.models import Group, update_last_login
 from django.db.transaction import atomic
 from django.db import IntegrityError
