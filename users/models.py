@@ -3,6 +3,7 @@ from django.utils.functional import cached_property
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ObjectDoesNotExist
 
+from base.models import StarterModel
 from users.enums import GroupType
 
 
@@ -35,21 +36,21 @@ class User(AbstractUser):
         return self.groups.filter(name=GroupType.worker.value).exists()
 
 
-class CustomerProfile(models.Model):
+class CustomerProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='customer_profile')
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
 
-class WasherProfile(models.Model):
+class WasherProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='washer_profile')
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
 
-class WorkerProfile(models.Model):
+class WorkerProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='worker_profile')
 
     def __str__(self):
