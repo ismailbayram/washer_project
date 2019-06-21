@@ -80,7 +80,7 @@ class UserViewSet(ModelViewSet):
            status code; **204_NO_CONTENT**.
 
        """
-    queryset = User.objects.exclude(is_superuser=True)
+    queryset = User.objects.exclude(is_superuser=True).prefetch_related('groups').all()
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser, )
     # permission_groups = {
