@@ -10,7 +10,7 @@ class CarView(viewsets.ModelViewSet):
     permission_classes = (permissions.HasGroupPermission,)
 
     permission_groups = {
-        'post':[GroupType.customer],
+        'create':[GroupType.customer],
     }
 
     serializer_class = CarSerializer
