@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework.reverse import reverse_lazy
 from rest_framework import status
 
-from address.models import Country
+from address.models import (Country, City, Township)
 from base.test import BaseTestMixin
 
 
@@ -116,4 +116,115 @@ class CountryViewSetTest(BaseLocationTestCase, BaseTestMixin):
         response = self.client.delete(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         country = Country.objects.get(pk=self.country.pk)
+        self.assertFalse(country.is_active)
+
+
+class CityViewSetTest(BaseLocationTestCase, BaseTestMixin):
+    def setUp(self):
+        super().setUp()
+        self.init_users()
+
+    def test_list_action(self):
+        url = reverse_lazy('api:router:cities-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        jresponse = json.loads(response.content)
+        self.assertEqual(jresponse['count'], 2)
+        self.assertEqual(jresponse['results'][0]['pk'], self.city.pk)
+        self.assertEqual(jresponse['results'][0]['name'], self.city.name)
+
+        url = f'{url}?country={self.country.pk}'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresponse = json.loads(response.content)
+        self.assertEqual(jresponse['count'], 1)
+        self.assertEqual(jresponse['results'][0]['pk'], self.city.pk)
+        self.assertEqual(jresponse['results'][0]['name'], self.city.name)
+
+    def test_retrieve_action(self):
+        url = reverse_lazy('api:router:cities-detail', args=[self.city.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        jresponse = json.loads(response.content)
+        self.assertEqual(jresponse['pk'], self.city.pk)
+        self.assertEqual(jresponse['name'], self.city.name)
+
+    def test_create_action(self):
+        url = reverse_lazy('api:router:cities-list')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        data = {
+            'name': 'Balikesir',
+            'country': self.country.pk
+        }
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.superuser_token}'}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        jresp = json.loads(response.content)
+        country = City.objects.get(name=data['name'])
+        self.assertEqual(jresp['pk'], country.pk)
+
+    def test_update_action(self):
+        url = reverse_lazy('api:router:cities-detail', args=[self.city.pk])
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        data = {
+            'name': 'Balikesir ili'
+        }
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.patch(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        response = self.client.patch(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.patch(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.superuser_token}'}
+        response = self.client.patch(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresp = json.loads(response.content)
+        country = City.objects.get(name=data['name'])
+        self.assertEqual(jresp['pk'], country.pk)
+
+    def test_destroy_action(self):
+        url = reverse_lazy('api:router:cities-detail', args=[self.city.pk])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.delete(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        response = self.client.delete(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.delete(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.superuser_token}'}
+        response = self.client.delete(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        country = City.objects.get(pk=self.city.pk)
         self.assertFalse(country.is_active)

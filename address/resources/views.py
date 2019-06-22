@@ -16,6 +16,7 @@ class CountryViewSet(viewsets.ModelViewSet):
     permission_groups = {
         'create': [],
         'update': [],
+        'partial_update': [],
         'destroy': []
     }
 
@@ -33,6 +34,7 @@ class CityViewSet(viewsets.ModelViewSet):
     permission_groups = {
         'create': [],
         'update': [],
+        'partial_update': [],
         'destroy': []
     }
 
@@ -50,6 +52,7 @@ class TownshipViewSet(viewsets.ModelViewSet):
     permission_groups = {
         'create': [],
         'update': [],
+        'partial_update': [],
         'destroy': []
     }
 
