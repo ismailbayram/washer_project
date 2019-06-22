@@ -13,14 +13,14 @@ router = DefaultRouter()
 router.register('users', UserViewSet, 'users')
 
 # addresses
-router.register('countries', CountryViewSet, 'countries')
-router.register('cities', CityViewSet, 'cities')
-router.register('townships', TownshipViewSet, 'townships')
+router.register('countries', CountryViewSet, base_name='countries')
+router.register('cities', CityViewSet, base_name='cities')
+router.register('townships', TownshipViewSet, base_name='townships')
 
 app_name = 'api'
 
 urlpatterns = [
-    path('', include((router.urls, 'api'), namespace='api')),
+    path('', include((router.urls, 'api'), namespace='router')),
     path('auth/', AuthView.as_view()),
     path('docs/', schema_view),
 ]

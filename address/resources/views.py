@@ -16,8 +16,13 @@ class CountryViewSet(viewsets.ModelViewSet):
     permission_groups = {
         'create': [],
         'update': [],
-        'delete': []
+        'destroy': []
     }
+
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()
+        return instance
 
 
 class CityViewSet(viewsets.ModelViewSet):
@@ -28,8 +33,13 @@ class CityViewSet(viewsets.ModelViewSet):
     permission_groups = {
         'create': [],
         'update': [],
-        'delete': []
+        'destroy': []
     }
+
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()
+        return instance
 
 
 class TownshipViewSet(viewsets.ModelViewSet):
@@ -40,7 +50,12 @@ class TownshipViewSet(viewsets.ModelViewSet):
     permission_groups = {
         'create': [],
         'update': [],
-        'delete': []
+        'destroy': []
     }
+
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()
+        return instance
 
 # TODO: AddressViewSet
