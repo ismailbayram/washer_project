@@ -24,8 +24,4 @@ class CarView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         servis = CarService()
         data = serializer.validated_data
-        servis.create_car(
-            licence_plate=data.get('licence_plate'),
-            car_type= data.get('licence_plate'),
-            customer_profile= data.get('customer_profile'),
-        )
+        servis.create_car(**data)
