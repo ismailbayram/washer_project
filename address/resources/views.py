@@ -1,12 +1,13 @@
 from rest_framework import viewsets
 from api.permissions import HasGroupPermission
 
-from address.models import Country, City, Township, Address
+from address.models import Country, City, Township
 from address.resources.serializers import (CountrySerializer,
                                            CitySerializer,
-                                           TownshipSerializer,
-                                           AddressSerializer)
+                                           TownshipSerializer)
 from address.filters import CityFilterSet, TownshipFilterSet
+from address.service import (CountryService, CityService,
+                             TownshipService)
 
 
 class CountryViewSet(viewsets.ModelViewSet):
@@ -21,8 +22,8 @@ class CountryViewSet(viewsets.ModelViewSet):
     }
 
     def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
+        service = CountryService()
+        instance = service.deactive_country(instance)
         return instance
 
 
@@ -39,8 +40,8 @@ class CityViewSet(viewsets.ModelViewSet):
     }
 
     def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
+        service = CityService()
+        instance = service.deactive_city(instance)
         return instance
 
 
@@ -57,6 +58,6 @@ class TownshipViewSet(viewsets.ModelViewSet):
     }
 
     def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
+        service = TownshipService()
+        instance = service.deactive_township(instance)
         return instance
