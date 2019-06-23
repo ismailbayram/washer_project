@@ -21,6 +21,7 @@ router.register('users', UserViewSet, 'users')
 router.register('countries', CountryViewSet, base_name='countries')
 router.register('cities', CityViewSet, base_name='cities')
 router.register('townships', TownshipViewSet, base_name='townships')
+router.register('cars', CarView, base_name='cars')
 
 # stores
 router.register('stores', StoreViewSet, base_name='my_stores')
