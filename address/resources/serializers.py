@@ -29,5 +29,4 @@ class AddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Address
-        # TODO: add store
         fields = ('pk', 'country', 'city', 'township', 'line', 'postcode', )

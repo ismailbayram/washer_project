@@ -60,5 +60,3 @@ class TownshipViewSet(viewsets.ModelViewSet):
         instance.is_active = False
         instance.save()
         return instance
-
-# TODO: AddressViewSet

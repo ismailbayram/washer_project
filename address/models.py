@@ -33,7 +33,6 @@ class Township(AbstractLocation):
 
 
 class Address(StarterModel):
-    # TODO: store =..
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
     township = models.ForeignKey(Township, on_delete=models.SET_NULL, null=True)
