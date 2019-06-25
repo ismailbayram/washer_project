@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from api.permissions import HasGroupPermission, IsOwnerOrReadOnlyPermission
 from api.views import MultiSerializerViewMixin
 from users.enums import GroupType
-from stores.resources.serializers import StoreSerializer, StoreDetailedSerializer
+from stores.resources.serializers import (StoreSerializer,
+                                          StoreDetailedSerializer)
 from stores.models import Store
 from stores.service import StoreService
 
@@ -72,10 +73,8 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
         return Response({}, status=status.HTTP_200_OK)
 
 
-class StoreListView(views.APIView):
-    def get(self):
-        # TODO: ElasticSearch
-        queryset = Store.objects.filter(is_active=True, is_approved=True) \
-            .select_related('address', 'address__city',
-                            'address__township')
-        pass
+class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Store.objects.filter(is_active=True, is_approved=True)\
+                            .select_related('address')
+    # TODO: compare select_related address and other address fields
+    serializer_class = StoreDetailedSerializer

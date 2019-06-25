@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 from users.resources.views import (UserViewSet, AuthView)
 from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
-from stores.resources.views import StoreViewSet
+from stores.resources.views import StoreViewSet, StoreListViewSet
 
 from api.views import get_swagger_view
 schema_view = get_swagger_view(title='Washer Project API')
@@ -19,7 +19,8 @@ router.register('cities', CityViewSet, base_name='cities')
 router.register('townships', TownshipViewSet, base_name='townships')
 
 # stores
-router.register('stores', StoreViewSet, base_name='stores')
+router.register('stores', StoreViewSet, base_name='my_stores')
+router.register('stores_list', StoreListViewSet, base_name='stores')
 
 app_name = 'api'
 

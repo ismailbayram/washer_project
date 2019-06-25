@@ -2,8 +2,8 @@ from stores.models import Store
 
 
 class StoreService():
-    def create_store(self, name, washer_profile, phone_number, tax_office, tax_number,
-                     latitude=None, longitude=None):
+    def create_store(self, name, washer_profile, phone_number, tax_office,
+                     tax_number, latitude=None, longitude=None):
         store = Store.objects.create(name=name, washer_profile=washer_profile,
                                      phone_number=phone_number, tax_office=tax_office,
                                      tax_number=tax_number, latitude=latitude, longitude=longitude)
