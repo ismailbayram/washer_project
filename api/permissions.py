@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
 class IsAuthenticatedAndActivated(BasePermission):
@@ -10,7 +10,7 @@ class IsAuthenticatedAndActivated(BasePermission):
 
 class HasGroupPermission(BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_superuser:
+        if request.user.is_staff:
             return True
         required_groups = view.permission_groups.get(view.action, None)
         if required_groups is None:  # if ..{ action: [] } => only superusers
@@ -19,3 +19,13 @@ class HasGroupPermission(BasePermission):
 
     def _is_in_group(self, user, group_name):
         return user.groups.filter(name=group_name).exists()
+
+
+class IsOwnerOrReadOnlyPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        if (request.user.is_authenticated and request.user.washer_profile == obj.washer_profile) or \
+                request.user.is_staff:
+            return True
+        return False

@@ -2,7 +2,7 @@ from rest_framework import viewsets, views, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.permissions import HasGroupPermission
+from api.permissions import HasGroupPermission, IsOwnerOrReadOnlyPermission
 from api.views import MultiSerializerViewMixin
 from users.enums import GroupType
 from stores.resources.serializers import StoreSerializer, StoreDetailedSerializer
@@ -19,7 +19,7 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
         'retrieve': StoreDetailedSerializer,
         'list': StoreDetailedSerializer,
     }
-    permission_classes = (HasGroupPermission, )
+    permission_classes = (HasGroupPermission, IsOwnerOrReadOnlyPermission, )
     permission_groups = {
         'create': [GroupType.washer],
         'update': [GroupType.washer],
@@ -70,8 +70,6 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
         instance = self.get_object()
         service.deactivate_store(instance)
         return Response({}, status=status.HTTP_200_OK)
-
-    # TODO: add checking object permission
 
 
 class StoreListView(views.APIView):
