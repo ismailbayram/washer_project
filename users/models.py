@@ -24,16 +24,20 @@ class User(AbstractUser):
         return f'{self.first_name} {self.last_name[0]}.'
 
     @cached_property
+    def user_groups(self):
+        return self.groups.all().values_list('name', flat=True)
+
+    @property
     def is_customer(self):
-        return self.groups.filter(name=GroupType.customer.value).exists()
+        return GroupType.customer.value in self.user_groups
 
-    @cached_property
+    @property
     def is_washer(self):
-        return self.groups.filter(name=GroupType.washer.value).exists()
+        return GroupType.washer.value in self.user_groups
 
-    @cached_property
+    @property
     def is_worker(self):
-        return self.groups.filter(name=GroupType.worker.value).exists()
+        return GroupType.worker.value in self.user_groups
 
 
 class CustomerProfile(StarterModel):
@@ -57,3 +61,4 @@ class WorkerProfile(StarterModel):
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
+# TODO: add SmsMessageModel: [user, is_expired, expire_datetime, code]

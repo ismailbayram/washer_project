@@ -6,8 +6,8 @@ from base.models import StarterModel
 
 class Store(StarterModel):
     name = models.CharField(max_length=128)
-    washer = models.ForeignKey('users.WasherProfile', on_delete=models.PROTECT, null=True)
-    address = models.OneToOneField('address.Address', on_delete=models.SET_NULL, null=True)
+    washer_profile = models.ForeignKey('users.WasherProfile', on_delete=models.PROTECT, null=True)
+    address = models.OneToOneField('address.Address', on_delete=models.SET_NULL, null=True, blank=True)
     phone_number = models.CharField(max_length=32)
     tax_office = models.CharField(max_length=128)
     tax_number = models.CharField(max_length=128)
@@ -17,3 +17,6 @@ class Store(StarterModel):
     longitude = models.FloatField(default=None)
     latitude = models.FloatField(default=None)
     rating = models.FloatField(default=None, null=True)
+
+    def __str__(self):
+        return f'{self.name}'

@@ -51,7 +51,6 @@ class UserService:
         except Group.DoesNotExist:
             raise UserGroupTypeInvalidException
 
-        user.groups.add(group)
         self._crete_profile(user, group)
         token = self._create_token(user)
         return user, token
@@ -68,8 +67,10 @@ class UserService:
             'worker': WorkerProfile
         }
         try:
+            user.groups.add(group)
             profile = groups[group.name].objects.create(user=user)
         except KeyError:
+            #TODO: log here
             return None
         except IntegrityError:
             return getattr(user, '{}_profile'.format(group.name))
