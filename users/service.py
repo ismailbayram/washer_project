@@ -31,7 +31,7 @@ class UserService:
         :param group_type: GroupType
         :param first_name: str
         :param last_name: str
-        :return: User
+        :return: user: User, token: str
         """
         username = str(uuid4())
         try:
