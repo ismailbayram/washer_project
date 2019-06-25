@@ -1,0 +1,19 @@
+from django.db import models
+from django.contrib.postgres.fields import JSONField
+
+from base.models import StarterModel
+
+
+class Store(StarterModel):
+    name = models.CharField(max_length=128)
+    washer = models.ForeignKey('users.WasherProfile', on_delete=models.PROTECT, null=True)
+    address = models.OneToOneField('address.Address', on_delete=models.SET_NULL, null=True)
+    phone_number = models.CharField(max_length=32)
+    tax_office = models.CharField(max_length=128)
+    tax_number = models.CharField(max_length=128)
+    is_approved = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    config = JSONField(default=dict)  # open hours and open reservations
+    longitude = models.FloatField(default=None)
+    latitude = models.FloatField(default=None)
+    rating = models.FloatField(default=None, null=True)

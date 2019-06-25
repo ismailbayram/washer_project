@@ -52,6 +52,7 @@ class WasherProfile(StarterModel):
 
 class WorkerProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='worker_profile')
+    store = models.ForeignKey('stores.Store', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f'{self.user.get_full_name()}'

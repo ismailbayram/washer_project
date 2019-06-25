@@ -8,11 +8,6 @@ class IsAuthenticatedAndActivated(BasePermission):
                     and request.user.is_active)
 
 
-class IsAdminUser(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_superuser
-
-
 class HasGroupPermission(BasePermission):
     def has_permission(self, request, view):
         if request.user.is_superuser:
