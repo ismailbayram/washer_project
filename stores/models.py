@@ -16,7 +16,8 @@ class Store(StarterModel):
     config = JSONField(default=dict)  # open hours and open reservations
     latitude = models.FloatField(default=None, null=True)
     longitude = models.FloatField(default=None, null=True)
-    rating = models.FloatField(default=None, null=True)  # limit decimal section
+    rating = models.FloatField(default=None, null=True)
+    # TODO: add manager for geohash algorithm
 
     def __str__(self):
         return f'{self.name}'

@@ -10,24 +10,6 @@ class StoreService():
 
         return store
 
-    def deactivate_store(self, instance):
-        """
-        :param instance: Store
-        :return: Store
-        """
-        instance.is_active = False
-        instance.save(update_fields=['is_active'])
-        return instance
-
-    def activate_store(self, instance):
-        """
-        :param instance: Store
-        :return: Store
-        """
-        instance.is_active = True
-        instance.save(update_fields=['is_active'])
-        return instance
-
     def approve_store(self, instance):
         """
         :param instance: Store
@@ -47,3 +29,5 @@ class StoreService():
         instance.is_approved = False
         instance.save(update_fields=['is_approved'])
         return instance
+
+    # TODO: config
