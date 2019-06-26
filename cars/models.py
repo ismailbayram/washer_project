@@ -14,3 +14,6 @@ class Car(StarterModel):
     customer_profile = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE,
                                          related_name='cars')
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('licence_plate', 'customer_profile')
