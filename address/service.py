@@ -44,27 +44,3 @@ class AddressService:
                                          postcode=postcode)
 
         return address
-
-    def update_address(self, instance, country, city, township,
-                       line, postcode=None):
-        """
-        :param country: Country
-        :param city: City
-        :param township: Township
-        :param postcode: str
-        :param line: str
-        :return: Address
-        """
-        if not city.country == country:
-            raise CityNotValidException(params=(city, country))
-
-        if not township.city == city:
-            raise TownshipNotValidException(params=(township, city))
-
-        instance.country = country
-        instance.city = city
-        instance.township = township
-        instance.line = line
-        instance.postcode = postcode
-
-        return instance

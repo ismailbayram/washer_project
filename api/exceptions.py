@@ -30,7 +30,7 @@ class ProjectBaseException(Exception):
 
 
 def _custom_exception_handler(exc, context):
-    # logger.exception(exc)
+    # TODO: logger.exception(exc)
     if isinstance(exc, ProjectBaseException):
         msg = exc.message
         data = {"non_field_errors": [msg],

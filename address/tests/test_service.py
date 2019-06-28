@@ -44,29 +44,3 @@ class AddressServiceTest(BaseLocationTestCase):
         self.assertEqual(address.township, data['township'])
         self.assertEqual(address.line, data['line'])
         self.assertEqual(address.postcode, data['postcode'])
-
-    def test_update_address(self):
-        data = {
-            'country': self.country2,
-            'city': self.city,
-            'township': self.township,
-            'line': 'Arka Sokak, Nu:1',
-            'postcode': '34220'
-        }
-
-        with self.assertRaises(CityNotValidException):
-            self.service.update_address(self.address, **data)
-
-        data.update({'city': self.city2})
-
-        with self.assertRaises(TownshipNotValidException):
-            self.service.update_address(self.address, **data)
-
-        data.update({'township': self.township2})
-        self.service.update_address(self.address, data)
-        self.address.refresh_from_db()
-        self.assertEqual(self.address.country, data['country'])
-        self.assertEqual(self.address.city, data['city'])
-        self.assertEqual(self.address.township, data['township'])
-        self.assertEqual(self.address.line, data['line'])
-        self.assertEqual(self.address.postcode, data['postcode'])

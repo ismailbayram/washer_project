@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api.permissions import HasGroupPermission
+from address.service import AddressService
+from address.resources.serializers import AddressSerializer
 from users.enums import GroupType
 from stores.resources.serializers import StoreSerializer
 from stores.models import Store
@@ -53,9 +55,18 @@ class StoreViewSet(viewsets.GenericViewSet,
         service.decline_store(instance)
         return Response({}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['POST', 'PUT'])
+    @action(detail=True, methods=['POST'])
     def address(self, request, *args, **kwargs):
-        pass
+        service = AddressService()
+        store = self.get_object()
+        if store.address:
+            store.address.delete()
+        serializer = AddressSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        address = service.create_address(**serializer.validated_data)
+        store.address = address
+        store.save(update_fields=['address'])
+        return Response({}, status=status.HTTP_200_OK)
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
