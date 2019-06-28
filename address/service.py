@@ -24,7 +24,6 @@ class TownshipService:
 
 
 class AddressService:
-    # TODO: AddressService test
     def create_address(self, country, city, township, line, postcode=None):
         """
         :param country: Country
