@@ -53,9 +53,14 @@ class StoreViewSet(viewsets.GenericViewSet,
         service.decline_store(instance)
         return Response({}, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['POST', 'PUT'])
+    def address(self, request, *args, **kwargs):
+        pass
+
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Store.objects.filter(is_active=True, is_approved=True)\
                             .select_related('address')
     # TODO: compare select_related address and other address fields
+    # TODO: connect with google maps
     serializer_class = StoreSerializer

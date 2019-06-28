@@ -1,7 +1,7 @@
 from stores.models import Store
 
 
-class StoreService():
+class StoreService:
     def create_store(self, name, washer_profile, phone_number, tax_office,
                      tax_number, latitude=None, longitude=None):
         store = Store.objects.create(name=name, washer_profile=washer_profile,
@@ -9,7 +9,7 @@ class StoreService():
                                      tax_number=tax_number, latitude=latitude, longitude=longitude)
 
         return store
-
+    # TODO: update_store check location and address changes
     def approve_store(self, instance):
         """
         :param instance: Store

@@ -15,7 +15,7 @@ class AbstractLocation(StarterModel):
 
 
 class Country(AbstractLocation):
-    pass
+    code = models.CharField(max_length=3, unique=True)
 
 
 class City(AbstractLocation):

@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from address.resources.serializers import AddressSerializer
+from address.resources.serializers import AddressDetailedSerializer
 from stores.models import Store
 
 
 class StoreSerializer(serializers.ModelSerializer):
-    address = AddressSerializer(read_only=True)
+    address = AddressDetailedSerializer(read_only=True)
     rating = serializers.ReadOnlyField()
     is_approved = serializers.ReadOnlyField()
     washer_profile = serializers.PrimaryKeyRelatedField(read_only=True)

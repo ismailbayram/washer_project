@@ -13,7 +13,7 @@ class HasGroupPermission(BasePermission):
         if request.user.is_staff:
             return True
         required_groups = view.permission_groups.get(view.action, None)
-        if required_groups is None:  # if ..{ action: [] } => only superusers
+        if required_groups is None:  # if ..{ action: [] } => only staffs
             return True
         return any([self._is_in_group(request.user, group.value) for group in required_groups])
 

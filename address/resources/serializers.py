@@ -22,11 +22,16 @@ class TownshipSerializer(serializers.ModelSerializer):
 
 
 class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ('pk', 'country', 'city', 'township', 'line', 'postcode',)
+
+
+class AddressDetailedSerializer(AddressSerializer):
     country = CountrySerializer()
     city = CitySerializer()
     township = TownshipSerializer()
     line = serializers.CharField(min_length=10)
 
-    class Meta:
-        model = Address
-        fields = ('pk', 'country', 'city', 'township', 'line', 'postcode', )
+    class Meta(AddressSerializer.Meta):
+        pass
