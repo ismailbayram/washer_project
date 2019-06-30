@@ -21,7 +21,7 @@ class StoreViewSet(viewsets.GenericViewSet,
         'create': [GroupType.washer],
         'update': [GroupType.washer],
         'list': [GroupType.washer],
-        'partial_update': [GroupType.washer],
+        'partial_update': [],
         'deactivate': [GroupType.washer],
         'activate': [GroupType.washer],
         'retrieve': [GroupType.washer],
@@ -33,6 +33,12 @@ class StoreViewSet(viewsets.GenericViewSet,
         service = StoreService()
         instance = service.create_store(washer_profile=self.request.user.washer_profile,
                                         **serializer.validated_data)
+        return instance
+
+    def perform_update(self, serializer):
+        service = StoreService()
+        store = self.get_object()
+        instance = service.update_store(store, **serializer.validated_data)
         return instance
 
     def list(self, request, *args, **kwargs):
@@ -59,14 +65,10 @@ class StoreViewSet(viewsets.GenericViewSet,
     def address(self, request, *args, **kwargs):
         service = AddressService()
         store = self.get_object()
-        if store.address:
-            store.address.delete()
         serializer = AddressSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        address = service.create_address(**serializer.validated_data)
-        store.address = address
-        store.save(update_fields=['address'])
-        return Response({}, status=status.HTTP_200_OK)
+        service.create_address(store, **serializer.validated_data)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):

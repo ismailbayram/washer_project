@@ -6,7 +6,7 @@ from base.models import StarterModel
 
 class Store(StarterModel):
     name = models.CharField(max_length=128)
-    washer_profile = models.ForeignKey('users.WasherProfile', on_delete=models.PROTECT, null=True)
+    washer_profile = models.ForeignKey('users.WasherProfile', on_delete=models.PROTECT)
     address = models.OneToOneField('address.Address', on_delete=models.SET_NULL, null=True, blank=True)
     phone_number = models.CharField(max_length=32)
     tax_office = models.CharField(max_length=128)

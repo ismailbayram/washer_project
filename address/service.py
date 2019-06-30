@@ -1,3 +1,5 @@
+from django.db.transaction import atomic
+
 from address.models import Address
 from address.exceptions import CityNotValidException, TownshipNotValidException
 
@@ -24,8 +26,10 @@ class TownshipService:
 
 
 class AddressService:
-    def create_address(self, country, city, township, line, postcode=None):
+    @atomic
+    def create_address(self, store, country, city, township, line, postcode=None):
         """
+        :param store: Store
         :param country: Country
         :param city: City
         :param township: Township
@@ -42,5 +46,12 @@ class AddressService:
         address = Address.objects.create(country=country, city=city,
                                          township=township, line=line,
                                          postcode=postcode)
+
+        if store.address:
+            store.address.delete()
+
+        store.address = address
+        store.is_approved = False
+        store.save(update_fields=['address', 'is_approved'])
 
         return address

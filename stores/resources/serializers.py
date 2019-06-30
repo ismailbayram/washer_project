@@ -8,16 +8,20 @@ from stores.models import Store
 
 
 class DaySerializer(serializers.Serializer):
-    start = serializers.TimeField(format="[HH:[MM]]", allow_null=True)
-    end = serializers.TimeField(format="[HH:[MM]]", allow_null=True)
+    start = serializers.TimeField(format="[HH:[MM]]", default=None, allow_null=True)
+    end = serializers.TimeField(format="[HH:[MM]]", default=None, allow_null=True)
     # TODO: test
 
     def validate(self, attrs):
-        start = attrs['start']
-        end = attrs['end']
+        start = attrs.get('start', None)
+        end = attrs.get('end', None)
 
         if (start and not end) or (not start and end):
             raise ValidationError(_('Başlangıç ve bitiş saatleri verilmeli.'))
+
+        if start and end:
+            if start >= end:
+                raise ValidationError(_('Başlangıç saati bitiş saatinden önce olmalı.'))
 
         return attrs
 
@@ -31,18 +35,29 @@ class WeekSerializer(serializers.Serializer):
     saturday = DaySerializer()
     sunday = DaySerializer()
 
+    def to_representation(self, instance):
+        if not instance:
+            return {}
+        return super().to_representation(instance)
+
 
 class OpeningHoursSerializer(WeekSerializer):
     pass
 
 
 class ReservationHoursSerializer(WeekSerializer):
+    # TODO: validate through opening hours
     pass
 
 
 class ConfigSerializer(serializers.Serializer):
-    opening_hours = OpeningHoursSerializer(default={})
-    reservation_hours = ReservationHoursSerializer(default={})
+    opening_hours = OpeningHoursSerializer()
+    reservation_hours = ReservationHoursSerializer()
+
+    def to_representation(self, instance):
+        if not instance:
+            return {'opening_hours': {}, 'reservation_hours': {}}
+        return super().to_representation(instance)
 
 
 class StoreSerializer(serializers.ModelSerializer):
@@ -50,10 +65,12 @@ class StoreSerializer(serializers.ModelSerializer):
     rating = serializers.ReadOnlyField()
     is_approved = serializers.ReadOnlyField()
     washer_profile = serializers.PrimaryKeyRelatedField(read_only=True)
-    config = ConfigSerializer()
+    config = ConfigSerializer(default={}, partial=False)
 
     class Meta:
         model = Store
         fields = ('pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
                   'is_approved')
+
+# TODO: StoreDetailedSerializer -> {modified and created datetime}
