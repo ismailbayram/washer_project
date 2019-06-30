@@ -2,7 +2,7 @@ from rest_framework import viewsets, views, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.permissions import HasGroupPermission
+from api.permissions import HasGroupPermission, IsOwnerOrReadOnlyPermission
 from address.service import AddressService
 from address.resources.serializers import AddressSerializer
 from users.enums import GroupType
@@ -16,7 +16,7 @@ class StoreViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
-    permission_classes = (HasGroupPermission, )
+    permission_classes = (HasGroupPermission, IsOwnerOrReadOnlyPermission, )
     permission_groups = {
         'create': [GroupType.washer],
         'update': [GroupType.washer],
@@ -39,10 +39,11 @@ class StoreViewSet(viewsets.GenericViewSet,
         service = StoreService()
         store = self.get_object()
         instance = service.update_store(store, **serializer.validated_data)
+        # FIXME: it shows old data after updating
         return instance
 
     def list(self, request, *args, **kwargs):
-        if request.user.is_staff or request.user.is_superuser:
+        if request.user.is_staff:
             return super().list(request, *args, **kwargs)
         self.queryset = request.user.washer_profile.store_set.all()
         return super().list(request, *args, **kwargs)

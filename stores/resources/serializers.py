@@ -25,6 +25,14 @@ class DaySerializer(serializers.Serializer):
 
         return attrs
 
+    def to_internal_value(self, data):
+        value = super().to_internal_value(data)
+        if value['start']:
+            value['start'] = value['start'].strftime("%H:%M")
+        if value['end']:
+            value['end'] = value['end'].strftime("%H:%M")
+        return value
+
 
 class WeekSerializer(serializers.Serializer):
     monday = DaySerializer()

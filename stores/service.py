@@ -1,3 +1,4 @@
+from base.utils import ordereddict_to_dict
 from stores.models import Store
 
 
@@ -47,10 +48,15 @@ class StoreService:
 
         if latitude or longitude or not store.phone_number == phone_number:
             store.is_approved = False
+            update_fields.append('is_approved')
 
         if is_active:
-            update_fields.append('is_active')
             store.is_active = is_active
+            update_fields.append('is_active')
+
+        if config:
+            store.config = ordereddict_to_dict(config)
+            update_fields.append('config')
 
         store.name = name
         store.phone_number = phone_number
@@ -59,7 +65,6 @@ class StoreService:
         store.save(update_fields=update_fields)
 
         return store
-
 
     def approve_store(self, instance):
         """
