@@ -17,7 +17,7 @@ class DaySerializer(serializers.Serializer):
         end = attrs.get('end', None)
 
         if (start and not end) or (not start and end):
-            raise ValidationError(_('Başlangıç ve bitiş saatleri verilmeli.'))
+            raise ValidationError(_('Başlangıç ve bitiş saatleri birlikte verilmeli.'))
 
         if start and end:
             if start >= end:
@@ -54,7 +54,6 @@ class OpeningHoursSerializer(WeekSerializer):
 
 
 class ReservationHoursSerializer(WeekSerializer):
-    # TODO: validate through opening hours
     pass
 
 
@@ -66,6 +65,21 @@ class ConfigSerializer(serializers.Serializer):
         if not instance:
             return {'opening_hours': {}, 'reservation_hours': {}}
         return super().to_representation(instance)
+
+    def validate(self, attrs):
+        opening_hours = attrs['opening_hours']
+        reservation_hours = attrs['reservation_hours']
+        for day, hours in opening_hours.items():
+            if reservation_hours[day]["start"] is None and hours['start'] is None:
+                continue
+            if reservation_hours[day]["start"] is not None and hours['start'] is None:
+                raise ValidationError(_('Dükkanın kapalı olduğu günlerde randevu açılamaz.'))
+            if reservation_hours[day]["start"] < hours["start"]:
+                raise ValidationError(_('Randevu saatleri dükkan açılış saatinden sonra olmalı.'))
+            if reservation_hours[day]["end"] > hours["end"]:
+                raise ValidationError(_('Randevu saatleri dükkan kapanış saatinden önce olmalı.'))
+
+        return attrs
 
 
 class StoreSerializer(serializers.ModelSerializer):

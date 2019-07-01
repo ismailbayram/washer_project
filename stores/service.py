@@ -16,8 +16,9 @@ class StoreService:
         :param kwargs: dict
         :return: Store
         """
+        config = {'opening_hours': {}, 'reservation_hours': {}}
         store = Store.objects.create(name=name, washer_profile=washer_profile,
-                                     phone_number=phone_number, tax_office=tax_office,
+                                     phone_number=phone_number, tax_office=tax_office, config=config,
                                      tax_number=tax_number, latitude=latitude, longitude=longitude)
 
         return store
@@ -85,5 +86,3 @@ class StoreService:
         instance.is_approved = False
         instance.save(update_fields=['is_approved'])
         return instance
-
-    # TODO: config
