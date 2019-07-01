@@ -42,3 +42,13 @@ def get_swagger_view(title=None, url=None, patterns=None, urlconf=None):
             return Response(schema)
 
     return SwaggerSchemaView.as_view()
+
+
+class MultiSerializerViewMixin(object):
+    action_serializers = {}
+
+    def get_serializer_class(self):
+        if self.action in self.action_serializers:
+            return self.action_serializers.get(self.action, None)
+        else:
+            return super().get_serializer_class()

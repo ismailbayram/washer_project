@@ -4,10 +4,10 @@ from users.service import UserService
 from users.enums import GroupType
 
 
-class BaseTestMixin:
+class BaseTestViewMixin:
     def init_users(self):
         service = UserService()
-        self.superuser = mommy.make('users.User', is_superuser=True)
+        self.superuser = mommy.make('users.User', is_staff=True)
         self.superuser_token = service._create_token(self.superuser)
 
         data = {

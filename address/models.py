@@ -15,7 +15,7 @@ class AbstractLocation(StarterModel):
 
 
 class Country(AbstractLocation):
-    pass
+    code = models.CharField(max_length=3, unique=True)
 
 
 class City(AbstractLocation):
@@ -33,8 +33,11 @@ class Township(AbstractLocation):
 
 
 class Address(StarterModel):
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
-    township = models.ForeignKey(Township, on_delete=models.SET_NULL, null=True)
+    country = models.ForeignKey(Country, on_delete=models.PROTECT)
+    city = models.ForeignKey(City, on_delete=models.PROTECT)
+    township = models.ForeignKey(Township, on_delete=models.PROTECT)
     postcode = models.CharField(max_length=24, null=True, blank=True)
     line = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f'{self.store} - {self.store.pk}'

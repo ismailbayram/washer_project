@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse_lazy
 from rest_framework import status
 
 from address.models import (Country, City, Township)
-from base.test import BaseTestMixin
+from base.test import BaseTestViewMixin
 
 
 class BaseLocationTestCase(TestCase):
@@ -18,7 +18,7 @@ class BaseLocationTestCase(TestCase):
         self.township2 = mommy.make('address.Township', name="valhalla merkez", city=self.city2)
 
 
-class CountryViewSetTest(BaseLocationTestCase, BaseTestMixin):
+class CountryViewSetTestView(BaseLocationTestCase, BaseTestViewMixin):
     def setUp(self):
         super().setUp()
         self.init_users()
@@ -120,7 +120,7 @@ class CountryViewSetTest(BaseLocationTestCase, BaseTestMixin):
         self.assertFalse(country.is_active)
 
 
-class CityViewSetTest(BaseLocationTestCase, BaseTestMixin):
+class CityViewSetTestView(BaseLocationTestCase, BaseTestViewMixin):
     def setUp(self):
         super().setUp()
         self.init_users()
@@ -231,7 +231,7 @@ class CityViewSetTest(BaseLocationTestCase, BaseTestMixin):
         self.assertFalse(city.is_active)
 
 
-class TownshipViewSetTest(BaseLocationTestCase, BaseTestMixin):
+class TownshipViewSetTestView(BaseLocationTestCase, BaseTestViewMixin):
     def setUp(self):
         super().setUp()
         self.init_users()
