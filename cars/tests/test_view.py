@@ -8,10 +8,10 @@ from users.models import User
 from cars.models import (Car)
 from cars.enums import CarType
 from cars.service import CarService
-from base.test import BaseTestMixin
+from base.test import BaseTestViewMixin
 
 
-class CarViewSetTest(BaseTestMixin, TestCase):
+class CarViewSetTest(BaseTestViewMixin, TestCase):
     def setUp(self):
         self.init_users()
         self.car1 = mommy.make(

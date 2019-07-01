@@ -10,9 +10,6 @@ from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
 from stores.resources.views import StoreViewSet, StoreListViewSet
 
-from cars.resources.views import (CarView)
-
-
 from api.views import get_swagger_view
 schema_view = get_swagger_view(title='Washer Project API')
 
