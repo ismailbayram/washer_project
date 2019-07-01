@@ -36,3 +36,12 @@ class CarViewSet(viewsets.ModelViewSet):
         servis = CarService()
         data = serializer.validated_data
         return servis.create_car(**data, user=self.request.user)
+
+    def perform_update(self, serializer, **kwargs):
+        servis = CarService()
+        data = serializer.validated_data
+        return servis.update_car(
+            user=self.request.user,
+            car=self.get_object(),
+            **data
+        )

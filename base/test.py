@@ -19,6 +19,14 @@ class BaseTestViewMixin:
         self.customer, self.customer_token = service.create_user(**data)
 
         data = {
+            "first_name": "Customer 2",
+            "last_name": "CusLast 2",
+            "phone_number": "5551112",
+            "group_type": GroupType.customer
+        }
+        self.customer2, self.customer2_token = service.create_user(**data)
+
+        data = {
             "first_name": "Worker 1",
             "last_name": "WorkLast",
             "phone_number": "555222",

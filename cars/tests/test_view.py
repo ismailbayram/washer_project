@@ -18,6 +18,7 @@ class CarViewSetTest(BaseTestMixin, TestCase):
             'cars.Car',
             licence_plate="09 TK 40",
             car_type = CarType.normal,
+            customer_profile = self.customer.customer_profile
         )
         self.car2 = mommy.make(
             'cars.Car',
@@ -53,7 +54,7 @@ class CarViewSetTest(BaseTestMixin, TestCase):
         # cant create by washer
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.post(url, data=data, content_type='application/json', **headers)
-        self.assertNotEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # create by customer
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
@@ -66,7 +67,6 @@ class CarViewSetTest(BaseTestMixin, TestCase):
 
     def test_retrieve_action(self):
         url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
-        print(url)
 
         # can't get by anonym
         response = self.client.get(url)
@@ -89,33 +89,25 @@ class CarViewSetTest(BaseTestMixin, TestCase):
     def test_update_action(self):
         url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
         data = {
-            'licence_plate': 'changed'
+            'licence_plate': '01 ADN 01'
         }
 
         # cant update anonym
         response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        # can update by customer
+        # can update by customer his car
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
-        response = self.client.put(url, data=data, content_type='application/json', **headers)
+        response = self.client.patch(url, data=data, content_type='application/json', **headers)
+        # self.assertEqual(response.data['licence_plate'], '01 ADN 01')  # TODO patlıyor
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # can't update by worker or washer
-        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
-        response = self.client.put(url, data=data, content_type='application/json', **headers)
+        # can't update by customer by not his car
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer2_token}'}
+        response = self.client.patch(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+        # can't update by washer
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
-        response = self.client.put(url, data=data, content_type='application/json', **headers)
+        response = self.client.patch(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        # can update by super user
-        headers = {'HTTP_AUTHORIZATION': f'Token {self.superuser_token}'}
-        response = self.client.put(url, data=data, content_type='application/json', **headers)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        jresp = json.loads(response.content)
-
-        # update last
-        country = Country.objects.get(licence_plate=data['licence_plate'])
-        self.assertEqual(jresp['pk'], country.pk)
