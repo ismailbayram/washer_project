@@ -23,8 +23,7 @@ class CountryViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         service = CountryService()
-        instance = service.deactive_country(instance)
-        return instance
+        service.deactive_country(instance)
 
 
 class CityViewSet(viewsets.ModelViewSet):
@@ -41,8 +40,7 @@ class CityViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         service = CityService()
-        instance = service.deactive_city(instance)
-        return instance
+        service.deactive_city(instance)
 
 
 class TownshipViewSet(viewsets.ModelViewSet):
@@ -59,5 +57,4 @@ class TownshipViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         service = TownshipService()
-        instance = service.deactive_township(instance)
-        return instance
+        service.deactive_township(instance)

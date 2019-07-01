@@ -31,16 +31,13 @@ class StoreViewSet(viewsets.GenericViewSet,
 
     def perform_create(self, serializer):
         service = StoreService()
-        instance = service.create_store(washer_profile=self.request.user.washer_profile,
+        serializer.instance = service.create_store(washer_profile=self.request.user.washer_profile,
                                         **serializer.validated_data)
-        return instance
 
     def perform_update(self, serializer):
         service = StoreService()
         store = self.get_object()
-        instance = service.update_store(store, **serializer.validated_data)
-        # FIXME: it shows old data after updating
-        return instance
+        serializer.instance = service.update_store(store, **serializer.validated_data)
 
     def list(self, request, *args, **kwargs):
         if request.user.is_staff:

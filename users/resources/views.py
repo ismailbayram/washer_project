@@ -88,8 +88,7 @@ class UserViewSet(ModelViewSet):
 
     def perform_destroy(self, instance):
         service = UserService()
-        instance = service.deactivate_user(instance)
-        return instance
+        service.deactivate_user(instance)
 
 
 class AuthView(APIView):
