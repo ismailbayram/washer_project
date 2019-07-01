@@ -10,7 +10,6 @@ from stores.models import Store
 class DaySerializer(serializers.Serializer):
     start = serializers.TimeField(format="[HH:[MM]]", default=None, allow_null=True)
     end = serializers.TimeField(format="[HH:[MM]]", default=None, allow_null=True)
-    # TODO: test
 
     def validate(self, attrs):
         start = attrs.get('start', None)
