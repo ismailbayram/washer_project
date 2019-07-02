@@ -1,7 +1,7 @@
 import rest_framework.exceptions
 from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
-from api.permissions import HasGroupPermission
+from api.permissions import HasGroupPermission, CarIsOwnerOrReadOnlyPermission
 
 from users.enums import GroupType
 from cars.resources.serializers import CarSerializer
@@ -12,7 +12,7 @@ from cars.service import CarService
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.filter(is_active=True)
     serializer_class = CarSerializer
-    permission_classes = (HasGroupPermission, )
+    permission_classes = (HasGroupPermission, CarIsOwnerOrReadOnlyPermission)
     permission_groups = {
         'create':[GroupType.customer],
         'update': [GroupType.customer],
@@ -40,7 +40,7 @@ class CarViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer, **kwargs):
         servis = CarService()
         data = serializer.validated_data
-        return servis.update_car(
+        serializer.instance = servis.update_car(
             user=self.request.user,
             car=self.get_object(),
             **data

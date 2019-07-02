@@ -29,10 +29,6 @@ class CarService:
         :param user: User
         :return: Car
         """
-        if user.customer_profile != car.customer_profile:
-            # TODO bu permission buraya olmadı
-            raise rest_framework.exceptions.PermissionDenied
-
         if licence_plate:
             car.licence_plate = licence_plate
         if car_type:

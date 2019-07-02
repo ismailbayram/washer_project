@@ -99,7 +99,7 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         # can update by customer his car
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         response = self.client.patch(url, data=data, content_type='application/json', **headers)
-        # self.assertEqual(response.data['licence_plate'], '01 ADN 01')  # TODO patlıyor
+        self.assertEqual(response.data['licence_plate'], '01 ADN 01')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # can't update by customer by not his car
