@@ -22,8 +22,6 @@ class StoreViewSet(viewsets.GenericViewSet,
         'update': [GroupType.washer],
         'list': [GroupType.washer],
         'partial_update': [],
-        'deactivate': [GroupType.washer],
-        'activate': [GroupType.washer],
         'retrieve': [GroupType.washer],
         'approve': [],
         'decline': [],
@@ -65,8 +63,8 @@ class StoreViewSet(viewsets.GenericViewSet,
         store = self.get_object()
         serializer = AddressSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        service.create_address(store, **serializer.validated_data)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        serializer.instance = service.create_address(store, **serializer.validated_data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):

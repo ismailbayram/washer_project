@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from users.models import User
+from users.models import User, WorkerProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -11,6 +11,12 @@ class UserSerializer(serializers.ModelSerializer):
                   'phone_number', 'is_active', 'is_customer', 'is_washer',
                   'is_worker')
 
+
+# class WorkerProfileSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = WorkerProfile
+#         fields = ('pk', )
+#
 
 class AuthFirstStepSerializer(serializers.Serializer):
     phone_number = serializers.CharField()

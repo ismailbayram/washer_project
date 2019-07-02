@@ -51,7 +51,7 @@ class StoreService:
             store.is_approved = False
             update_fields.append('is_approved')
 
-        if is_active:
+        if is_active is not None:
             store.is_active = is_active
             update_fields.append('is_active')
 
