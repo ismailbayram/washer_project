@@ -3,9 +3,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from users.resources.views import (UserViewSet, AuthView)
-
 from cars.resources.views import (CarViewSet)
-
 from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
 from stores.resources.views import StoreViewSet, StoreListViewSet

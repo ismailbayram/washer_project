@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ObjectDoesNotExist
 
 from base.models import StarterModel
-
 from users.enums import GroupType
 
 
@@ -14,13 +13,11 @@ class User(AbstractUser):
     def __str__(self):
         return self.get_full_name()
 
-
     def __getattribute__(self, item):
         try:
             return super().__getattribute__(item)
         except ObjectDoesNotExist:
             return None
-
 
     @property
     def protected_name(self):

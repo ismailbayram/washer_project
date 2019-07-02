@@ -21,7 +21,6 @@ class UserService:
         jwt_encode_handler = jwt_settings.JWT_ENCODE_HANDLER
         payload = jwt_response_payload_handler(user)
         update_last_login(User, user)
-
         return jwt_encode_handler(payload)
 
     @atomic
