@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 from base.models import StarterModel
+from stores.manager import StoreManager
 
 
 class Store(StarterModel):
@@ -17,7 +18,7 @@ class Store(StarterModel):
     latitude = models.FloatField(default=None, null=True)
     longitude = models.FloatField(default=None, null=True)
     rating = models.FloatField(default=None, null=True)
-    # TODO: add manager for geohash algorithm
+    objects = StoreManager()
 
     def __str__(self):
         return f'{self.name}'

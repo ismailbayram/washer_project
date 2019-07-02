@@ -14,7 +14,7 @@ from stores.service import StoreService
 class StoreViewSet(viewsets.GenericViewSet,
                    mixins.CreateModelMixin, mixins.UpdateModelMixin,
                    mixins.ListModelMixin, mixins.RetrieveModelMixin):
-    queryset = Store.objects.all()
+    queryset = Store.objects.prefetch_stores()
     serializer_class = StoreSerializer
     permission_classes = (HasGroupPermission, IsOwnerOrReadOnlyPermission, )
     permission_groups = {
@@ -27,6 +27,12 @@ class StoreViewSet(viewsets.GenericViewSet,
         'decline': [],
     }
 
+    def list(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return super().list(request, *args, **kwargs)
+        self.queryset = request.user.washer_profile.store_set.prefetch_stores().all()
+        return super().list(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         service = StoreService()
         serializer.instance = service.create_store(washer_profile=self.request.user.washer_profile,
@@ -36,12 +42,6 @@ class StoreViewSet(viewsets.GenericViewSet,
         service = StoreService()
         store = self.get_object()
         serializer.instance = service.update_store(store, **serializer.validated_data)
-
-    def list(self, request, *args, **kwargs):
-        if request.user.is_staff:
-            return super().list(request, *args, **kwargs)
-        self.queryset = request.user.washer_profile.store_set.all()
-        return super().list(request, *args, **kwargs)
 
     @action(detail=True, methods=['POST'])
     def approve(self, request, *args, **kwargs):
