@@ -148,7 +148,7 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         response = self.client.get(url, **headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-class CarViewSetTest(BaseTestViewMixin, TestCase):
+class CarSelectViewSetTest(BaseTestViewMixin, TestCase):
     def setUp(self):
         self.init_users()
         self.car1 = mommy.make(

@@ -31,7 +31,7 @@ class CarViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         if request.user.is_staff:
             return super().list(request, *args, **kwargs)
-        self.queryset = request.user.customer_profile.cars.filter(is_active=True).order_by("id")
+        self.queryset = request.user.customer_profile.cars.filter(is_active=True).order_by("pk")
         return super().list(request, *args, **kwargs)
 
     def perform_create(self, serializer):
