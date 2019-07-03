@@ -1,14 +1,13 @@
 from uuid import uuid4
 from django.contrib.auth.models import Group, update_last_login
 from django.db.transaction import atomic
-from django.db import IntegrityError
 from rest_framework_jwt.settings import api_settings as jwt_settings
 
 from users.models import (User, CustomerProfile, WasherProfile,
                           WorkerProfile)
 from users.enums import GroupType
 from users.exceptions import (UserGroupTypeInvalidException,
-                              UserAlreadyExistException)
+                              StoreDoesNotBelongToWasherException)
 
 
 class UserService:
@@ -33,29 +32,35 @@ class UserService:
         :param last_name: str
         :return: user: User, token: str
         """
+        try:
+            group_name = GroupType(group_type).value
+        except ValueError:
+            raise UserGroupTypeInvalidException
+
         username = str(uuid4())
         try:
-            User.objects.get(phone_number=phone_number)
-            raise UserAlreadyExistException
+            user = User.objects.get(phone_number=phone_number)
+            if user.groups.filter(name=group_name).exists():
+                token = self._create_token(user)
+                return user, token
         except User.DoesNotExist:
-            pass
-
-        user = User.objects.create(phone_number=phone_number,
-                                   first_name=first_name,
-                                   last_name=last_name,
-                                   username=username)
-        user.set_unusable_password()
+            user = User.objects.create(phone_number=phone_number,
+                                       first_name=first_name,
+                                       last_name=last_name,
+                                       username=username)
+            user.set_unusable_password()
+            user.save()
 
         try:
-            group = Group.objects.get(name=group_type.value)
+            group = Group.objects.get(name=group_name)
         except Group.DoesNotExist:
             raise UserGroupTypeInvalidException
 
-        self._crete_profile(user, group)
+        self._create_profile(user, group)
         token = self._create_token(user)
         return user, token
 
-    def _crete_profile(self, user, group):
+    def _create_profile(self, user, group):
         """
         :param user: User
         :param group: Group
@@ -66,14 +71,8 @@ class UserService:
             'washer': WasherProfile,
             'worker': WorkerProfile
         }
-        try:
-            user.groups.add(group)
-            profile = groups[group.name].objects.create(user=user)
-        except KeyError:
-            #TODO: log here
-            return None
-        except IntegrityError:
-            return getattr(user, '{}_profile'.format(group.name))
+        user.groups.add(group)
+        profile = groups[group.name].objects.create(user=user)
         return profile
 
     def deactivate_user(self, user):
@@ -93,3 +92,49 @@ class UserService:
         user.is_active = True
         user.save()
         return user
+
+
+class WorkerProfileService:
+    @atomic
+    def create_worker(self, washer_profile, store, phone_number, first_name,
+                      last_name,):
+        """
+        :param washer_profile: WasherProfile
+        :param store: Store
+        :param phone_number: str
+        :param first_name: str
+        :param last_name: str
+        :return: WorkerProfile
+        """
+        if not store.washer_profile == washer_profile:
+            raise StoreDoesNotBelongToWasherException
+        user_service = UserService()
+        worker, _ = user_service.create_user(phone_number, first_name, last_name,
+                                             group_type=GroupType.worker)
+        worker_profile = worker.worker_profile
+        worker_profile.washer_profile = washer_profile
+        worker_profile.store = store
+        worker_profile.save()
+
+        return worker_profile
+
+    def fire_worker(self, worker_profile):
+        """
+        :param worker_profile: WorkerProfile
+        :return: WorkerProfile
+        """
+        worker_profile.store = None
+        worker_profile.washer_profile = None
+        worker_profile.save()
+        # NOTIFICATION
+        return worker_profile
+
+    def move_worker(self, worker_profile, store):
+        """
+        :param worker_profile: WorkerProfile
+        :return: WorkerProfile
+        """
+        worker_profile.store = store
+        worker_profile.save()
+        # NOTIFICATION
+        return worker_profile

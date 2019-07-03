@@ -72,7 +72,7 @@ class StoreService:
         :param instance: Store
         :return: Store
         """
-        # TODO: send notification
+        # NOTIFICATION
         instance.is_approved = True
         instance.save(update_fields=['is_approved'])
         return instance
@@ -82,7 +82,7 @@ class StoreService:
         :param instance: Store
         :return: Store
         """
-        # TODO: send notification
+        # NOTIFICATION
         instance.is_approved = False
         instance.save(update_fields=['is_approved'])
         return instance
