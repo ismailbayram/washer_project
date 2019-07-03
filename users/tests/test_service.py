@@ -33,10 +33,10 @@ class UserServiceTest(TestCase):
             "group_type": "invalid"
         }
         with self.assertRaises(UserGroupTypeInvalidException):
-            self.service.create_user(**data)
+            self.service.create_or_get_user(**data)
 
         data.update({"group_type": GroupType.customer})
-        user, _ = self.service.create_user(**data)
+        user, _ = self.service.create_or_get_user(**data)
 
         self.assertEqual(user.first_name, data["first_name"])
         self.assertEqual(user.last_name, data["last_name"])
@@ -51,10 +51,10 @@ class UserServiceTest(TestCase):
         self.assertIsNotNone(user.customer_profile)
         self.assertIsNone(user.worker_profile)
 
-        self.service.create_user(**data)
+        self.service.create_or_get_user(**data)
 
         data.update({"group_type": GroupType.washer})
-        user, _ = self.service.create_user(**data)
+        user, _ = self.service.create_or_get_user(**data)
         self.assertEqual(user.first_name, data["first_name"])
         self.assertEqual(user.last_name, data["last_name"])
         self.assertEqual(user.phone_number, data["phone_number"])

@@ -23,8 +23,8 @@ class UserService:
         return jwt_encode_handler(payload)
 
     @atomic
-    def create_user(self, phone_number, first_name, last_name,
-                    group_type=GroupType.customer):
+    def create_or_get_user(self, phone_number, first_name, last_name,
+                           group_type=GroupType.customer):
         """
         :param phone_number: str
         :param group_type: GroupType
@@ -106,11 +106,12 @@ class WorkerProfileService:
         :param last_name: str
         :return: WorkerProfile
         """
+        # NOTIFICATION
         if not store.washer_profile == washer_profile:
             raise StoreDoesNotBelongToWasherException
         user_service = UserService()
-        worker, _ = user_service.create_user(phone_number, first_name, last_name,
-                                             group_type=GroupType.worker)
+        worker, _ = user_service.create_or_get_user(phone_number, first_name, last_name,
+                                                    group_type=GroupType.worker)
         worker_profile = worker.worker_profile
         worker_profile.washer_profile = washer_profile
         worker_profile.store = store
