@@ -10,4 +10,4 @@ class CarSerializer(ModelSerializer):
 
     class Meta:
         model = Car
-        fields = ('pk', 'licence_plate', 'car_type')
+        fields = ('pk', 'licence_plate', 'car_type', 'is_selected')

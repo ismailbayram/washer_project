@@ -1,7 +1,7 @@
 import json
 from model_mommy import mommy
 from django.test import TestCase
-from rest_framework.reverse import reverse_lazy
+from rest_framework.reverse import reverse_lazy, reverse
 from rest_framework import status
 
 from users.models import User
@@ -147,3 +147,57 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         # after deletion we can't get
         response = self.client.get(url, **headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+class CarViewSetTest(BaseTestViewMixin, TestCase):
+    def setUp(self):
+        self.init_users()
+        self.car1 = mommy.make(
+            'cars.Car',
+            licence_plate="09 TK 00",
+            car_type = CarType.normal,
+            customer_profile = self.customer.customer_profile
+        )
+        self.car2 = mommy.make(
+            'cars.Car',
+            licence_plate="09 TK 01",
+            car_type = CarType.normal,
+            customer_profile = self.customer.customer_profile
+        )
+        self.car3 = mommy.make(
+            'cars.Car',
+            licence_plate="09 TK 02",
+            car_type = CarType.normal,
+            customer_profile = self.customer.customer_profile
+        )
+        self.car4 = mommy.make(
+            'cars.Car',
+            licence_plate="09 TK 03",
+            car_type = CarType.normal,
+            customer_profile = self.customer.customer_profile
+        )
+
+    def test_destroy_action(self):
+        # selected of 1 an 2 will false
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+
+        url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.data['is_selected'], False)
+
+        url = reverse_lazy('api:router:cars-detail', args=[self.car2.pk])
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.data['is_selected'], False)
+
+        # i will select 1 and will selected
+        url = reverse_lazy('api:car_select', args=[self.car1.pk])
+        response = self.client.get(str(url), **headers)
+        self.assertEqual(response.data['is_selected'], True)
+
+        url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.data['is_selected'], True)
+
+        # 2 have to be un selected
+        url = reverse_lazy('api:router:cars-detail', args=[self.car2.pk])
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.data['is_selected'], False)

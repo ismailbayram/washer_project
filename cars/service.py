@@ -1,4 +1,4 @@
-# from django.db.transaction import atomic
+from django.db.transaction import atomic
 import rest_framework.exceptions
 
 from cars.enums import CarType
@@ -6,7 +6,6 @@ from cars.models import Car
 
 
 class CarService:
-    # @atomic
     def create_car(self, licence_plate, car_type, user):
         """
         :param license_plate: str
@@ -41,5 +40,18 @@ class CarService:
         :param car: Car
         """
         car.is_active = False
+        car.save()
+        return car
+
+    @atomic
+    def select_car(self, car, user):
+        """
+        :param car: Car
+        :param user: User
+        """
+
+        Car.objects.filter(customer_profile = user.customer_profile).update(is_selected=False)
+
+        car.is_selected = True
         car.save()
         return car
