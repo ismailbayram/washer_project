@@ -21,12 +21,11 @@ class CarService:
         )
         return car
 
-    def update_car(self, car, licence_plate=None, car_type=None, user=None, **kwargs):
+    def update_car(self, car, licence_plate=None, car_type=None,  **kwargs):
         """
         :param car: Car
         :param license_plate: str
         :param car_type: CarType
-        :param user: User
         :return: Car
         """
         if licence_plate:
@@ -34,5 +33,13 @@ class CarService:
         if car_type:
             car.car_type = car_type
 
+        car.save()
+        return car
+
+    def disable_car(self, car):
+        """
+        :param car: Car
+        """
+        car.is_active = False
         car.save()
         return car

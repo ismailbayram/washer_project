@@ -60,6 +60,9 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         response = self.client.post(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['licence_plate'], data['licence_plate'])
+        self.assertEqual(response.data['car_type'], data['car_type'])
+
         jresponse = json.loads(response.content)
         self.assertEqual(jresponse['licence_plate'], test_licence_plate)
         self.assertEqual(jresponse['car_type'], test_car_type)
@@ -111,3 +114,35 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.patch(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_destroy_action(self):
+        url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
+
+        # cant delete by anonym
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # cant delete by not owner
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer2_token}'}
+        response = self.client.delete(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # cant delete by washer
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.delete(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # can delete by owner
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+
+        # before deletetion we can get
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # delete
+        response = self.client.delete(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # after deletion we can't get
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
