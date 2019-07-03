@@ -201,3 +201,17 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         url = reverse_lazy('api:router:cars-detail', args=[self.car2.pk])
         response = self.client.get(url, **headers)
         self.assertEqual(response.data['is_selected'], False)
+
+        # i will select 2 and will selected
+        url = reverse_lazy('api:car_select', args=[self.car2.pk])
+        response = self.client.get(str(url), **headers)
+        self.assertEqual(response.data['is_selected'], True)
+
+        url = reverse_lazy('api:router:cars-detail', args=[self.car2.pk])
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.data['is_selected'], True)
+
+        # 1 have to be un selected
+        url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.data['is_selected'], False)
