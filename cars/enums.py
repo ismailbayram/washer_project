@@ -12,5 +12,5 @@ class CarType(Enum):
     class Labels:
         normal = _('Binek Araç')
         suv = _('Suv')
-        commercial = _('Commercial')
+        commercial = _('Ticari Araç')
         minibus = _('Minibus')
