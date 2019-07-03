@@ -3,7 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from api.permissions import HasGroupPermission, CarIsOwnerOrReadOnlyPermission
+from api.permissions import HasGroupPermission, IsCustomerOrReadOnlyPermission
 
 from users.enums import GroupType
 from cars.resources.serializers import CarSerializer
@@ -14,20 +14,23 @@ from cars.service import CarService
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.filter(is_active=True)
     serializer_class = CarSerializer
-    permission_classes = (HasGroupPermission, CarIsOwnerOrReadOnlyPermission)
+    permission_classes = (HasGroupPermission, IsCustomerOrReadOnlyPermission, )
     permission_groups = {
-        'create':[GroupType.customer],
+        'create': [GroupType.customer],
         'update': [GroupType.customer],
+        'list': [GroupType.customer],
         'partial_update': [GroupType.customer],
-        'destroy': [GroupType.customer],
+        'deactivate': [GroupType.customer],
+        'activate': [GroupType.customer],
+        'retrieve': [GroupType.customer, GroupType.washer],
+        'approve': [GroupType.customer],
+        'decline': [GroupType.customer],
     }
 
     def list(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return Response({}, status.HTTP_401_UNAUTHORIZED)
         if request.user.is_staff:
             return super().list(request, *args, **kwargs)
-        self.queryset = request.user.customer_profile.cars.all().order_by("id")
+        self.queryset = request.user.customer_profile.cars.filter(is_active=True).order_by("id")
         return super().list(request, *args, **kwargs)
 
     def perform_create(self, serializer):

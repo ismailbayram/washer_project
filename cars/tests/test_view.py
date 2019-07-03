@@ -73,16 +73,17 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
 
         # can't get by anonym
         response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # get by cutomer
-        headers = {'Authorization': f'Token {self.customer_token}'}
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         response = self.client.get(url, **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         jresponse = json.loads(response.content)
         self.assertEqual(jresponse['licence_plate'], self.car1.licence_plate)
 
         # get by washer
-        headers = {'Authorization': f'Token {self.washer_token}'}
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.get(url, **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         jresponse = json.loads(response.content)
