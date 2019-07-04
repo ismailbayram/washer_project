@@ -44,13 +44,13 @@ class CarService:
         return car
 
     @atomic
-    def select_car(self, car, user):
+    def select_car(self, car, customer_profile):
         """
         :param car: Car
         :param user: User
         """
 
-        Car.objects.filter(customer_profile = user.customer_profile).update(is_selected=False)
+        Car.objects.filter(customer_profile = customer_profile).update(is_selected=False)
 
         car.is_selected = True
         car.save()

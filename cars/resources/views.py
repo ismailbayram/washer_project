@@ -59,6 +59,6 @@ class CarViewSet(viewsets.ModelViewSet):
 
         car = Car.objects.get(pk=car_pk)
         service = CarService()
-        return_car = service.select_car(car, request.user)
+        return_car = service.select_car(car, request.user.customer_profile)
         serializer = CarSerializer(return_car)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
