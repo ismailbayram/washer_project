@@ -18,9 +18,11 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         self.store3 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile)
         self.worker_profile = self.worker.worker_profile
         self.worker_profile.washer_profile = self.washer.washer_profile
+        self.worker_profile.store = self.store
         self.worker_profile.save()
         self.worker2_profile = self.worker2.worker_profile
         self.worker2_profile.washer_profile = self.washer2.washer_profile
+        self.worker2_profile.store = self.store2
         self.worker2_profile.save()
         self.worker3, _ = self.user_service.get_or_create_user(first_name='Ahmet',
                                                                last_name='Cetin',
@@ -44,6 +46,13 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         jresponse = json.loads(response.content)
         self.assertEqual(jresponse['count'], 1)
         self.assertEqual(jresponse['results'][0]['pk'], self.worker_profile.pk)
+
+        url_filtered = f'{url}?store={self.store.pk}'
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.superuser_token}'}
+        response = self.client.get(url_filtered, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresponse = json.loads(response.content)
+        self.assertEqual(jresponse['count'], 1)
 
         headers = {'HTTP_AUTHORIZATION': f'Token {self.superuser_token}'}
         response = self.client.get(url, content_type='application/json', **headers)
