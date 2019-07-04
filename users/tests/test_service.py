@@ -118,6 +118,14 @@ class WorkerProfileServiceTest(TestCase):
         self.assertEqual(worker_profile.washer_profile, self.washer2_profile)
         self.assertEqual(worker_profile.store, self.store3)
 
+        data.update({
+            "phone_number": self.washer_profile.user.phone_number,
+            "first_name": self.washer_profile.user.first_name,
+            "last_name": self.washer_profile.user.last_name,
+        })
+        with self.assertRaises(WorkerDoesNotBelongToWasherException):
+            self.service.create_worker(**data)
+
         data = {
             "washer_profile": self.washer2_profile,
             "store": self.store3,

@@ -7,6 +7,7 @@ class StarterModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ['-created_date']
 
     def save(self, *args, **kwargs):
         update_fields = kwargs.get('update_fields', None)

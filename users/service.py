@@ -67,13 +67,13 @@ class UserService:
         :param group: Group
         :return: Profile, None
         """
-        groups = {
+        profiles = {
             'customer': CustomerProfile,
             'washer': WasherProfile,
             'worker': WorkerProfile
         }
         user.groups.add(group)
-        profile = groups[group.name].objects.create(user=user)
+        profile = profiles[group.name].objects.create(user=user)
         return profile
 
     def deactivate_user(self, user):
@@ -114,7 +114,8 @@ class WorkerProfileService:
         worker, _ = user_service.get_or_create_user(phone_number, first_name, last_name,
                                                     group_type=GroupType.worker)
         worker_profile = worker.worker_profile
-        if worker_profile.washer_profile and not worker_profile.washer_profile == washer_profile:
+        if (worker_profile.washer_profile and not worker_profile.washer_profile == washer_profile) \
+                or worker.washer_profile:
             raise WorkerDoesNotBelongToWasherException
 
         worker_profile.washer_profile = washer_profile
