@@ -4,6 +4,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import generics, mixins, views
 from rest_framework import decorators
+from rest_framework.exceptions import NotFound
 
 from api.permissions import HasGroupPermission, IsCustomerOrReadOnlyPermission
 from users.enums import GroupType
@@ -53,12 +54,9 @@ class CarViewSet(viewsets.ModelViewSet):
     @decorators.action(detail=True, methods=['GET'])
     def select(self, request, *args, **kwargs):
         car_pk = self.kwargs.get('pk', None)
-        if car_pk is None:
-            # TODO doğru exception
-            raise BaseException("hata")
 
         car = Car.objects.get(pk=car_pk)
         service = CarService()
         return_car = service.select_car(car, request.user.customer_profile)
-        serializer = CarSerializer(return_car)
+        serializer = self.serializer_class(return_car)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
