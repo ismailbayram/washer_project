@@ -12,3 +12,7 @@ class UserGroupTypeInvalidException(ProjectBaseException):
 
 class StoreDoesNotBelongToWasherException(ProjectBaseException):
     code = codes.workers_100_0
+
+
+class WorkerDoesNotBelongToWasherException(ProjectBaseException):
+    code = codes.workers_100_1

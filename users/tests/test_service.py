@@ -3,8 +3,10 @@ from django.test import TestCase
 from django.contrib.auth.models import Group
 
 from users.models import CustomerProfile
-from users.service import UserService
-from users.exceptions import UserGroupTypeInvalidException
+from users.service import UserService, WorkerProfileService
+from users.exceptions import (UserGroupTypeInvalidException,
+                              StoreDoesNotBelongToWasherException,
+                              WorkerDoesNotBelongToWasherException)
 from users.enums import GroupType
 
 
@@ -75,3 +77,73 @@ class UserServiceTest(TestCase):
     def test_activate_user(self):
         self.service.activate_user(self.user)
         self.assertEqual(self.user.is_active, True)
+
+
+class WorkerProfileServiceTest(TestCase):
+    def setUp(self):
+        user_service = UserService()
+        self.service = WorkerProfileService()
+        washer, _ = user_service.get_or_create_user("555111", group_type=GroupType.washer)
+        self.washer_profile = washer.washer_profile
+        washer2, _ = user_service.get_or_create_user("555112", group_type=GroupType.washer)
+        self.washer2_profile = washer2.washer_profile
+        self.store = mommy.make('stores.Store', washer_profile=self.washer_profile)
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer_profile)
+        self.store3 = mommy.make('stores.Store', washer_profile=self.washer2_profile)
+        worker, _ = user_service.get_or_create_user("555333", group_type=GroupType.worker)
+        self.worker_profile = worker.worker_profile
+        self.worker_profile.store = self.store
+        self.worker_profile.washer_profile = self.washer_profile
+        self.worker_profile.save()
+
+    def test_create_worker(self):
+        data = {
+            "washer_profile": self.washer2_profile,
+            "store": self.store2,
+            "phone_number": self.worker_profile.user.phone_number,
+            "first_name": self.worker_profile.user.first_name,
+            "last_name": self.worker_profile.user.last_name,
+        }
+        with self.assertRaises(StoreDoesNotBelongToWasherException):
+            self.service.create_worker(**data)
+
+        data.update({"store": self.store3})
+        with self.assertRaises(WorkerDoesNotBelongToWasherException):
+            self.service.create_worker(**data)
+
+        self.worker_profile.washer_profile = None
+        self.worker_profile.store = None
+        self.worker_profile.save()
+        worker_profile = self.service.create_worker(**data)
+        self.assertEqual(worker_profile.washer_profile, self.washer2_profile)
+        self.assertEqual(worker_profile.store, self.store3)
+
+        data = {
+            "washer_profile": self.washer2_profile,
+            "store": self.store3,
+            "phone_number": "555222",
+            "first_name": "Ahmet",
+            "last_name": "Cetin"
+        }
+        worker_profile = self.service.create_worker(**data)
+        self.assertEqual(worker_profile.washer_profile, self.washer2_profile)
+        self.assertEqual(worker_profile.store, self.store3)
+
+    def test_fire_worker(self):
+        worker_profile = self.service.fire_worker(self.worker_profile)
+        self.assertIsNone(worker_profile.store)
+        self.assertIsNone(worker_profile.washer_profile)
+
+    def test_move_worker(self):
+        with self.assertRaises(StoreDoesNotBelongToWasherException):
+            self.service.move_worker(self.worker_profile, self.store3)
+
+        worker_profile = self.service.move_worker(self.worker_profile, self.store2)
+        self.assertEqual(worker_profile.store, self.store2)
+
+        self.worker_profile.store = None
+        self.worker_profile.washer_profile = None
+        self.worker_profile.save()
+
+        worker_profile = self.service.move_worker(self.worker_profile, self.store2)
+        self.assertEqual(worker_profile.store, self.store2)

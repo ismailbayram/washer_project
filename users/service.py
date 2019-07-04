@@ -7,7 +7,8 @@ from users.models import (User, CustomerProfile, WasherProfile,
                           WorkerProfile)
 from users.enums import GroupType
 from users.exceptions import (UserGroupTypeInvalidException,
-                              StoreDoesNotBelongToWasherException)
+                              StoreDoesNotBelongToWasherException,
+                              WorkerDoesNotBelongToWasherException)
 
 
 class UserService:
@@ -97,7 +98,7 @@ class UserService:
 class WorkerProfileService:
     @atomic
     def create_worker(self, washer_profile, store, phone_number, first_name,
-                      last_name,):
+                      last_name):
         """
         :param washer_profile: WasherProfile
         :param store: Store
@@ -113,6 +114,9 @@ class WorkerProfileService:
         worker, _ = user_service.get_or_create_user(phone_number, first_name, last_name,
                                                     group_type=GroupType.worker)
         worker_profile = worker.worker_profile
+        if worker_profile.washer_profile and not worker_profile.washer_profile == washer_profile:
+            raise WorkerDoesNotBelongToWasherException
+
         worker_profile.washer_profile = washer_profile
         worker_profile.store = store
         worker_profile.save()
@@ -135,6 +139,8 @@ class WorkerProfileService:
         :param worker_profile: WorkerProfile
         :return: WorkerProfile
         """
+        if worker_profile.washer_profile and not store.washer_profile == worker_profile.washer_profile:
+            raise StoreDoesNotBelongToWasherException
         worker_profile.store = store
         worker_profile.save()
         # NOTIFICATION
