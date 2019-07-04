@@ -3,7 +3,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from users.resources.views import (UserViewSet, AuthView)
-from cars.resources.views import (CarViewSet, CarSelectView)
+from cars.resources.views import (CarViewSet)
 from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
 from stores.resources.views import StoreViewSet, StoreListViewSet
@@ -30,7 +30,6 @@ app_name = 'api'
 
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
-    path('car_select/<int:pk>/', CarSelectView.as_view(), name='car_select'),
     path('auth/', AuthView.as_view()),
     path('docs/', schema_view),
 ]

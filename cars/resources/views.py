@@ -3,14 +3,13 @@ from rest_framework import viewsets, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import generics, mixins, views
+from rest_framework import decorators
 
 from api.permissions import HasGroupPermission, IsCustomerOrReadOnlyPermission
-
 from users.enums import GroupType
 from cars.resources.serializers import CarSerializer
 from cars.models import Car
 from cars.service import CarService
-
 
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.filter(is_active=True)
@@ -51,14 +50,8 @@ class CarViewSet(viewsets.ModelViewSet):
         service = CarService()
         service.disable_car(instance)
 
-
-class CarSelectView(views.APIView):
-    queryset = Car.objects.filter(is_active=True)
-    permission_classes = (IsCustomerOrReadOnlyPermission, )
-
-    serializer_class = CarSerializer
-
-    def get(self, request, form=None, *args, **kwargs):
+    @decorators.action(detail=True, methods=['GET'])
+    def select(self, request, *args, **kwargs):
         car_pk = self.kwargs.get('pk', None)
         if car_pk is None:
             # TODO doğru exception
