@@ -14,15 +14,11 @@ class CarService:
         :param customer_profile: CustomerProfile
         :return: Car
         """
-        try:
-            with atomic():
-                car = Car.objects.create(
+        car = Car.objects.create(
                     licence_plate=licence_plate,
                     car_type=car_type,
                     customer_profile=customer_profile,
                 )
-        except IntegrityError:
-            raise DublicateCarException
 
         return car
 
@@ -38,11 +34,7 @@ class CarService:
         if car_type:
             car.car_type = car_type
 
-        try:
-            with atomic():
-                car.save()
-        except IntegrityError:
-            raise DublicateCarException
+        car.save()
 
         return car
 
