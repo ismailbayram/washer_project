@@ -1,4 +1,4 @@
-from rest_framework import viewsets, views, status, mixins
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -25,13 +25,13 @@ class StoreViewSet(viewsets.GenericViewSet,
         'retrieve': [GroupType.washer],
         'approve': [],
         'decline': [],
+        'address': [GroupType.washer]
     }
 
-    def list(self, request, *args, **kwargs):
-        if request.user.is_staff:
-            return super().list(request, *args, **kwargs)
-        self.queryset = request.user.washer_profile.store_set.prefetch_stores().all()
-        return super().list(request, *args, **kwargs)
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return super().get_queryset()
+        return self.request.user.washer_profile.store_set.all()
 
     def perform_create(self, serializer):
         service = StoreService()
