@@ -10,7 +10,7 @@ class CarService:
     def create_car(self, licence_plate, car_type, customer_profile):
         """
         :param license_plate: str
-        :param car_type: CarTyp_
+        :param car_type: CarType
         :param customer_profile: CustomerProfile
         :return: Car
         """
@@ -54,8 +54,6 @@ class CarService:
         :param customer_profile: CustomerProfile
         """
         Car.objects.filter(customer_profile=customer_profile).update(is_selected=False)
-        # customer_profile.car_set.update(is_selected=False)
 
         car.is_selected = True
         car.save()
-        return car
