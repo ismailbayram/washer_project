@@ -12,11 +12,20 @@ class UserSerializer(serializers.ModelSerializer):
                   'is_worker')
 
 
-# class WorkerProfileSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = WorkerProfile
-#         fields = ('pk', )
-#
+class WorkerProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    first_name = serializers.CharField(write_only=True)
+    last_name = serializers.CharField(write_only=True)
+    phone_number = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = WorkerProfile
+        fields = ('pk', 'washer_profile', 'store', 'user', 'first_name',
+                  'last_name', 'phone_number')
+        extra_kwargs = {
+            'store': {'required': True},
+        }
+
 
 class AuthFirstStepSerializer(serializers.Serializer):
     phone_number = serializers.CharField()

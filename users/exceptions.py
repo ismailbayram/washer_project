@@ -10,6 +10,9 @@ class UserGroupTypeInvalidException(ProjectBaseException):
     code = codes.users_100_1
 
 
-class UserAlreadyExistException(ProjectBaseException):
-    code = codes.users_100_2
+class StoreDoesNotBelongToWasherException(ProjectBaseException):
+    code = codes.workers_100_0
 
+
+class WorkerDoesNotBelongToWasherException(ProjectBaseException):
+    code = codes.workers_100_1

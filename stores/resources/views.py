@@ -2,7 +2,7 @@ from rest_framework import viewsets, views, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.permissions import HasGroupPermission, IsOwnerOrReadOnlyPermission
+from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from address.service import AddressService
 from address.resources.serializers import AddressSerializer
 from users.enums import GroupType
@@ -16,7 +16,7 @@ class StoreViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = Store.objects.prefetch_stores()
     serializer_class = StoreSerializer
-    permission_classes = (HasGroupPermission, IsOwnerOrReadOnlyPermission, )
+    permission_classes = (HasGroupPermission, IsWasherOrReadOnlyPermission,)
     permission_groups = {
         'create': [GroupType.washer],
         'update': [GroupType.washer],
@@ -70,6 +70,5 @@ class StoreViewSet(viewsets.GenericViewSet,
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Store.objects.filter(is_active=True, is_approved=True)\
                             .select_related('address')
-    # TODO: compare select_related address and other address fields
     # TODO: connect with google maps
     serializer_class = StoreSerializer
