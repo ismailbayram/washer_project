@@ -62,7 +62,7 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
 
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
         response = self.client.put(url, data=data, content_type='application/json', **headers)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.put(url, data=data, content_type='application/json', **headers)
@@ -186,7 +186,7 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
 
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
         response = self.client.post(url, data=data, content_type='application/json', **headers)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.post(url, data=data, content_type='application/json', **headers)

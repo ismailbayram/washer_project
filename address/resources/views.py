@@ -5,7 +5,7 @@ from address.models import Country, City, Township
 from address.resources.serializers import (CountrySerializer,
                                            CitySerializer,
                                            TownshipSerializer)
-from address.filters import CityFilterSet, TownshipFilterSet
+from address.resources.filters import CityFilterSet, TownshipFilterSet
 from address.service import (CountryService, CityService,
                              TownshipService)
 
