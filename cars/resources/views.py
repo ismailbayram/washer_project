@@ -37,7 +37,7 @@ class CarViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         service = CarService()
         data = serializer.validated_data
-        serializer.instance = service.create_car(**data, user=self.request.user)
+        serializer.instance = service.create_car(**data, customer_profile=self.request.user.customer_profile)
 
     def perform_update(self, serializer, **kwargs):
         service = CarService()
@@ -49,7 +49,7 @@ class CarViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         service = CarService()
-        service.disable_car(instance)
+        service.deactivate_car(instance)
 
     @decorators.action(detail=True, methods=['GET'])
     def select(self, request, *args, **kwargs):

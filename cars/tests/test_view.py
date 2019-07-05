@@ -25,6 +25,12 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
             licence_plate="09 TK 41",
             car_type = CarType.normal,
         )
+        self.car3 = mommy.make(
+            'cars.Car',
+            licence_plate="09 TK 43",
+            car_type = CarType.normal,
+            customer_profile = self.customer.customer_profile
+        )
 
     def test_list_action(self):
         url = reverse_lazy('api:router:cars-list')
@@ -90,13 +96,12 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         # get by washer
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.get(url, **headers)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        jresponse = json.loads(response.content)
-        self.assertEqual(jresponse['licence_plate'], self.car1.licence_plate)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
     def test_update_action(self):
         url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
+        url3 = reverse_lazy('api:router:cars-detail', args=[self.car3.pk])
         data = {
             'licence_plate': '01 ADN 01'
         }
@@ -110,6 +115,17 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         response = self.client.patch(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.data['licence_plate'], '01 ADN 01')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # dublicate
+        data2 = {
+            'licence_plate': '01 ADN 01'
+        }
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.patch(url3, data=data2, content_type='application/json', **headers)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+        self.assertEqual(response.data['licence_plate'], '01 ADN 01')
+
 
         # can't update by customer by not his car
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer2_token}'}
