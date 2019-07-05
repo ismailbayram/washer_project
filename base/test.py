@@ -24,7 +24,7 @@ class BaseTestViewMixin:
             "phone_number": "5551112",
             "group_type": GroupType.customer
         }
-        self.customer2, self.customer2_token = service.create_user(**data)
+        self.customer2, self.customer2_token = service.get_or_create_user(**data)
 
         data = {
             "first_name": "Worker 1",

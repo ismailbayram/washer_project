@@ -1,4 +1,3 @@
-from model_mommy import mommy
 from django.test import TestCase
 
 from users.service import UserService
@@ -8,7 +7,7 @@ from cars.service import CarService
 from cars.enums import CarType
 
 
-class UserServiceTest(TestCase):
+class CarServiceTest(TestCase):
     def setUp(self):
         user_service = UserService()
 
@@ -18,7 +17,7 @@ class UserServiceTest(TestCase):
             "phone_number": "555111",
             "group_type": GroupType.customer
         }
-        self.customer, self.customer_token = user_service.create_user(**data)
+        self.customer, self.customer_token = user_service.get_or_create_user(**data)
         self.service = CarService()
 
         self.car1 = self.service.create_car(
