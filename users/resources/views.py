@@ -10,7 +10,7 @@ from api.permissions import (HasGroupPermission,
 from users.enums import GroupType
 from users.resources.serializers import (UserSerializer,
                                          WorkerProfileSerializer)
-from users.filters import WorkerProfileFilterSet
+from users.resources.filters import WorkerProfileFilterSet
 from users.models import User, WorkerProfile
 from users.service import UserService, WorkerProfileService
 from stores.models import Store
