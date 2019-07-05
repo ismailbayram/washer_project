@@ -23,7 +23,7 @@ class CarViewSet(viewsets.ModelViewSet):
         'partial_update': [GroupType.customer],
         'deactivate': [GroupType.customer],
         'activate': [GroupType.customer],
-        'retrieve': [GroupType.customer, GroupType.washer],
+        'retrieve': [GroupType.customer],
         'approve': [GroupType.customer],
         'decline': [GroupType.customer],
     }
