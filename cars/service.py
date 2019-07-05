@@ -1,9 +1,10 @@
 from django.db.transaction import atomic
+from django.db.utils import IntegrityError
 import rest_framework.exceptions
 
 from cars.enums import CarType
 from cars.models import Car
-
+from cars.exceptions import DublicateCarException
 
 class CarService:
     def create_car(self, licence_plate, car_type, user):
@@ -13,11 +14,14 @@ class CarService:
         :param user: User
         :return: Car
         """
-        car = Car.objects.create(
-            licence_plate=licence_plate,
-            car_type=car_type,
-            customer_profile=user.customer_profile,
-        )
+        try:
+            car = Car.objects.create(
+                licence_plate=licence_plate,
+                car_type=car_type,
+                customer_profile=user.customer_profile,
+            )
+        except IntegrityError:
+            raise DublicateCarException
         return car
 
     def update_car(self, car, licence_plate=None, car_type=None,  **kwargs):

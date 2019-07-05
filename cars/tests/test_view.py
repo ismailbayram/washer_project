@@ -67,6 +67,11 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         self.assertEqual(jresponse['licence_plate'], test_licence_plate)
         self.assertEqual(jresponse['car_type'], test_car_type)
 
+        # dublicate car
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
 
     def test_retrieve_action(self):
         url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
@@ -176,7 +181,7 @@ class CarSelectViewSetTest(BaseTestViewMixin, TestCase):
             customer_profile = self.customer.customer_profile
         )
 
-    def test_destroy_action(self):
+    def test_select_action(self):
         # selected of 1 an 2 will false
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
 

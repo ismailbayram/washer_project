@@ -53,9 +53,7 @@ class CarViewSet(viewsets.ModelViewSet):
 
     @decorators.action(detail=True, methods=['GET'])
     def select(self, request, *args, **kwargs):
-        car_pk = self.kwargs.get('pk', None)
-
-        car = Car.objects.get(pk=car_pk)
+        car = self.get_object()
         service = CarService()
         return_car = service.select_car(car, request.user.customer_profile)
         serializer = self.serializer_class(return_car)
