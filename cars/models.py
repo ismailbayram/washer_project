@@ -17,7 +17,7 @@ class Car(StarterModel):
     is_selected = models.BooleanField(default=False)
 
     def __str__(self):
-        return licence_plate
+        return self.licence_plate
 
     class Meta:
         unique_together = ('licence_plate', 'customer_profile')
