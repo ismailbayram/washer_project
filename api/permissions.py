@@ -21,6 +21,20 @@ class HasGroupPermission(BasePermission):
         return user.groups.filter(name=group_name).exists()
 
 
+class IsCustomerOrReadOnlyPermission(BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        if (request.user.customer_profile == obj.customer_profile) or request.user.is_staff:
+            return True
+        return False
+
+
 class IsWasherOrReadOnlyPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:

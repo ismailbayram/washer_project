@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'users',
     'address',
-    'stores'
+    'stores',
+    'cars',
 ]
 
 MIDDLEWARE = [

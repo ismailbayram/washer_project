@@ -3,6 +3,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from users.resources.views import (UserViewSet, AuthView, WorkerProfileViewSet)
+from cars.resources.views import (CarViewSet)
 from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
 from stores.resources.views import StoreViewSet, StoreListViewSet
@@ -22,6 +23,9 @@ router.register('townships', TownshipViewSet, base_name='townships')
 # stores
 router.register('stores', StoreViewSet, base_name='my_stores')
 router.register('stores_list', StoreListViewSet, base_name='stores')
+
+# cars
+router.register('cars', CarViewSet, base_name='cars')
 
 app_name = 'api'
 
