@@ -51,7 +51,7 @@ class StoreService:
             store.is_approved = False
             update_fields.append('is_approved')
 
-        if is_active:
+        if is_active is not None:
             store.is_active = is_active
             update_fields.append('is_active')
 
@@ -72,7 +72,7 @@ class StoreService:
         :param instance: Store
         :return: Store
         """
-        # TODO: send notification
+        # NOTIFICATION
         instance.is_approved = True
         instance.save(update_fields=['is_approved'])
         return instance
@@ -82,7 +82,7 @@ class StoreService:
         :param instance: Store
         :return: Store
         """
-        # TODO: send notification
+        # NOTIFICATION
         instance.is_approved = False
         instance.save(update_fields=['is_approved'])
         return instance

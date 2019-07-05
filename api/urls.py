@@ -2,7 +2,7 @@ from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
 
-from users.resources.views import (UserViewSet, AuthView)
+from users.resources.views import (UserViewSet, AuthView, WorkerProfileViewSet)
 from cars.resources.views import (CarViewSet)
 from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
@@ -13,6 +13,7 @@ schema_view = get_swagger_view(title='Washer Project API')
 
 router = DefaultRouter()
 router.register('users', UserViewSet, 'users')
+router.register('workers', WorkerProfileViewSet, 'workers')
 
 # addresses
 router.register('countries', CountryViewSet, base_name='countries')
