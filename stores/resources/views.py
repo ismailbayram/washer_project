@@ -14,7 +14,7 @@ from stores.service import StoreService
 class StoreViewSet(viewsets.GenericViewSet,
                    mixins.CreateModelMixin, mixins.UpdateModelMixin,
                    mixins.ListModelMixin, mixins.RetrieveModelMixin):
-    queryset = Store.objects.all()
+    queryset = Store.objects.prefetch_stores()
     serializer_class = StoreSerializer
     permission_classes = (HasGroupPermission, IsOwnerOrReadOnlyPermission, )
     permission_groups = {
@@ -22,12 +22,16 @@ class StoreViewSet(viewsets.GenericViewSet,
         'update': [GroupType.washer],
         'list': [GroupType.washer],
         'partial_update': [],
-        'deactivate': [GroupType.washer],
-        'activate': [GroupType.washer],
         'retrieve': [GroupType.washer],
         'approve': [],
         'decline': [],
     }
+
+    def list(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return super().list(request, *args, **kwargs)
+        self.queryset = request.user.washer_profile.store_set.prefetch_stores().all()
+        return super().list(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         service = StoreService()
@@ -38,12 +42,6 @@ class StoreViewSet(viewsets.GenericViewSet,
         service = StoreService()
         store = self.get_object()
         serializer.instance = service.update_store(store, **serializer.validated_data)
-
-    def list(self, request, *args, **kwargs):
-        if request.user.is_staff:
-            return super().list(request, *args, **kwargs)
-        self.queryset = request.user.washer_profile.store_set.all()
-        return super().list(request, *args, **kwargs)
 
     @action(detail=True, methods=['POST'])
     def approve(self, request, *args, **kwargs):
@@ -65,8 +63,8 @@ class StoreViewSet(viewsets.GenericViewSet,
         store = self.get_object()
         serializer = AddressSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        service.create_address(store, **serializer.validated_data)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        serializer.instance = service.create_address(store, **serializer.validated_data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):

@@ -94,4 +94,10 @@ class StoreSerializer(serializers.ModelSerializer):
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
                   'is_approved')
 
-# TODO: StoreDetailedSerializer -> {modified and created datetime}
+
+class StoreDetailedSerializer(StoreSerializer):
+    # workerprofile_set =
+
+    class Meta(StoreSerializer.Meta):
+        fields = StoreSerializer.Meta.fields + ('created_date', 'modified_date',
+                                                'workerprofile_set')

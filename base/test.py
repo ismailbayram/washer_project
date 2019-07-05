@@ -27,9 +27,25 @@ class BaseTestViewMixin:
         self.worker, self.worker_token = service.create_user(**data)
 
         data = {
+            "first_name": "Worker 2",
+            "last_name": "WorkLast",
+            "phone_number": "555223",
+            "group_type": GroupType.worker
+        }
+        self.worker2, self.worker2_token = service.create_user(**data)
+
+        data = {
             "first_name": "Washer 1",
             "last_name": "WashLast",
             "phone_number": "555333",
             "group_type": GroupType.washer
         }
         self.washer, self.washer_token = service.create_user(**data)
+
+        data = {
+            "first_name": "Washer 2",
+            "last_name": "WashLast",
+            "phone_number": "555334",
+            "group_type": GroupType.washer
+        }
+        self.washer2, self.washer2_token = service.create_user(**data)
