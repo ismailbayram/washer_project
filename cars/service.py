@@ -15,11 +15,12 @@ class CarService:
         :return: Car
         """
         try:
-            car = Car.objects.create(
-                licence_plate=licence_plate,
-                car_type=car_type,
-                customer_profile=customer_profile,
-            )
+            with atomic():
+                car = Car.objects.create(
+                    licence_plate=licence_plate,
+                    car_type=car_type,
+                    customer_profile=customer_profile,
+                )
         except IntegrityError:
             raise DublicateCarException
 
@@ -38,9 +39,11 @@ class CarService:
             car.car_type = car_type
 
         try:
-            car.save()
+            with atomic():
+                car.save()
         except IntegrityError:
             raise DublicateCarException
+
         return car
 
     def deactivate_car(self, car):

@@ -122,9 +122,7 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         }
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         response = self.client.patch(url3, data=data2, content_type='application/json', **headers)
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
-        self.assertEqual(response.data['licence_plate'], '01 ADN 01')
 
 
         # can't update by customer by not his car
