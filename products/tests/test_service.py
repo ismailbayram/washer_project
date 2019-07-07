@@ -78,7 +78,8 @@ class ProductServiceTest(TestCase, BaseTestViewMixin):
             "description": "Updated Description",
             "store": 1,
             "washer_profile": 3,
-            "product_type": ProductType.periodic
+            "product_type": ProductType.periodic,
+            "period": 32
         }
         product = self.service.update_product(product, **data)
         self.assertEqual(product.name, data['name'])
@@ -86,6 +87,19 @@ class ProductServiceTest(TestCase, BaseTestViewMixin):
         self.assertNotEqual(product.store, data['store'])
         self.assertNotEqual(product.washer_profile, data['washer_profile'])
         self.assertNotEqual(product.product_type, data['product_type'])
+        self.assertNotEqual(product.period, data['period'])
+
+        product = mommy.make('products.Product', product_type=ProductType.periodic, period=45)
+        data.update({
+            "period": 45
+        })
+        product = self.service.update_product(product, **data)
+        self.assertEqual(product.name, data['name'])
+        self.assertEqual(product.description, data['description'])
+        self.assertNotEqual(product.store, data['store'])
+        self.assertNotEqual(product.washer_profile, data['washer_profile'])
+        self.assertEqual(product.product_type, data['product_type'])
+        self.assertEqual(product.period, data['period'])
 
     def test_delete_product(self):
         product = self.service.create_primary_product(self.store)

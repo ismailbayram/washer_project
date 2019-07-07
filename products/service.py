@@ -69,7 +69,8 @@ class ProductService:
             ProductPrice.objects.create(product=product, car_type=value,
                                         price=settings.DEFAULT_PRODUCT_PRICE)
 
-    def update_product(self, product, name=None, description=None, **kwargs):
+    def update_product(self, product, name=None, description=None,
+                       period=None, **kwargs):
         """
         :param product: Product
         :param name: str
@@ -85,6 +86,10 @@ class ProductService:
         if description:
             product.description = description
             update_fields.append('description')
+
+        if period and product.product_type == ProductType.periodic:
+            product.period = period
+            update_fields.append('period')
 
         product.save(update_fields=update_fields)
         return product

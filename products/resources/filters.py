@@ -6,4 +6,4 @@ from products.models import Product
 class ProductFilterSet(filters.FilterSet):
     class Meta:
         model = Product
-        fields = ('store', 'is_primary', )
+        fields = ('store', 'is_primary', 'product_type')

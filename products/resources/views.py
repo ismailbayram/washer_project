@@ -22,7 +22,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         'retrieve': [GroupType.washer],
         'update': [GroupType.washer],
         'partial_update': [GroupType.washer],
-        'delete': [GroupType.washer],
+        'destroy': [GroupType.washer],
         'price': [GroupType.washer],
     }
     filter_class = ProductFilterSet
