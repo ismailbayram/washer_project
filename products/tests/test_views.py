@@ -239,3 +239,38 @@ class ProductViewSetTestView(TestCase, BaseTestViewMixin):
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.delete(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+
+class ProductListViewSetTest(TestCase, BaseTestViewMixin):
+    def setUp(self):
+        store_service = StoreService()
+        self.service = ProductService()
+        self.init_users()
+        self.store = store_service.create_store(name="Washer1Store",
+                                                washer_profile=self.washer.washer_profile,
+                                                phone_number="021255", tax_office="a",
+                                                tax_number="1")
+        self.store2 = store_service.create_store(name="Washer2Store",
+                                                washer_profile=self.washer2.washer_profile,
+                                                phone_number="021255", tax_office="a",
+                                                tax_number="1")
+        self.store.is_approved = True
+        self.store.save()
+        self.product = self.service.create_product(name="Arac Parfumu", store=self.store,
+                                                   washer_profile=self.washer.washer_profile)
+        self.product2 = self.service.create_product(name="Arac Parfumu", store=self.store2,
+                                                   washer_profile=self.washer2.washer_profile)
+
+    def test_list(self):
+        url = reverse_lazy('api:router:products-list')
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresponse = json.loads(response.content)
+        self.assertEqual(jresponse['count'], 2)
+
+        filtered_url = f'{url}?store={self.store2.pk}'
+        response = self.client.get(filtered_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresponse = json.loads(response.content)
+        self.assertEqual(jresponse['count'], 0)

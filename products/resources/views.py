@@ -59,4 +59,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         self.service.update_price(product_price, **serializer.validated_data)
         return Response({}, status=status.HTTP_200_OK)
 
-# TODO: make seperate viewset like StoreViewSet and add mandatory parameter store in product_list
+
+class ProductListViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Product.objects.filter(store__is_active=True,
+                                      store__is_approved=True)\
+                              .prefetch_related('productprice_set')
+    serializer_class = ProductSerializer
+    filter_class = ProductFilterSet
+
