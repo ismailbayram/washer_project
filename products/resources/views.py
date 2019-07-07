@@ -61,8 +61,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class ProductListViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Product.objects.filter(store__is_active=True,
-                                      store__is_approved=True)\
+    queryset = Product.objects.filter(store__is_active=True, store__is_approved=True)\
                               .prefetch_related('productprice_set')
     serializer_class = ProductSerializer
     filter_class = ProductFilterSet

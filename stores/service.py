@@ -45,14 +45,18 @@ class StoreService:
         update_fields = ['name', 'phone_number', 'tax_office', 'tax_number']
 
         if latitude:
-            update_fields.append('latitude')
             store.latitude = latitude
+            update_fields.append('latitude')
+            store.is_approved = False
+            update_fields.append('is_approved')
 
         if longitude:
-            update_fields.append('longitude')
             store.longitude = longitude
+            update_fields.append('longitude')
+            store.is_approved = False
+            update_fields.append('is_approved')
 
-        if latitude or longitude or not store.phone_number == phone_number:
+        if not store.phone_number == phone_number:
             store.is_approved = False
             update_fields.append('is_approved')
 
@@ -68,7 +72,7 @@ class StoreService:
         store.phone_number = phone_number
         store.tax_office = tax_office
         store.tax_number = tax_number
-        store.save(update_fields=update_fields)
+        store.save(update_fields=[*set(update_fields)])
 
         return store
 
