@@ -1,8 +1,12 @@
+from django.db.transaction import atomic
+
 from base.utils import ordereddict_to_dict
 from stores.models import Store
+from products.service import ProductService
 
 
 class StoreService:
+    @atomic
     def create_store(self, name, washer_profile, phone_number, tax_office,
                      tax_number, latitude=None, longitude=None, **kwargs):
         """
@@ -20,7 +24,8 @@ class StoreService:
         store = Store.objects.create(name=name, washer_profile=washer_profile,
                                      phone_number=phone_number, tax_office=tax_office, config=config,
                                      tax_number=tax_number, latitude=latitude, longitude=longitude)
-
+        product_service = ProductService()
+        product_service.create_primary_product(store)
         return store
 
     def update_store(self, store, name, phone_number, tax_office, tax_number, **kwargs):

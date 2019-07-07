@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import datetime
+from decimal import Decimal
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -145,6 +146,9 @@ AUTH_USER_MODEL = 'users.User'
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+DEFAULT_PRODUCT_PRICE = Decimal('30.00')
+MINIMUM_PRODUCT_PRICE = Decimal('0.99')
 
 try:
     from washer_project.settings_local import *

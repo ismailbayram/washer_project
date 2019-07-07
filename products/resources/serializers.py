@@ -7,8 +7,8 @@ from products.enums import ProductType, Currency
 
 
 class ProductPriceSerializer(serializers.ModelSerializer):
-    currency = EnumField(enum=Currency)
-    car_type = EnumField(enum=CarType)
+    currency = EnumField(enum=Currency, read_only=True)
+    car_type = EnumField(enum=CarType, read_only=True)
 
     class Meta:
         model = ProductPrice
@@ -21,4 +21,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('pk', 'name', 'description', 'store', 'productprice_set', 'product_type', 'period')
+        fields = ('pk', 'name', 'description', 'store', 'productprice_set',
+                  'is_primary', 'product_type', 'period')
+        extra_kwargs = {
+            'is_primary': {'read_only': True}
+        }

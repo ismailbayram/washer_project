@@ -13,6 +13,7 @@ class Product(StarterModel):
     product_type = EnumField(enum=ProductType)
     description = models.TextField(max_length=512, default='', blank=True)
     period = models.PositiveSmallIntegerField(default=None, null=True)
+    is_primary = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
