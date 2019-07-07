@@ -13,10 +13,10 @@ class Currency(Enum):
 
 class ProductType(Enum):
     periodic = 'periodic'
-    indefinite = 'indefinite'
+    # indefinite = 'indefinite'
     other = 'other'
 
     class Labels:
         periodic = _('Süreli')
-        indefinite = _('Süresi Belirsiz')
+        # indefinite = _('Süresi Belirsiz')
         other = _('Diğer')

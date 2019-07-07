@@ -29,9 +29,10 @@ class StoreViewSet(viewsets.GenericViewSet,
     }
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         if self.request.user.is_staff:
-            return super().get_queryset()
-        return self.request.user.washer_profile.store_set.all()
+            return queryset
+        return queryset.filter(washer_profile=self.request.user.washer_profile)
 
     def perform_create(self, serializer):
         service = StoreService()

@@ -22,3 +22,5 @@ class Store(StarterModel):
 
     def __str__(self):
         return f'{self.name}'
+
+# photoItem.store.washer_profile req
