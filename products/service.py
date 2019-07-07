@@ -48,10 +48,11 @@ class ProductService:
         """
         if product_type == ProductType.periodic and period is None:
             raise PeriodIsRequiredException
+        if not product_type == ProductType.periodic:
+            period = None
         if not store.washer_profile == washer_profile:
             raise StoreDoesNotBelongToWasherException(params=(store, washer_profile))
 
-        period = None
         product = Product.objects.create(name=name, store=store,
                                          washer_profile=washer_profile,
                                          period=period, product_type=product_type,
@@ -98,7 +99,7 @@ class ProductService:
         if price < settings.MINIMUM_PRODUCT_PRICE:
             raise ProductPriceCanNotLessThanException(params=(product_price.currency.label, ))
         product_price.price = price
-        product_price.save()
+        product_price.save(update_fields=['price'])
         return product_price
 
     def delete_product(self, product):
