@@ -106,7 +106,14 @@ class StoreService:
             raise StoreHasSoMuchImageException
 
 
-        # TODO Change image quality
+        not_saved_pure_name = "".join(image.name.split('.')[0:-1])
+        pil_image = Image.open(image)
+        pil_image.convert('RGB')
+
+        f = BytesIO()
+        pil_image.save(f, "JPEG", quality=90)
+        image = ContentFile(f.getvalue())
+        image.name = "{0}.{1}".format(not_saved_pure_name, "jpeg")
 
 
         # Save StoreImageItem model
