@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from base.test import BaseTestViewMixin
 from stores.service import StoreService
+from cars.enums import CarType
 
 
 class StoreServiceTest(BaseTestViewMixin, TestCase):
@@ -30,6 +31,11 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         self.assertTrue(store.is_active)
         self.assertFalse(store.is_approved)
         self.assertEqual(store.config, {'opening_hours': {}, 'reservation_hours': {}})
+
+        self.assertEqual(store.product_set.count(), 1)
+        self.assertEqual(store.product_set.filter(is_primary=True).count(), 1)
+        primary_product = store.product_set.first()
+        self.assertEqual(primary_product.productprice_set.count(), len(CarType.choices()))
 
     def test_update_store(self):
         data = {

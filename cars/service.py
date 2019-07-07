@@ -7,6 +7,7 @@ from cars.models import Car
 from cars.exceptions import DublicateCarException
 
 class CarService:
+    # TODO: select created car
     def create_car(self, licence_plate, car_type, customer_profile):
         """
         :param license_plate: str
@@ -46,7 +47,6 @@ class CarService:
         car.is_selected = False
         car.save()
         return car
-
 
     def select_car(self, car, customer_profile):
         """

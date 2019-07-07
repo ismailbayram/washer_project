@@ -5,9 +5,9 @@ from django.contrib.auth.models import Group
 from users.models import CustomerProfile
 from users.service import UserService, WorkerProfileService
 from users.exceptions import (UserGroupTypeInvalidException,
-                              StoreDoesNotBelongToWasherException,
                               WorkerDoesNotBelongToWasherException)
 from users.enums import GroupType
+from stores.exceptions import StoreDoesNotBelongToWasherException
 
 
 class UserServiceTest(TestCase):

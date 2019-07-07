@@ -7,8 +7,8 @@ from users.models import (User, CustomerProfile, WasherProfile,
                           WorkerProfile)
 from users.enums import GroupType
 from users.exceptions import (UserGroupTypeInvalidException,
-                              StoreDoesNotBelongToWasherException,
                               WorkerDoesNotBelongToWasherException)
+from stores.exceptions import StoreDoesNotBelongToWasherException
 
 
 class UserService:
@@ -109,7 +109,7 @@ class WorkerProfileService:
         """
         # NOTIFICATION
         if not store.washer_profile == washer_profile:
-            raise StoreDoesNotBelongToWasherException
+            raise StoreDoesNotBelongToWasherException(params=(store, washer_profile))
         user_service = UserService()
         worker, _ = user_service.get_or_create_user(phone_number, first_name, last_name,
                                                     group_type=GroupType.worker)
@@ -141,7 +141,7 @@ class WorkerProfileService:
         :return: WorkerProfile
         """
         if worker_profile.washer_profile and not store.washer_profile == worker_profile.washer_profile:
-            raise StoreDoesNotBelongToWasherException
+            raise StoreDoesNotBelongToWasherException(params=(worker_profile, store.washer_profile))
         worker_profile.store = store
         worker_profile.save()
         # NOTIFICATION

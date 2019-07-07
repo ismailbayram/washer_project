@@ -7,6 +7,7 @@ from cars.resources.views import (CarViewSet)
 from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
 from stores.resources.views import StoreViewSet, StoreListViewSet
+from products.resources.views import ProductViewSet, ProductListViewSet
 
 from api.views import get_swagger_view
 schema_view = get_swagger_view(title='Washer Project API')
@@ -26,6 +27,10 @@ router.register('stores_list', StoreListViewSet, base_name='stores')
 
 # cars
 router.register('cars', CarViewSet, base_name='cars')
+
+# products
+router.register('products', ProductViewSet, base_name='my_products')
+router.register('product_list', ProductListViewSet, base_name='products')
 
 app_name = 'api'
 
