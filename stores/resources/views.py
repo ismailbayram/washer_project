@@ -36,8 +36,11 @@ class StoreViewSet(viewsets.GenericViewSet,
 
     def perform_create(self, serializer):
         service = StoreService()
-        serializer.instance = service.create_store(washer_profile=self.request.user.washer_profile,
-                                        **serializer.validated_data)
+        data = serializer.validated_data
+        data.update({
+            "washer_profile": self.request.user.washer_profile,
+        })
+        serializer.instance = service.create_store(**data)
 
     def perform_update(self, serializer):
         service = StoreService()

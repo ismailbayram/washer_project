@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from django.utils.translation import ugettext_lazy as _
 from django.db.transaction import atomic
 from django.conf import settings
@@ -70,9 +68,25 @@ class ProductService:
             ProductPrice.objects.create(product=product, car_type=value,
                                         price=settings.DEFAULT_PRODUCT_PRICE)
 
-    def update_product(self):
-        # take product_type but do nothing
-        pass
+    def update_product(self, product, name=None, description=None, **kwargs):
+        """
+        :param product: Product
+        :param name: str
+        :param description: str
+        :param kwargs: dict
+        :return: Product
+        """
+        update_fields = []
+        if name:
+            product.name = name
+            update_fields.append('name')
+
+        if description:
+            product.description = description
+            update_fields.append('description')
+
+        product.save(update_fields=update_fields)
+        return product
 
     def update_price(self, product_price, price, **kwargs):
         """

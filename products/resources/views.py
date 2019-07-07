@@ -27,7 +27,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     }
     filter_class = ProductFilterSet
     service = ProductService()
-    # TODO: edit prices with detail endpoint enum
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -41,6 +40,11 @@ class ProductViewSet(viewsets.ModelViewSet):
             "washer_profile": self.request.user.washer_profile
         })
         serializer.instance = self.service.create_product(**data)
+
+    def perform_update(self, serializer):
+        product = self.get_object()
+        data = serializer.validated_data
+        serializer.instance = self.service.update_product(product, **data)
 
     def perform_destroy(self, instance):
         self.service.delete_product(instance)
