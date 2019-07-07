@@ -4,7 +4,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from address.resources.serializers import AddressDetailedSerializer
-from stores.models import Store
+from stores.models import Store, StoreImageItem
+from api.fields import Base64ImageField
 
 
 class DaySerializer(serializers.Serializer):
@@ -101,3 +102,10 @@ class StoreDetailedSerializer(StoreSerializer):
     class Meta(StoreSerializer.Meta):
         fields = StoreSerializer.Meta.fields + ('created_date', 'modified_date',
                                                 'workerprofile_set')
+
+class StoreImageSerializer(serializers.ModelSerializer):
+    image = Base64ImageField(required=True)
+
+    class Meta:
+        model = StoreImageItem
+        fields = ('pk', 'image', )

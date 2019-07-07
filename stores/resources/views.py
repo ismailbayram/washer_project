@@ -6,7 +6,7 @@ from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from address.service import AddressService
 from address.resources.serializers import AddressSerializer
 from users.enums import GroupType
-from stores.resources.serializers import StoreSerializer
+from stores.resources.serializers import StoreSerializer, StoreImageSerializer
 from stores.models import Store
 from stores.service import StoreService
 
@@ -64,6 +64,21 @@ class StoreViewSet(viewsets.GenericViewSet,
         serializer = AddressSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.instance = service.create_address(store, **serializer.validated_data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'], url_path='photo_galery')
+    def gallery_image(self, request, *args, **kwargs):
+        service = StoreService()
+        serializer = StoreImageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        serializer.instance = service.add_image(
+            store=self.get_object(),
+            image=data['image'],
+            washer_profile=request.user.washer_profile
+        )
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

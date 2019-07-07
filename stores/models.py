@@ -1,3 +1,6 @@
+import imghdr
+from uuid import uuid4
+
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
@@ -18,7 +21,21 @@ class Store(StarterModel):
     latitude = models.FloatField(default=None, null=True)
     longitude = models.FloatField(default=None, null=True)
     rating = models.FloatField(default=None, null=True)
+    image = models.ImageField()
     objects = StoreManager()
 
     def __str__(self):
         return f'{self.name}'
+
+
+
+def get_file_name(instance, *args, **kwargs):
+    ext = instance.image.name.split(".")[-1]
+    return "{0}.{1}".format(uuid4().hex, ext)
+
+
+
+class StoreImageItem(StarterModel):
+    image = models.ImageField(upload_to=get_file_name)
+    store = models.ForeignKey(Store, related_name='images', on_delete=models.CASCADE)
+    washer_profile = models.ForeignKey('users.WasherProfile', on_delete=models.CASCADE)
