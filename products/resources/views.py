@@ -27,6 +27,12 @@ class ProductViewSet(viewsets.ModelViewSet):
     service = ProductService()
     # TODO: edit prices with detail endpoint enum
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_staff:
+            return queryset
+        return queryset.filter(washer_profile=self.request.user.washer_profile)
+
     def perform_create(self, serializer):
         data = serializer.validated_data
         data.update({
@@ -34,11 +40,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         })
         serializer.instance = self.service.create_product(**data)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if self.request.user.is_staff:
-            return queryset
-        return queryset.filter(washer_profile=self.request.user.washer_profile)
+    def perform_destroy(self, instance):
+        self.service.delete_product(instance)
 
 
 # TODO: make seperate viewset like StoreViewSet and add mandatory parameter store in product_list

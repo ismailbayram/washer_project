@@ -1,3 +1,5 @@
+from django.db.transaction import atomic
+
 from stores.exceptions import StoreDoesNotBelongToWasherException
 from products.models import Product
 from products.enums import ProductType
@@ -20,6 +22,7 @@ class ProductService:
             raise PeriodIsRequiredException
         if not store.washer_profile == washer_profile:
             raise StoreDoesNotBelongToWasherException(params=(store, washer_profile))
+
         period = None
         product = Product.objects.create(name=name, store=store,
                                          washer_profile=washer_profile,
@@ -27,3 +30,13 @@ class ProductService:
                                          description=description)
 
         return product
+
+    @atomic
+    def delete_product(self, product):
+        """
+        :param product: Product
+        :return: bool
+        """
+        product.productprice_set.all().delete()
+        product.delete()
+        return True
