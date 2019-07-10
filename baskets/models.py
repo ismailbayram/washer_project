@@ -4,18 +4,33 @@ from django.db import models
 
 from base.models import StarterModel
 from baskets.enums import BasketStatus
+from products.enums import Currency
 
 
 class Basket(StarterModel):
     customer_profile = models.ForeignKey('users.CustomerProfile', on_delete=models.PROTECT)
     status = EnumField(enum=BasketStatus)
     car = models.ForeignKey('cars.Car', on_delete=models.PROTECT)
+    currency = EnumField(enum=Currency, default=Currency.TRY)
+
+    def __str__(self):
+        return f'{self.status.value}'
 
     def get_total_amount(self):
         total_amount = Decimal('0.00')
         for bi in self.basketitem_set.all():
-            total_amount += bi.get_price()
+            total_amount += bi.get_price() * bi.quantity
         return total_amount
+
+    def get_total_quantity(self):
+        total_quantity = 0
+        for bi in self.basketitem_set.all():
+            total_quantity += bi.quantity
+        return total_quantity
+
+    @property
+    def is_empty(self):
+        return not self.basketitem_set.exists()
 
 
 class BasketItem(StarterModel):
