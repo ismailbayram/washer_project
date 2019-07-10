@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from users.enums import GroupType
-from products.resources.serializers import (ProductSerializer,
+from products.resources.serializers import (ProductDetailedSerializer,
                                             ProductPriceSerializer)
 from products.resources.filters import ProductFilterSet
 from products.models import Product, ProductPrice
@@ -14,7 +14,7 @@ from products.service import ProductService
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.filter(is_active=True).prefetch_related('productprice_set').all()
-    serializer_class = ProductSerializer
+    serializer_class = ProductDetailedSerializer
     permission_classes = (HasGroupPermission, IsWasherOrReadOnlyPermission)
     permission_groups = {
         'create': [GroupType.washer],
@@ -63,6 +63,6 @@ class ProductViewSet(viewsets.ModelViewSet):
 class ProductListViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.filter(is_active=True, store__is_active=True,
                                       store__is_approved=True).prefetch_related('productprice_set')
-    serializer_class = ProductSerializer
+    serializer_class = ProductDetailedSerializer
     filter_class = ProductFilterSet
 
