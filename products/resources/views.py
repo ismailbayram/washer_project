@@ -13,7 +13,7 @@ from products.service import ProductService
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.prefetch_related('productprice_set').all()
+    queryset = Product.objects.filter(is_active=True).prefetch_related('productprice_set').all()
     serializer_class = ProductSerializer
     permission_classes = (HasGroupPermission, IsWasherOrReadOnlyPermission)
     permission_groups = {
@@ -61,8 +61,8 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class ProductListViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Product.objects.filter(store__is_active=True, store__is_approved=True)\
-                              .prefetch_related('productprice_set')
+    queryset = Product.objects.filter(is_active=True, store__is_active=True,
+                                      store__is_approved=True).prefetch_related('productprice_set')
     serializer_class = ProductSerializer
     filter_class = ProductFilterSet
 

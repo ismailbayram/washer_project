@@ -14,9 +14,13 @@ class Product(StarterModel):
     description = models.TextField(max_length=512, default='', blank=True)
     period = models.PositiveSmallIntegerField(default=None, null=True)
     is_primary = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
+
+    def price(self, car_type):
+        return self.productprice_set.get(car_type=car_type).price
 
 
 class ProductPrice(StarterModel):

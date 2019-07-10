@@ -18,6 +18,3 @@ class Car(StarterModel):
 
     def __str__(self):
         return self.licence_plate
-
-    class Meta:
-        unique_together = ('licence_plate', 'customer_profile')
