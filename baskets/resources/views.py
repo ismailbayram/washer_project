@@ -12,7 +12,9 @@ from baskets.resources.serializers import BasketSerializer, CreateBasketItemSeri
 class BasketViewSet(viewsets.ViewSet):
     permission_classes = (HasGroupPermission,)
     permission_groups = {
-        'view_basket': [GroupType.customer]
+        'view_basket': [GroupType.customer],
+        'add_item': [GroupType.customer],
+        'delete_item': [GroupType.customer],
     }
     service = BasketService()
 

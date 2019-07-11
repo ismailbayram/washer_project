@@ -5,6 +5,7 @@ from django.test import TestCase, override_settings
 from base.test import BaseTestViewMixin
 from cars.enums import CarType
 from cars.service import CarService
+from cars.exceptions import CustomerHasNoSelectedCarException
 from products.service import ProductService
 from baskets.models import Basket
 from baskets.service import BasketService
@@ -39,6 +40,11 @@ class BasketServiceTest(TestCase, BaseTestViewMixin):
 
         basket = self.service.get_or_create_basket(customer_profile=self.customer_profile)
         self.assertEqual(Basket.objects.filter(customer_profile=self.customer_profile).count(), 1)
+
+        basket.delete()
+        self.car.delete()
+        with self.assertRaises(CustomerHasNoSelectedCarException):
+            self.service.get_or_create_basket(customer_profile=self.customer_profile)
 
     def test_add_basket_item(self):
         basket = self.service.get_or_create_basket(customer_profile=self.customer_profile)

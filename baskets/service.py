@@ -4,6 +4,7 @@ from django.db.transaction import atomic
 from baskets.models import Basket, BasketItem
 from baskets.enums import BasketStatus
 from baskets.exceptions import PrimaryProductsQuantityMustOne
+from cars.exceptions import CustomerHasNoSelectedCarException
 
 
 class BasketService:
@@ -12,6 +13,8 @@ class BasketService:
         :param customer_profile: CustomerProfile
         :return: Basket
         """
+        if not customer_profile.selected_car:
+            raise CustomerHasNoSelectedCarException
         try:
             basket = Basket.objects.get(customer_profile=customer_profile,
                                         status=BasketStatus.active,
