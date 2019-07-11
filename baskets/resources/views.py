@@ -29,4 +29,13 @@ class BasketViewSet(viewsets.ViewSet):
         basket = self.service.get_or_create_basket(request.user.customer_profile)
         self.service.add_basket_item(basket, **serializer.validated_data)
         serializer = BasketSerializer(instance=basket)
-        return Response({'basket': serializer.data}, status=status.HTTP_200_OK)
+        return Response({'basket': serializer.data}, status=status.HTTP_201_CREATED)
+
+    @action(methods=['DELETE'], detail=False)
+    def delete_item(self, request, *args, **kwargs):
+        serializer = CreateBasketItemSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        basket = self.service.get_or_create_basket(request.user.customer_profile)
+        self.service.delete_basket_item(basket, **serializer.validated_data)
+        serializer = BasketSerializer(instance=basket)
+        return Response({'basket': serializer.data}, status=status.HTTP_204_NO_CONTENT)

@@ -36,7 +36,8 @@ router.register('product_list', ProductListViewSet, base_name='products')
 # basket
 basket_view = BasketViewSet.as_view({
     'get': 'view_basket',
-    'post': 'add_item'
+    'post': 'add_item',
+    'delete': 'delete_item',
 })
 
 app_name = 'api'

@@ -49,6 +49,14 @@ class BasketService:
         """
         basket.basketitem_set.all().delete()
 
+    def delete_basket_item(self, basket, product):
+        """
+        :param basket: Basket
+        :param product: Product
+        :return: None
+        """
+        basket.basketitem_set.filter(product=product).delete()
+
     @atomic
     def complete_basket(self, basket):
         """
