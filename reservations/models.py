@@ -1,3 +1,21 @@
+from enumfields import EnumField
 from django.db import models
 
-# Create your models here.
+from base.models import StarterModel
+from reservations.enums import ReservationStatus
+
+
+class Reservation(StarterModel):
+    status = EnumField(enum=ReservationStatus)
+    period = models.PositiveSmallIntegerField()
+    start_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    basket = models.ForeignKey('baskets.Basket', null=True, blank=True, on_delete=models.SET_NULL)
+    store = models.ForeignKey('stores.Store', on_delete=models.PROTECT)
+    customer_profile = models.ForeignKey('users.CustomerProfile', null=True, default=None,
+                                         on_delete=models.SET_NULL)
+    total_amount = models.DecimalField(decimal_places=2, max_digits=6, null=True, default=None)
+    number = models.CharField(max_length=12)
+
+    def __str__(self):
+        return f'{self.status.label}'
