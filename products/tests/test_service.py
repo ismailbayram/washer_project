@@ -110,5 +110,6 @@ class ProductServiceTest(TestCase, BaseTestViewMixin):
         product = self.service.create_product(name="test", store=self.store,
                                               washer_profile=self.store.washer_profile)
 
-        self.service.delete_product(product)
-        self.assertEqual(0, ProductPrice.objects.filter(product=product).count())
+        product = self.service.delete_product(product)
+        product.refresh_from_db()
+        self.assertFalse(product.is_active)

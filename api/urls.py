@@ -8,6 +8,7 @@ from address.resources.views import (CountryViewSet, CityViewSet,
                                      TownshipViewSet)
 from stores.resources.views import StoreViewSet, StoreListViewSet
 from products.resources.views import ProductViewSet, ProductListViewSet
+from baskets.resources.views import BasketViewSet
 
 from api.views import get_swagger_view
 schema_view = get_swagger_view(title='Washer Project API')
@@ -32,10 +33,18 @@ router.register('cars', CarViewSet, base_name='cars')
 router.register('products', ProductViewSet, base_name='my_products')
 router.register('product_list', ProductListViewSet, base_name='products')
 
+# basket
+basket_view = BasketViewSet.as_view({
+    'get': 'view_basket',
+    'post': 'add_item',
+    'delete': 'delete_item',
+})
+
 app_name = 'api'
 
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
+    path('basket/', basket_view, name='basket'),
     path('auth/', AuthView.as_view()),
     path('docs/', schema_view),
 ]

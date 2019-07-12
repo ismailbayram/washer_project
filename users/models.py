@@ -46,6 +46,13 @@ class CustomerProfile(StarterModel):
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
+    @property
+    def selected_car(self):
+        q = self.cars.filter(is_selected=True).first()
+        if q:
+            return q
+        return None
+
 
 class WasherProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='washer_profile')

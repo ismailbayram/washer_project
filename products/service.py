@@ -110,9 +110,10 @@ class ProductService:
     def delete_product(self, product):
         """
         :param product: Product
-        :return: bool
+        :return: Product
         """
         if product.is_primary:
             raise PrimaryProductsCanNotDeletedException
-        product.delete()
-        return True
+        product.is_active = False
+        product.save()
+        return product

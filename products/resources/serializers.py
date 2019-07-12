@@ -17,12 +17,19 @@ class ProductPriceSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     product_type = EnumField(enum=ProductType)
-    productprice_set = ProductPriceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
-        fields = ('pk', 'name', 'description', 'store', 'productprice_set',
+        fields = ('pk', 'name', 'description', 'store',
                   'is_primary', 'product_type', 'period')
         extra_kwargs = {
             'is_primary': {'read_only': True}
         }
+
+
+class ProductDetailedSerializer(ProductSerializer):
+    productprice_set = ProductPriceSerializer(many=True, read_only=True)
+
+    class Meta(ProductSerializer.Meta):
+        fields = ProductSerializer.Meta.fields + ('productprice_set', )
+
