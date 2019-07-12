@@ -13,6 +13,10 @@ class Basket(StarterModel):
     car = models.ForeignKey('cars.Car', on_delete=models.PROTECT)
     currency = EnumField(enum=Currency, default=Currency.TRY)
 
+    def __init__(self, *args, **kwargs):
+        self.warning_messages = []
+        super().__init__(*args, **kwargs)
+
     def __str__(self):
         return f'{self.status.value}'
 

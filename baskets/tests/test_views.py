@@ -18,12 +18,10 @@ class BasketViewSetTest(TestCase, BaseTestViewMixin):
         self.car_service = CarService()
         self.init_users()
         self.customer_profile = self.customer.customer_profile
-        self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile)
-        self.store.is_approved = True
-        self.store.save()
-        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile)
-        self.store2.is_approved = True
-        self.store2.save()
+        self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile,
+                                is_approved=True, is_active=True)
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile,
+                                 is_approved=True, is_active=True)
         self.product1 = self.product_service.create_primary_product(self.store)
         self.product2 = self.product_service.create_product(name='Parfume', store=self.store,
                                                             washer_profile=self.store.washer_profile)
@@ -86,6 +84,12 @@ class BasketViewSetTest(TestCase, BaseTestViewMixin):
                          str(self.product1.price(self.car.car_type) + self.product2.price(self.car.car_type)))
         self.assertEqual(jresponse['basket']['total_quantity'], 2)
         self.assertEqual(len(jresponse['basket']['basketitem_set']), 2)
+
+        self.product_service.delete_product(self.product2)
+        response = self.client.get(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresponse = json.loads(response.content)
+        self.assertNotEqual(len(jresponse['basket']['warning_messages']), 0)
 
         data.update({"product": self.product3.pk})
         response = self.client.post(url, data=data, content_type='application/json', **headers)

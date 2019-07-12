@@ -31,7 +31,9 @@ class BasketSerializer(serializers.ModelSerializer):
     total_quantity = serializers.IntegerField(source='get_total_quantity')
     car = CarSerializer()
     basketitem_set = BasketItemSerializer(many=True)
+    warning_messages = serializers.ListField()
 
     class Meta:
         model = Basket
-        fields = ('currency', 'total_amount', 'total_quantity', 'car', 'basketitem_set', )
+        fields = ('currency', 'total_amount', 'total_quantity', 'car', 'basketitem_set',
+                  'warning_messages',)

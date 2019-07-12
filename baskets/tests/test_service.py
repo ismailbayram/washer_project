@@ -10,7 +10,7 @@ from products.service import ProductService
 from baskets.models import Basket
 from baskets.service import BasketService
 from baskets.enums import BasketStatus
-from baskets.exceptions import PrimaryProductsQuantityMustOne
+from baskets.exceptions import PrimaryProductsQuantityMustOne, BasketInvalidException
 
 
 @override_settings(DEFAULT_PRODUCT_PRICE=Decimal('20.00'))
@@ -21,8 +21,10 @@ class BasketServiceTest(TestCase, BaseTestViewMixin):
         self.car_service = CarService()
         self.init_users()
         self.customer_profile = self.customer.customer_profile
-        self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile)
-        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile)
+        self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile,
+                                is_approved=True, is_active=True)
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile,
+                                 is_approved=True, is_active=True)
         self.product1 = self.product_service.create_primary_product(self.store)
         self.product2 = self.product_service.create_product(name='Parfume', store=self.store,
                                                             washer_profile=self.store.washer_profile)
@@ -101,3 +103,8 @@ class BasketServiceTest(TestCase, BaseTestViewMixin):
 
         for bi in basket.basketitem_set.all():
             self.assertIsNotNone(bi.amount)
+
+        self.product_service.delete_product(self.product2)
+
+        with self.assertRaises(BasketInvalidException):
+            self.service.complete_basket(basket)
