@@ -6,7 +6,7 @@ from reservations.enums import ReservationStatus
 
 
 class Reservation(StarterModel):
-    status = EnumField(enum=ReservationStatus)
+    status = EnumField(enum=ReservationStatus, default=ReservationStatus.available)
     period = models.PositiveSmallIntegerField()
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
@@ -15,7 +15,10 @@ class Reservation(StarterModel):
     customer_profile = models.ForeignKey('users.CustomerProfile', null=True, default=None,
                                          on_delete=models.SET_NULL)
     total_amount = models.DecimalField(decimal_places=2, max_digits=6, null=True, default=None)
-    number = models.CharField(max_length=12)
+    number = models.CharField(max_length=12, unique=True)
 
     def __str__(self):
         return f'{self.status.label}'
+
+    class Meta:
+        unique_together = ('start_datetime', 'store', )

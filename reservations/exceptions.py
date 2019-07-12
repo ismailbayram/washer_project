@@ -2,5 +2,5 @@ from api.exceptions import ProjectBaseException
 from reservations import codes
 
 
-# class PeriodIsRequiredException(ProjectBaseException):
-#     code = codes.product_100_0
+class BasketEmptyException(ProjectBaseException):
+    code = codes.reservations_100_0
