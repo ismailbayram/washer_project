@@ -37,7 +37,7 @@ class BasketService:
                                                       product__store__is_active=True,
                                                       product__store__is_approved=True)
         if invalid_items:
-            msg = _('Some services that are invalid has been removed from your basket: ')
+            msg = _('Some services that are invalid have been removed from your basket: ')
 
             for bi in invalid_items:
                 msg += bi.product.name + ', '
