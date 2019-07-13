@@ -36,31 +36,31 @@ class ReservationService:
 
         return reservation
 
-    def create_day_from_config(self, store):
-        pass
+    def create_day_from_config(self, store, day_datetime, period):
+        config = store.config['reservation_hours']
+        day = day_datetime.strftime("%A").lower()
+
+        start = config[day]['start']
+        end = config[day]['end']
+        if start is None:
+            return
+
+        start_time = datetime.datetime.strptime(start, "%H:%M")
+        end_time = datetime.datetime.strptime(end, "%H:%M")
+        diff = (end_time - start_time).seconds / 60
+        period_count = int(diff / period)
+
+        start_datetime = day_datetime.replace(hour=start_time.hour, minute=start_time.minute,
+                                              second=0)
+        for p in range(period_count):
+            start_dt = start_datetime + datetime.timedelta(minutes=(p * period))
+            start_dt = timezone.localize(start_dt)
+            self.create_reservation(store=store, start_datetime=start_dt, period=period)
 
     @atomic
     def create_week_from_config(self, store):
-        config = store.config['reservation_hours']
         period = store.product_set.filter(is_primary=True).order_by('-period').first().period
 
         for k in range(1, 8):
             day_datetime = datetime.datetime.today() + datetime.timedelta(days=k)
-            day = day_datetime.strftime("%A").lower()
-
-            start = config[day]['start']
-            end = config[day]['end']
-            if start is None:
-                continue
-
-            start_time = datetime.datetime.strptime(start, "%H:%M")
-            end_time = datetime.datetime.strptime(end, "%H:%M")
-            diff = (end_time - start_time).seconds / 60
-            period_count = int(diff / period)
-
-            start_datetime = day_datetime.replace(hour=start_time.hour, minute=start_time.minute,
-                                                  second=0)
-            for p in range(period_count):
-                start_dt = start_datetime + datetime.timedelta(minutes=(p * period))
-                start_dt = timezone.localize(start_dt)
-                self.create_reservation(store=store, start_datetime=start_dt, period=period)
+            self.create_day_from_config(store, day_datetime, period)
