@@ -6,9 +6,9 @@ from django.utils.crypto import get_random_string
 from django.conf import settings
 
 from reservations.models import Reservation
-
-
-timezone = pytz.timezone(settings.TIME_ZONE)
+from reservations.enums import ReservationStatus
+from reservations.exceptions import (ReservationNotAvailableException,
+                                     ReservationOccupiedBySomeoneException)
 
 
 class ReservationService:
@@ -37,8 +37,15 @@ class ReservationService:
         return reservation
 
     def create_day_from_config(self, store, day_datetime, period):
+        """
+        :param store: Store
+        :param day_datetime: DateTime
+        :param period: int
+        :return: None
+        """
         config = store.config['reservation_hours']
         day = day_datetime.strftime("%A").lower()
+        timezone = pytz.timezone(settings.TIME_ZONE)
 
         start = config[day]['start']
         end = config[day]['end']
@@ -59,8 +66,26 @@ class ReservationService:
 
     @atomic
     def create_week_from_config(self, store):
+        """
+        :param store: Store
+        :return: None
+        """
         period = store.product_set.filter(is_primary=True).order_by('-period').first().period
 
         for k in range(1, 8):
             day_datetime = datetime.datetime.today() + datetime.timedelta(days=k)
             self.create_day_from_config(store, day_datetime, period)
+
+    def occupy(self, reservation, customer_profile):
+        if reservation.status > ReservationStatus.occupied:
+            raise ReservationNotAvailableException
+        if reservation.status == ReservationStatus.occupied and \
+                not reservation.customer_profile == customer_profile:
+            raise ReservationOccupiedBySomeoneException
+
+        # TODO: add an async task and run after 60 * 4 seconds
+        reservation.status = ReservationStatus.occupied
+        reservation.customer_profile = customer_profile
+        reservation.save(update_fields=['status', 'customer_profile'])
+
+        return reservation

@@ -5,7 +5,7 @@ from enumfields import Enum
 
 class ReservationStatus(Enum):
     available = '100'
-    busy = '200'
+    occupied = '200'
     reserved = '300'
     started = '350'
     completed = '400'
@@ -15,10 +15,22 @@ class ReservationStatus(Enum):
 
     class Labels:
         available = _('Available')
-        busy = _('Busy')
+        occupied = _('Occupied')
         reserved = _('Reserved')
         started = _('Started')
         completed = _('Completed')
         cancelled = _('Cancelled')
         expired = _('Expired')
         disabled = _('Disabled')
+
+    def __gt__(self, other):
+        return int(self.value) > int(other.value)
+
+    def __ge__(self, other):
+        return int(self.value) >= int(other.value)
+
+    def __lt__(self, other):
+        return int(self.value) < int(other.value)
+
+    def __le__(self, other):
+        return int(self.value) <= int(other.value)
