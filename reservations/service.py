@@ -36,6 +36,9 @@ class ReservationService:
 
         return reservation
 
+    def create_day_from_config(self, store):
+        pass
+
     @atomic
     def create_week_from_config(self, store):
         config = store.config['reservation_hours']
