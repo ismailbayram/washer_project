@@ -42,6 +42,5 @@ class ReservationViewSet(viewsets.ReadOnlyModelViewSet):
             self.permission_denied(request)
         elif washer_profile and not reservation.store.washer_profile == washer_profile:
             self.permission_denied(request)
-        else:
-            self.permission_denied(request)
+        return True
 
