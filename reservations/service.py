@@ -9,6 +9,7 @@ from reservations.models import Reservation
 from reservations.enums import ReservationStatus
 from reservations.exceptions import (ReservationNotAvailableException,
                                      ReservationOccupiedBySomeoneException)
+from reservations.tasks import prevent_occupying_reservation
 
 
 class ReservationService(object):
@@ -97,7 +98,8 @@ class ReservationService(object):
                 raise ReservationOccupiedBySomeoneException
             return reservation
 
-        # TODO: add an async task and run after 60 * 4 seconds
+        occupy_timeout = 60 * 4
+        prevent_occupying_reservation.apply_async((reservation.pk, ), countdown=occupy_timeout)
         reservation.status = ReservationStatus.occupied
         reservation.customer_profile = customer_profile
         reservation.save(update_fields=['status', 'customer_profile'])
