@@ -278,6 +278,5 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         # delete test with owner
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         delete_url = reverse_lazy('api:router:my_stores-delete-image', args=[self.store.pk, image_pk])
-        print(delete_url)
         response = self.client.delete(delete_url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)

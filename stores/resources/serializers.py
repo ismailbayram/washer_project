@@ -91,7 +91,7 @@ class ConfigSerializer(serializers.Serializer):
         return attrs
 
 
-class StoreImageSerializer(serializers.ModelSerializer):
+class StoreImageSerializer(serializers.Serializer):
     image = Base64ImageField(required=True)
 
     class Meta:
