@@ -8,3 +8,6 @@ stores_100_1 = {"code": "stores_100_1",
 
 stores_100_2 = {"code": "stores_100_2",
                  "message": _("{}, {} kullanıcısına ait değil.")}
+
+stores_100_3 = {"code": "stores_100_2",
+                 "message": _("Belirtilen dükkanın logosu bulunmamakta.")}

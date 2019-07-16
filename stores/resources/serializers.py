@@ -111,7 +111,7 @@ class StoreSerializer(serializers.ModelSerializer):
         model = Store
         fields = ('pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
-                  'is_approved', 'images')
+                  'is_approved', 'logo', 'images')
 
 
 

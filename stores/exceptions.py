@@ -12,3 +12,7 @@ class ImageDidNotDelete(ProjectBaseException):
 
 class StoreDoesNotBelongToWasherException(ProjectBaseException):
     code = codes.stores_100_2
+
+
+class StoreHasNoLogo(ProjectBaseException):
+    code = codes.stores_100_3

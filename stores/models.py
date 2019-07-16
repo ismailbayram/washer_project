@@ -19,7 +19,7 @@ class Store(StarterModel):
     latitude = models.FloatField(default=None, null=True)
     longitude = models.FloatField(default=None, null=True)
     rating = models.FloatField(default=None, null=True)
-    image = models.ImageField()
+    logo = models.ImageField(null=True)
     objects = StoreManager()
 
     def __str__(self):

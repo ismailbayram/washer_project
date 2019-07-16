@@ -5,11 +5,12 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db.transaction import atomic
 from PIL import Image
-from rest_framework import exceptions
 
-from base.utils import ordereddict_to_dict, thumbnail_file_name_by_orginal_name
+from base.utils import (compress_image, ordereddict_to_dict,
+                        thumbnail_file_name_by_orginal_name)
 from products.service import ProductService
-from stores.exceptions import ImageDidNotDelete, StoreHasSoManyImageException
+from stores.exceptions import (ImageDidNotDelete, StoreHasNoLogo,
+                               StoreHasSoManyImageException)
 from stores.models import Store, StoreImageItem
 
 
@@ -104,8 +105,29 @@ class StoreService:
         instance.save(update_fields=['is_approved'])
         return instance
 
-    def add_logo(self, store, washer_profile):
-        pass
+    def add_logo(self, store, image):
+        """
+        :param store: Store
+        :param image: ContentFile
+        """
+
+        # If there is logo allready it need to be delete on as a file
+        if store.logo:
+            default_storage.delete(store.logo.name)
+
+        image = compress_image(image, do_square=True)
+        store.logo = image
+        store.save()
+
+    def delete_logo(self, store):
+        """
+        :param store: Store
+        """
+        if not store.logo:
+            raise StoreHasNoLogo
+        default_storage.delete(store.logo.name)
+        store.logo = None
+        store.save()
 
     def add_image(self, store, image, washer_profile):
         """
@@ -117,14 +139,7 @@ class StoreService:
             raise StoreHasSoManyImageException
 
         # Compress the comming image
-        not_saved_pure_name = "".join(image.name.split('.')[0:-1])
-        pil_image = Image.open(image)
-        pil_image.convert('RGB')
-
-        f = BytesIO()
-        pil_image.save(f, "JPEG", quality=90)
-        image = ContentFile(f.getvalue())
-        image.name = "{0}.{1}".format(not_saved_pure_name, "jpeg")
+        image = compress_image(image, do_square=True)
 
         # Save StoreImageItem model
         saved_image = StoreImageItem.objects.create(

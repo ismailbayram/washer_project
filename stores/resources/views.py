@@ -72,7 +72,7 @@ class StoreViewSet(viewsets.GenericViewSet,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['POST'], url_path='photo_gallery')
-    def get_images(self, request, *args, **kwargs):
+    def add_images(self, request, *args, **kwargs):
         service = StoreService()
         serializer = StoreImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -83,8 +83,7 @@ class StoreViewSet(viewsets.GenericViewSet,
                           washer_profile=request.user.washer_profile
         )
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+        return Response({}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['DELETE'], url_path='photo_gallery/(?P<image_pk>[0-9]+)')
     def delete_images(self, request, image_pk=None, *args, **kwargs):
@@ -95,6 +94,28 @@ class StoreViewSet(viewsets.GenericViewSet,
         service.delete_image(store_image_item, request.user.washer_profile)
         return Response({})
 
+    @action(detail=True, methods=['POST', 'DELETE'], url_path='logo')
+    def logo(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            return self.add_logo(request, *args, **kwargs)
+        if request.method == 'DELETE':
+            return self.delete_logo(request, *args, **kwargs)
+
+    def add_logo(self, request, *args, **kwargs):
+        service = StoreService()
+
+        # NOTE using the StoreImageSerializer is a hack
+        serializer = StoreImageSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        service.add_logo(**data, store=self.get_object())
+        return Response({}, status=status.HTTP_200_OK)
+
+    def delete_logo(self, request, *args, **kwargs):
+        service = StoreService()
+        service.delete_logo(self.get_object())
+        return Response({})
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
