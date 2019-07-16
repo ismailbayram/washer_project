@@ -90,6 +90,13 @@ class StoreImageSerializer(serializers.ModelSerializer):
         model = StoreImageItem
         fields = ('pk', 'image', )
 
+class StoreLogoSerializer(serializers.ModelSerializer):
+    logo = Base64ImageField(required=True)
+
+    class Meta:
+        model = Store
+        fields = ('logo', )
+
 
 class StoreImagesWithSizesSerializer(serializers.RelatedField):
     def to_representation(self, obj):

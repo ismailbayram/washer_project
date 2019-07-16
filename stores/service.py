@@ -105,17 +105,17 @@ class StoreService:
         instance.save(update_fields=['is_approved'])
         return instance
 
-    def add_logo(self, store, image):
+    def add_logo(self, store, logo):
         """
         :param store: Store
-        :param image: ContentFile
+        :param logo: ContentFile
         """
 
         # If there is logo allready it need to be delete on as a file
         if store.logo:
             default_storage.delete(store.logo.name)
 
-        image = compress_image(image, do_square=True)
+        image = compress_image(logo, do_square=True)
         store.logo = image
         store.save()
 
@@ -138,15 +138,11 @@ class StoreService:
         if StoreImageItem.objects.filter(store=store).count() > 9:
             raise StoreHasSoManyImageException
 
-        # Compress the comming image
-        image = compress_image(image, do_square=True)
+        image = compress_image(image, do_square=True)  # Compress the comming image
 
         # Save StoreImageItem model
-        saved_image = StoreImageItem.objects.create(
-            store=store,
-            image=image,
-            washer_profile=washer_profile
-        )
+        saved_image = StoreImageItem.objects.create(store=store, image=image,
+                                                    washer_profile=washer_profile)
         saved_name_ext = saved_image.image.name.split(".")[-1]
 
         # Saving thumbnail images
@@ -154,11 +150,7 @@ class StoreService:
         edge_size = min(pil_image.size)
         for name, size in settings.IMAGE_SIZES.items():
             croped_image = pil_image.crop((0, 0, edge_size, edge_size))
-
-            croped_image.thumbnail(
-                (size['height'], size['width'],),
-                Image.ANTIALIAS
-            )
+            croped_image.thumbnail((size['height'], size['width'],), Image.ANTIALIAS)
 
             # pillow image to ContentFile and save
             f = BytesIO()
@@ -175,7 +167,7 @@ class StoreService:
         :return: boolean
         """
         try:
-            count, _ = store_image_item.delete()
+            store_image_item.delete()
         except:
             raise ImageDidNotDelete
 

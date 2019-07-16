@@ -7,7 +7,8 @@ from address.resources.serializers import AddressSerializer
 from address.service import AddressService
 from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from stores.models import Store, StoreImageItem
-from stores.resources.serializers import StoreImageSerializer, StoreSerializer
+from stores.resources.serializers import (StoreImageSerializer,
+                                          StoreLogoSerializer, StoreSerializer)
 from stores.service import StoreService
 from users.enums import GroupType
 
@@ -88,8 +89,7 @@ class StoreViewSet(viewsets.GenericViewSet,
     @action(detail=True, methods=['DELETE'], url_path='photo_gallery/(?P<image_pk>[0-9]+)')
     def delete_images(self, request, image_pk=None, *args, **kwargs):
         service = StoreService()
-        store_image_item = get_object_or_404(StoreImageItem,
-                                             pk=image_pk,
+        store_image_item = get_object_or_404(StoreImageItem, pk=image_pk,
                                              washer_profile=request.user.washer_profile)
         service.delete_image(store_image_item, request.user.washer_profile)
         return Response({})
@@ -105,7 +105,7 @@ class StoreViewSet(viewsets.GenericViewSet,
         service = StoreService()
 
         # NOTE using the StoreImageSerializer is a hack
-        serializer = StoreImageSerializer(data=request.data)
+        serializer = StoreLogoSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
