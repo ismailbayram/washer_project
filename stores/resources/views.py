@@ -82,12 +82,11 @@ class StoreViewSet(viewsets.GenericViewSet,
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
-        service.add_image(**data,
-                          store=self.get_object(),
-                          washer_profile=request.user.washer_profile
-        )
+        service.add_image(**data, store=self.get_object(),
+                          washer_profile=request.user.washer_profile)
 
         return Response({}, status=status.HTTP_202_ACCEPTED)
+
 
     @action(detail=True, methods=['DELETE'], url_path='photo_gallery/(?P<image_pk>[0-9]+)')
     def delete_image(self, request, image_pk=None, *args, **kwargs):
@@ -97,28 +96,20 @@ class StoreViewSet(viewsets.GenericViewSet,
         service.delete_image(store_image_item, request.user.washer_profile)
         return Response({}, status=status.HTTP_202_ACCEPTED)
 
+
     @action(detail=True, methods=['POST', 'DELETE'], url_path='logo')
     def logo(self, request, *args, **kwargs):
         if request.method == 'POST':
-            return self.add_logo(request, *args, **kwargs)
+            service = StoreService()
+            serializer = StoreLogoSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            data = serializer.validated_data
+            service.add_logo(**data, store=self.get_object())
+            return Response({}, status=status.HTTP_202_ACCEPTED)
         if request.method == 'DELETE':
-            return self.delete_logo(request, *args, **kwargs)
-
-    def add_logo(self, request, *args, **kwargs):
-        service = StoreService()
-
-        # NOTE using the StoreImageSerializer is a hack
-        serializer = StoreLogoSerializer(data=request.data)
-
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        service.add_logo(**data, store=self.get_object())
-        return Response({}, status=status.HTTP_202_ACCEPTED)
-
-    def delete_logo(self, request, *args, **kwargs):
-        service = StoreService()
-        service.delete_logo(self.get_object())
-        return Response({}, status=status.HTTP_202_ACCEPTED)
+            service = StoreService()
+            service.delete_logo(self.get_object())
+            return Response({}, status=status.HTTP_202_ACCEPTED)
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):

@@ -109,6 +109,7 @@ class StoreService:
         """
         :param store: Store
         :param logo: ContentFile
+        :return: store
         """
 
         # If there is logo allready it need to be delete on as a file
@@ -118,6 +119,7 @@ class StoreService:
         image = compress_image(logo, do_square=True)
         store.logo = image
         store.save()
+        return store
 
     def delete_logo(self, store):
         """

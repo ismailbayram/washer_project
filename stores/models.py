@@ -2,7 +2,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from base.models import StarterModel
-from base.utils import get_file_name_for_image
+from base.utils import generate_file_name
 from stores.manager import StoreManager
 
 
@@ -30,6 +30,6 @@ class Store(StarterModel):
 
 
 class StoreImageItem(StarterModel):
-    image = models.ImageField(upload_to=get_file_name_for_image)
+    image = models.ImageField(upload_to=generate_file_name)
     store = models.ForeignKey(Store, related_name='images', on_delete=models.CASCADE)
     washer_profile = models.ForeignKey('users.WasherProfile', on_delete=models.CASCADE)

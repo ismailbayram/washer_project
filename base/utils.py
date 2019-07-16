@@ -24,7 +24,7 @@ def thumbnail_file_name_by_orginal_name(orginal_name, thumb_name):
     return "{0}_{1}.{2}".format(pure_name, thumb_name, ext_name)
 
 
-def get_file_name_for_image(instance, *args, **kwargs):
+def generate_file_name(instance, *args, **kwargs):
     ext = instance.image.name.split(".")[-1]
     return "{0}.{1}".format(uuid4().hex, ext)
 
