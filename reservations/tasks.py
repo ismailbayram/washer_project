@@ -44,4 +44,17 @@ def check_expired_reservations():
                                                   start_datetime__lt=dt):
         res_service.expire(reservation)
 
-# TODO: periodic task for the day that is after 7 days from now
+
+@periodic_task(run_every=(crontab(hour='4', minute='0')), name="reservations.create_next_week_day")
+def create_next_week_day():
+    # every day at 4 am
+    import datetime
+    from stores.models import Store
+    from reservations.service import ReservationService
+
+    start_datetime = datetime.datetime.today() + datetime.timedelta(days=7)
+    res_service = ReservationService()
+
+    for store in Store.objects.filter(is_active=True, is_approved=True):
+        period = store.product_set.filter(is_primary=True).order_by('-period').first().period
+        res_service.create_day_from_config(store, start_datetime, period)
