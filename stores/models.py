@@ -1,7 +1,8 @@
-from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.db import models
 
 from base.models import StarterModel
+from base.utils import generate_file_name
 from stores.manager import StoreManager
 
 
@@ -18,6 +19,7 @@ class Store(StarterModel):
     latitude = models.FloatField(default=None, null=True)
     longitude = models.FloatField(default=None, null=True)
     rating = models.FloatField(default=None, null=True)
+    logo = models.ImageField(null=True)
     objects = StoreManager()
 
     def __str__(self):
@@ -26,4 +28,8 @@ class Store(StarterModel):
     def get_primary_product(self):
         return self.product_set.filter(is_primary=True).first()
 
-# photoItem.store.washer_profile req
+
+class StoreImageItem(StarterModel):
+    image = models.ImageField(upload_to=generate_file_name)
+    store = models.ForeignKey(Store, related_name='images', on_delete=models.CASCADE)
+    washer_profile = models.ForeignKey('users.WasherProfile', on_delete=models.CASCADE)

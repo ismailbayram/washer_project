@@ -1,10 +1,13 @@
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.test import TestCase
 from model_mommy import mommy
 
-from django.test import TestCase
-
 from base.test import BaseTestViewMixin
-from stores.service import StoreService
+from base.utils import thumbnail_file_name_by_orginal_name
 from cars.enums import CarType
+from stores.service import StoreService
 
 
 class StoreServiceTest(BaseTestViewMixin, TestCase):
@@ -12,6 +15,12 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         self.service = StoreService()
         self.init_users()
         self.store = mommy.make('stores.Store', is_approved=True, phone_number="05555555555")
+        self.washers_store = mommy.make('stores.Store', is_approved=True,
+                                        phone_number="05555555555",
+                                        washer_profile=self.washer.washer_profile)
+
+        with open('stores/tests/img.jpeg', mode='rb') as file:
+            self.photo = file.read()
 
     def test_create_store(self):
         data = {
@@ -87,3 +96,34 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         store = self.service.decline_store(store)
         self.assertFalse(store.is_approved)
 
+    def test_add_delete_logo(self):
+        content_file_logo = ContentFile(self.photo)
+        content_file_logo.name = "img.jpeg"
+
+        store = self.service.add_logo(store=self.washers_store, logo=content_file_logo)
+        file_name = store.logo.name
+        self.assertTrue(default_storage.exists(file_name))
+
+        self.service.delete_logo(store)
+        self.assertFalse(default_storage.exists(file_name))
+
+
+    def test_add_delete_image(self):
+        content_file_logo = ContentFile(self.photo)
+        content_file_logo.name = "img.jpeg"
+
+        self.service.add_image(store=self.washers_store, image=content_file_logo,
+                               washer_profile=self.washer.washer_profile)
+
+        file_name = self.washers_store.images.first().image.name
+        self.assertTrue(default_storage.exists(file_name))
+        for size_name in settings.IMAGE_SIZES.keys():
+            thumb_f_n = thumbnail_file_name_by_orginal_name(file_name, size_name)
+            self.assertTrue(default_storage.exists(thumb_f_n))
+
+        self.service.delete_image(self.washers_store.images.first(), self.washer.washer_profile)
+
+        self.assertFalse(default_storage.exists(file_name))
+        for size_name in settings.IMAGE_SIZES.keys():
+            thumb_f_n = thumbnail_file_name_by_orginal_name(file_name, size_name)
+            self.assertFalse(default_storage.exists(thumb_f_n))
