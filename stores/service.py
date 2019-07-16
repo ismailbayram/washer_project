@@ -4,9 +4,10 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from PIL import Image
+from rest_framework import exceptions
 
 from base.utils import ordereddict_to_dict, thumbnail_file_name_by_orginal_name
-from stores.exceptions import StoreHasSoMuchImageException
+from stores.exceptions import ImageDidNotDelete, StoreHasSoManyImageException
 from stores.models import Store, StoreImageItem
 
 
@@ -102,7 +103,7 @@ class StoreService:
         :param washer_profile: WasherProfile
         """
         if StoreImageItem.objects.filter(store=store).count() > 9:
-            raise StoreHasSoMuchImageException
+            raise StoreHasSoManyImageException
 
 
         # Compress the comming image
@@ -140,4 +141,24 @@ class StoreService:
             default_storage.save(
                 thumbnail_file_name_by_orginal_name(saved_image.image.name, name),
                 ContentFile(f.getvalue())
+            )
+
+    def delete_image(self, store_image_item, washer_profile):
+        """
+        :param store_image_item: StoreImageItem
+        :param washer_profeile: WasherProfile
+        :return: boolean
+        """
+        if store_image_item.washer_profile != washer_profile:
+            raise exceptions.NotAuthenticated()
+
+        try:
+            count, _ = store_image_item.delete()
+        except:
+            raise ImageDidNotDelete
+
+        default_storage.delete(store_image_item.image.name)
+        for name, _ in settings.IMAGE_SIZES.items():
+            default_storage.delete(
+                thumbnail_file_name_by_orginal_name(store_image_item.image.name, name)
             )

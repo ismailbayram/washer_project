@@ -96,7 +96,7 @@ class StoreImagesWithSizesSerializer(serializers.RelatedField):
         images = {'full': obj.image.url}
         for name, _ in settings.IMAGE_SIZES.items():
             images[name] = thumbnail_file_name_by_orginal_name(obj.image.url, name)
-        return images
+        return {"pk":obj.pk, "image":images}
 
 
 class StoreSerializer(serializers.ModelSerializer):
@@ -109,9 +109,9 @@ class StoreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Store
-        fields = ('pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
+        fields = ( 'images','pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
-                  'is_approved', 'images')
+                  'is_approved',)
 
 
 

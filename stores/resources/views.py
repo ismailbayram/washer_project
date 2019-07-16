@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -5,7 +6,7 @@ from rest_framework.response import Response
 from address.resources.serializers import AddressSerializer
 from address.service import AddressService
 from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
-from stores.models import Store
+from stores.models import Store, StoreImageItem
 from stores.resources.serializers import StoreImageSerializer, StoreSerializer
 from stores.service import StoreService
 from users.enums import GroupType
@@ -66,9 +67,8 @@ class StoreViewSet(viewsets.GenericViewSet,
         serializer.instance = service.create_address(store, **serializer.validated_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['POST'], url_path='photo_galery')
+    @action(detail=True, methods=['POST'], url_path='photo_gallery')
     def get_images(self, request, *args, **kwargs):
-        print(request.data)
         service = StoreService()
         serializer = StoreImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -81,6 +81,17 @@ class StoreViewSet(viewsets.GenericViewSet,
         )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @action(detail=True, methods=['DELETE'], url_path='photo_gallery/(?P<image_pk>[0-9]+)')
+    def delete_images(self, request, image_pk=None, *args, **kwargs):
+        service = StoreService()
+        store_image_item = get_object_or_404(StoreImageItem,
+                                             pk=image_pk,
+                                             washer_profile=request.user.washer_profile)
+        service.delete_image(store_image_item, request.user.washer_profile)
+        return Response({})
+
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):

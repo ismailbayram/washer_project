@@ -2,5 +2,9 @@ from api.exceptions import ProjectBaseException
 from stores import codes
 
 
-class StoreHasSoMuchImageException(ProjectBaseException):
+class StoreHasSoManyImageException(ProjectBaseException):
     code = codes.stores_100_0
+
+
+class ImageDidNotDelete(ProjectBaseException):
+    code = codes.stores_100_1
