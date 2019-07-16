@@ -54,7 +54,6 @@ class CarService:
         :param customer_profile: CustomerProfile
         """
 
-        # TODO: if car.is_active = False raise exception
         Car.objects.filter(customer_profile=customer_profile).update(is_selected=False)
 
         car.is_selected = True

@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -21,6 +23,12 @@ class DaySerializer(serializers.Serializer):
         if start and end:
             if start >= end:
                 raise ValidationError(_('Başlangıç saati bitiş saatinden önce olmalı.'))
+            start_time = datetime.datetime.strptime(start, "%H:%M")
+            end_time = datetime.datetime.strptime(end, "%H:%M")
+            diff = (end_time - start_time).seconds / 60
+
+            if diff <= 59:
+                raise ValidationError(_('Başlangıç saati bitiş saati arasında en az 1 saat olmalı.'))
 
         return attrs
 

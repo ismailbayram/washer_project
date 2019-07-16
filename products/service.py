@@ -19,6 +19,7 @@ PRIMARY_PRODUCT = {
 
 class ProductService:
     def create_primary_product(self, store):
+        # TODO: check second primary product period greater than 60
         """
         :param store: Store
         :return: Product
