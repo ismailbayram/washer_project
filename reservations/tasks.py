@@ -1,3 +1,6 @@
+from celery.task import periodic_task
+from celery.schedules import crontab
+
 from washer_project.celery import app
 
 
@@ -24,7 +27,7 @@ def create_store_weekly_reservations(store_id):
     # NOTIFICATION
 
 
-@app.task(name="reservations.check_expired_reservations")
+@periodic_task(run_every=(crontab(minute='*/30')), name="reservations.check_expired_reservations")
 def check_expired_reservations():
     import pytz
     from datetime import datetime

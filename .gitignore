@@ -93,3 +93,4 @@ media/*
 settings_local.py
 dummy_data.py
 celerybeat-schedule
+celerybeat.pid
