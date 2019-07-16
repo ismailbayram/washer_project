@@ -1,8 +1,10 @@
 import json
-from model_mommy import mommy
+
+from django.core.files.storage import default_storage
 from django.test import TestCase
-from rest_framework.reverse import reverse_lazy
+from model_mommy import mommy
 from rest_framework import status
+from rest_framework.reverse import reverse_lazy
 
 from base.test import BaseTestViewMixin
 from stores.models import Store
@@ -16,6 +18,9 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
                                 is_approved=False, is_active=False)
         self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile,
                                  is_approved=True)
+
+        with open('stores/tests/img.txt', 'r') as file:
+            self.photo = file.read()
 
     def test_create_store(self):
         url = reverse_lazy('api:router:my_stores-list')
@@ -199,3 +204,80 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         store.refresh_from_db()
         self.assertEqual(store.address.pk, jresponse['pk'])
         self.assertFalse(store.is_approved)
+
+    def test_logo_add_and_delete(self):
+        logo_url = reverse_lazy('api:router:my_stores-logo', args=[self.store.pk])
+        store_url = reverse_lazy('api:router:my_stores-detail', args=[self.store.pk])
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+
+        data ={
+            "logo": self.photo
+        }
+
+        # save image
+        image_response = self.client.post(logo_url, data=data, content_type='application/json', **headers)
+        self.assertEqual(image_response.status_code, status.HTTP_202_ACCEPTED)
+
+        # get image
+        store_response = self.client.get(store_url, content_type='application/json', **headers)
+        url = store_response.data.get('logo')
+        self.assertNotEqual(url, None)
+
+        # delete image
+        image_response = self.client.delete(logo_url, content_type='application/json', **headers)
+        self.assertEqual(image_response.status_code, status.HTTP_202_ACCEPTED)
+
+        # cant add or delete image washer2 or customer
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
+        response = self.client.post(logo_url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.delete(logo_url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.post(logo_url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        response = self.client.delete(logo_url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+    def test_gallery(self):
+        url = reverse_lazy('api:router:my_stores-add-image', args=[self.store.pk])
+        store_url = reverse_lazy('api:router:my_stores-detail', args=[self.store.pk])
+        data ={
+            "image": self.photo
+        }
+        # cant send image by anouther
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+        # get image from store
+        store_response = self.client.get(store_url, content_type='application/json', **headers)
+        image_pk = store_response.data.get('images')[0].get('pk')
+
+        # delete test with washer2 and customer
+        delete_url = reverse_lazy('api:router:my_stores-delete-image', args=[self.store.pk, image_pk])
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
+        response = self.client.delete(delete_url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.delete(delete_url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+        # delete test with owner
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        delete_url = reverse_lazy('api:router:my_stores-delete-image', args=[self.store.pk, image_pk])
+        print(delete_url)
+        response = self.client.delete(delete_url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)

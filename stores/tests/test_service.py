@@ -1,10 +1,9 @@
+from django.test import TestCase
 from model_mommy import mommy
 
-from django.test import TestCase
-
 from base.test import BaseTestViewMixin
-from stores.service import StoreService
 from cars.enums import CarType
+from stores.service import StoreService
 
 
 class StoreServiceTest(BaseTestViewMixin, TestCase):
@@ -86,4 +85,3 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         store = mommy.make('stores.Store', is_approved=True)
         store = self.service.decline_store(store)
         self.assertFalse(store.is_approved)
-
