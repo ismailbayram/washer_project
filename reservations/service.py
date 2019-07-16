@@ -105,3 +105,12 @@ class ReservationService(object):
         reservation.save(update_fields=['status', 'customer_profile'])
 
         return reservation
+
+    def disable(self, reservation):
+        if not reservation.status == ReservationStatus.available:
+            raise ReservationNotAvailableException
+        # notification to washer
+
+        reservation.status = ReservationStatus.disabled
+        reservation.save(update_fields=['status'])
+        return reservation

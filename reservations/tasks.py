@@ -21,5 +21,6 @@ def create_store_weekly_reservations(store_id):
     res_service = ReservationService()
     store = Store.objects.get(pk=store_id)
     res_service.create_week_from_config(store)
+    # NOTIFICATION
 
 # TODO: periodic task for the day that is after 7 days from now

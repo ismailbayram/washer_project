@@ -34,6 +34,8 @@ class ReservationViewSet(viewsets.ReadOnlyModelViewSet):
     def disable(self, request, *args, **kwargs):
         reservation = self.get_object()
         self._check_object_permission(request, reservation)
+        self.service.disable(reservation)
+        return Response({}, status=status.HTTP_200_OK)
 
     def _check_object_permission(self, request, reservation):
         washer_profile = request.user.washer_profile

@@ -9,7 +9,7 @@ class ReservationStatus(Enum):
     reserved = '300'  # reserved by customer
     started = '350'  # process started by washer or worker
     completed = '400'  # process completed by washer or worker
-    cancelled = '500'  # cancel reserved reservation by washer or worker
+    cancelled = '500'  # cancel reserved reservation by washer or worker or customer
     expired = '530'  # expire by system
     disabled = '560'  # disable by washer or worker
 
