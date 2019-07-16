@@ -113,7 +113,6 @@ class StoreService:
         if StoreImageItem.objects.filter(store=store).count() > 9:
             raise StoreHasSoManyImageException
 
-
         # Compress the comming image
         not_saved_pure_name = "".join(image.name.split('.')[0:-1])
         pil_image = Image.open(image)

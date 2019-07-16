@@ -109,9 +109,9 @@ class StoreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Store
-        fields = ( 'images','pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
+        fields = ('pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
-                  'is_approved',)
+                  'is_approved', 'images')
 
 
 
