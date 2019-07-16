@@ -3,6 +3,7 @@ from django.db.transaction import atomic
 from base.utils import ordereddict_to_dict
 from stores.models import Store
 from products.service import ProductService
+from reservations.tasks import create_store_weekly_reservations
 
 
 class StoreService:
@@ -84,6 +85,7 @@ class StoreService:
         # NOTIFICATION
         instance.is_approved = True
         instance.save(update_fields=['is_approved'])
+        create_store_weekly_reservations.delay(instance.id)
         return instance
 
     def decline_store(self, instance):
@@ -92,6 +94,7 @@ class StoreService:
         :return: Store
         """
         # NOTIFICATION
+        # TODO: check reservations
         instance.is_approved = False
         instance.save(update_fields=['is_approved'])
         return instance
