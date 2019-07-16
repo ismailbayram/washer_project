@@ -104,6 +104,9 @@ class StoreService:
         instance.save(update_fields=['is_approved'])
         return instance
 
+    def add_logo(self, store, washer_profile):
+        pass
+
     def add_image(self, store, image, washer_profile):
         """
         :param store: Store
@@ -156,9 +159,6 @@ class StoreService:
         :param washer_profeile: WasherProfile
         :return: boolean
         """
-        if store_image_item.washer_profile != washer_profile:
-            raise exceptions.NotAuthenticated()
-
         try:
             count, _ = store_image_item.delete()
         except:
