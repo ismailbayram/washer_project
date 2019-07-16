@@ -1,14 +1,14 @@
-from PIL import Image
-
-from django.conf import settings
-
-from base.utils import ordereddict_to_dict
-from stores.models import Store, StoreImageItem
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from io import BytesIO
 
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from PIL import Image
+
+from base.utils import ordereddict_to_dict, thumbnail_file_name_by_orginal_name
 from stores.exceptions import StoreHasSoMuchImageException
+from stores.models import Store, StoreImageItem
+
 
 class StoreService:
     def create_store(self, name, washer_profile, phone_number, tax_office,
@@ -101,11 +101,11 @@ class StoreService:
         :param image: ContentFile
         :param washer_profile: WasherProfile
         """
-
         if StoreImageItem.objects.filter(store=store).count() > 9:
             raise StoreHasSoMuchImageException
 
 
+        # Compress the comming image
         not_saved_pure_name = "".join(image.name.split('.')[0:-1])
         pil_image = Image.open(image)
         pil_image.convert('RGB')
@@ -115,20 +115,15 @@ class StoreService:
         image = ContentFile(f.getvalue())
         image.name = "{0}.{1}".format(not_saved_pure_name, "jpeg")
 
-
         # Save StoreImageItem model
         saved_image = StoreImageItem.objects.create(
             store=store,
             image=image,
             washer_profile=washer_profile
         )
-
-
-        saved_name = saved_image.image.name
-        saved_name_pure = "".join(saved_image.image.name.split(".")[0:-1])
         saved_name_ext = saved_image.image.name.split(".")[-1]
 
-        # Saveing thumbnail images
+        # Saving thumbnail images
         pil_image = Image.open(saved_image.image)
         edge_size = min(pil_image.size)
         for name, size in settings.IMAGE_SIZES.items():
@@ -143,6 +138,6 @@ class StoreService:
             f = BytesIO()
             croped_image.save(f, saved_name_ext)
             default_storage.save(
-                    "{0}_{1}.{2}".format(saved_name_pure, name, saved_name_ext),
-                    ContentFile(f.getvalue())
+                thumbnail_file_name_by_orginal_name(saved_image.image.name, name),
+                ContentFile(f.getvalue())
             )

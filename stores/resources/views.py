@@ -1,14 +1,14 @@
-from rest_framework import viewsets, status, mixins
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
-from address.service import AddressService
 from address.resources.serializers import AddressSerializer
-from users.enums import GroupType
-from stores.resources.serializers import StoreSerializer, StoreImageSerializer
+from address.service import AddressService
+from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from stores.models import Store
+from stores.resources.serializers import StoreImageSerializer, StoreSerializer
 from stores.service import StoreService
+from users.enums import GroupType
 
 
 class StoreViewSet(viewsets.GenericViewSet,
@@ -67,13 +67,14 @@ class StoreViewSet(viewsets.GenericViewSet,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['POST'], url_path='photo_galery')
-    def gallery_image(self, request, *args, **kwargs):
+    def get_images(self, request, *args, **kwargs):
+        print(request.data)
         service = StoreService()
         serializer = StoreImageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
-        serializer.instance = service.add_image(
+        service.add_image(
             store=self.get_object(),
             image=data['image'],
             washer_profile=request.user.washer_profile
