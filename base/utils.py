@@ -1,3 +1,6 @@
+from uuid import uuid4
+
+
 def ordereddict_to_dict(value):
     for k, v in value.items():
         if isinstance(v, dict):
@@ -15,3 +18,8 @@ def thumbnail_file_name_by_orginal_name(orginal_name, thumb_name):
     pure_name = "".join(orginal_name.split(".")[0:-1])
     ext_name = orginal_name.split(".")[-1]
     return "{0}_{1}.{2}".format(pure_name, thumb_name, ext_name)
+
+
+def get_file_name_for_image(instance, *args, **kwargs):
+    ext = instance.image.name.split(".")[-1]
+    return "{0}.{1}".format(uuid4().hex, ext)

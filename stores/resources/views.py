@@ -74,10 +74,9 @@ class StoreViewSet(viewsets.GenericViewSet,
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
-        service.add_image(
-            store=self.get_object(),
-            image=data['image'],
-            washer_profile=request.user.washer_profile
+        service.add_image(**data,
+                          store=self.get_object(),
+                          washer_profile=request.user.washer_profile
         )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
