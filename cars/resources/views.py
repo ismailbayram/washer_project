@@ -1,16 +1,13 @@
-import rest_framework.exceptions
 from rest_framework import viewsets, status
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework import generics, mixins, views
 from rest_framework import decorators
-from rest_framework.exceptions import NotFound
 
 from api.permissions import HasGroupPermission, IsCustomerOrReadOnlyPermission
 from users.enums import GroupType
 from cars.resources.serializers import CarSerializer
 from cars.models import Car
 from cars.service import CarService
+
 
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.filter(is_active=True)

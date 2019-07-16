@@ -9,6 +9,7 @@ from address.resources.views import (CountryViewSet, CityViewSet,
 from stores.resources.views import StoreViewSet, StoreListViewSet
 from products.resources.views import ProductViewSet, ProductListViewSet
 from baskets.resources.views import BasketViewSet
+from reservations.resources.views import ReservationViewSet
 
 from api.views import get_swagger_view
 
@@ -40,6 +41,9 @@ basket_view = BasketViewSet.as_view({
     'post': 'add_item',
     'delete': 'delete_item',
 })
+
+# reservations
+router.register('reservations', ReservationViewSet, base_name='reservations')
 
 app_name = 'api'
 

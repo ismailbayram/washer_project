@@ -32,11 +32,16 @@ class StoreSerializersTest(TestCase):
             serializer = DaySerializer(data=data)
             serializer.is_valid(raise_exception=True)
 
-        data = {"start": "09:00", "end": "18:00"}
+        data = {"start": "09:00", "end": "09:59"}
+        with self.assertRaises(ValidationError):
+            serializer = DaySerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+
+        data = {"start": "09:00", "end": "10:00"}
         serializer = DaySerializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.assertEqual(serializer.validated_data['start'], "09:00")
-        self.assertEqual(serializer.validated_data['end'], "18:00")
+        self.assertEqual(serializer.validated_data['end'], "10:00")
 
     def test_week_serializer(self):
         data = {
