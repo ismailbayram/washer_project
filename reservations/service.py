@@ -77,6 +77,20 @@ class ReservationService:
             self.create_day_from_config(store, day_datetime, period)
 
     def occupy(self, reservation, customer_profile):
+        """
+        :param reservation: Reservation
+        :param customer_profile: CustomerProfile
+        :return: Reservation
+        """
+        try:
+            reservation_occupied = customer_profile.reservation_set.get(status=ReservationStatus.occupied)
+            if reservation_occupied:
+                reservation_occupied.status = ReservationStatus.available
+                reservation_occupied.customer_profile = None
+                reservation_occupied.save(update_fields=['status', 'customer_profile'])
+        except Reservation.DoesNotExist:
+            pass
+
         if reservation.status > ReservationStatus.occupied:
             raise ReservationNotAvailableException
         if reservation.status == ReservationStatus.occupied and \
