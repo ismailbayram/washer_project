@@ -114,3 +114,9 @@ class ReservationService(object):
         reservation.status = ReservationStatus.disabled
         reservation.save(update_fields=['status'])
         return reservation
+
+    def expire(self, reservation):
+        # notification to washer
+        reservation.status = ReservationStatus.expired
+        reservation.save(update_fields=['status'])
+        return reservation

@@ -23,4 +23,22 @@ def create_store_weekly_reservations(store_id):
     res_service.create_week_from_config(store)
     # NOTIFICATION
 
+
+@app.task(name="reservations.check_expired_reservations")
+def check_expired_reservations():
+    import pytz
+    from datetime import datetime
+    from django.conf import settings
+    from reservations.models import Reservation
+    from reservations.enums import ReservationStatus
+    from reservations.service import ReservationService
+
+    timezone = pytz.timezone(settings.TIME_ZONE)
+    dt = timezone.localize(datetime.now())
+    res_service = ReservationService()
+
+    for reservation in Reservation.objects.filter(status=ReservationStatus.available,
+                                                  start_datetime__lt=dt):
+        res_service.expire(reservation)
+
 # TODO: periodic task for the day that is after 7 days from now
