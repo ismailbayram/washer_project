@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import datetime
 import os
+from decimal import Decimal
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,6 +44,8 @@ INSTALLED_APPS = [
     'address',
     'stores',
     'cars',
+    'products',
+    'baskets',
 ]
 
 MIDDLEWARE = [
@@ -145,6 +148,7 @@ AUTH_USER_MODEL = 'users.User'
 
 STATIC_URL = '/static/'
 
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -159,6 +163,10 @@ IMAGE_SIZES = {
         "width": 250,
     },
 }
+
+DEFAULT_PRODUCT_PRICE = Decimal('30.00')
+MINIMUM_PRODUCT_PRICE = Decimal('0.99')
+
 
 try:
     from washer_project.settings_local import *

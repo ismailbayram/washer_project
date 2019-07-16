@@ -3,15 +3,18 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.db.transaction import atomic
 from PIL import Image
 from rest_framework import exceptions
 
 from base.utils import ordereddict_to_dict, thumbnail_file_name_by_orginal_name
+from products.service import ProductService
 from stores.exceptions import ImageDidNotDelete, StoreHasSoManyImageException
 from stores.models import Store, StoreImageItem
 
 
 class StoreService:
+    @atomic
     def create_store(self, name, washer_profile, phone_number, tax_office,
                      tax_number, latitude=None, longitude=None, **kwargs):
         """
@@ -29,7 +32,8 @@ class StoreService:
         store = Store.objects.create(name=name, washer_profile=washer_profile,
                                      phone_number=phone_number, tax_office=tax_office, config=config,
                                      tax_number=tax_number, latitude=latitude, longitude=longitude)
-
+        product_service = ProductService()
+        product_service.create_primary_product(store)
         return store
 
     def update_store(self, store, name, phone_number, tax_office, tax_number, **kwargs):
@@ -49,14 +53,18 @@ class StoreService:
         update_fields = ['name', 'phone_number', 'tax_office', 'tax_number']
 
         if latitude:
-            update_fields.append('latitude')
             store.latitude = latitude
+            update_fields.append('latitude')
+            store.is_approved = False
+            update_fields.append('is_approved')
 
         if longitude:
-            update_fields.append('longitude')
             store.longitude = longitude
+            update_fields.append('longitude')
+            store.is_approved = False
+            update_fields.append('is_approved')
 
-        if latitude or longitude or not store.phone_number == phone_number:
+        if not store.phone_number == phone_number:
             store.is_approved = False
             update_fields.append('is_approved')
 
@@ -72,7 +80,7 @@ class StoreService:
         store.phone_number = phone_number
         store.tax_office = tax_office
         store.tax_number = tax_number
-        store.save(update_fields=update_fields)
+        store.save(update_fields=[*set(update_fields)])
 
         return store
 

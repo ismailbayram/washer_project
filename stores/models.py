@@ -25,6 +25,8 @@ class Store(StarterModel):
     def __str__(self):
         return f'{self.name}'
 
+    def get_primary_product(self):
+        return self.product_set.filter(is_primary=True).first()
 
 
 class StoreImageItem(StarterModel):

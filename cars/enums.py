@@ -4,7 +4,7 @@ from enumfields import Enum
 
 
 class CarType(Enum):
-    normal = 'binek arac'
+    normal = 'normal'
     suv = 'suv'
     commercial = 'commercial'
     minibus = 'minibus'

@@ -8,3 +8,7 @@ class StoreHasSoManyImageException(ProjectBaseException):
 
 class ImageDidNotDelete(ProjectBaseException):
     code = codes.stores_100_1
+
+
+class StoreDoesNotBelongToWasherException(ProjectBaseException):
+    code = codes.stores_100_2

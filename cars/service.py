@@ -1,10 +1,5 @@
-from django.db.transaction import atomic
-from django.db.utils import IntegrityError
-import rest_framework.exceptions
-
-from cars.enums import CarType
 from cars.models import Car
-from cars.exceptions import DublicateCarException
+
 
 class CarService:
     def create_car(self, licence_plate, car_type, customer_profile):
@@ -19,6 +14,8 @@ class CarService:
                     car_type=car_type,
                     customer_profile=customer_profile,
                 )
+        if customer_profile.cars.count() == 1:
+            self.select_car(car, customer_profile)
 
         return car
 
@@ -45,8 +42,11 @@ class CarService:
         car.is_active = False
         car.is_selected = False
         car.save()
-        return car
 
+        if car.customer_profile.cars.filter(is_active=True, is_selected=True).count() == 0:
+            car_selected = car.customer_profile.cars.first()
+            self.select_car(car_selected, car.customer_profile)
+        return car
 
     def select_car(self, car, customer_profile):
         """
@@ -54,6 +54,7 @@ class CarService:
         :param customer_profile: CustomerProfile
         """
 
+        # TODO: if car.is_active = False raise exception
         Car.objects.filter(customer_profile=customer_profile).update(is_selected=False)
 
         car.is_selected = True
