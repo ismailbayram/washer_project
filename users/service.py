@@ -8,11 +8,12 @@ from rest_framework_jwt.settings import api_settings as jwt_settings
 
 from stores.exceptions import StoreDoesNotBelongToWasherException
 from users.enums import GroupType
-from users.exceptions import (SmsCodeExpired, SmsCodeIsInvalid,
-                              SmsCodeIsNotCreated,
+from users.exceptions import (SmsCodeExpiredException,
+                              SmsCodeIsInvalidException,
+                              SmsCodeIsNotCreatedException,
                               UserGroupTypeInvalidException,
                               WorkerDoesNotBelongToWasherException,
-                              WorkerHasNoStore)
+                              WorkerHasNoStoreException)
 from users.models import (CustomerProfile, SmsMessageModel, User,
                           WasherProfile, WorkerProfile)
 
@@ -197,18 +198,18 @@ class SmsService:
         try:
             sms_obj = SmsMessageModel.objects.get(user=user, is_expired=False)
         except SmsMessageModel.DoesNotExist:
-            raise SmsCodeIsNotCreated
+            raise SmsCodeIsNotCreatedException
 
         if now > sms_obj.expire_datetime:
             sms_obj.is_expired = True
             sms_obj.save(update_fields=['is_expired'])
-            raise SmsCodeExpired
+            raise SmsCodeExpiredException
 
         if sms_obj.code != sms_code:
-            raise SmsCodeIsInvalid
+            raise SmsCodeIsInvalidException
 
         if user.is_worker and user.washer_profile is None:
-            raise WorkerHasNoStore
+            raise WorkerHasNoStoreException
 
         # So sms is accepted
         sms_obj.is_expired = True

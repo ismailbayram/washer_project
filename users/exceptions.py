@@ -13,14 +13,14 @@ class UserGroupTypeInvalidException(ProjectBaseException):
 class WorkerDoesNotBelongToWasherException(ProjectBaseException):
     code = codes.workers_100_0
 
-class SmsCodeIsNotCreated(ProjectBaseException):
+class SmsCodeIsNotCreatedException(ProjectBaseException):
     code = codes.auth_100_0
 
-class SmsCodeExpired(ProjectBaseException):
+class SmsCodeExpiredException(ProjectBaseException):
     code = codes.auth_100_1
 
-class SmsCodeIsInvalid(ProjectBaseException):
+class SmsCodeIsInvalidException(ProjectBaseException):
     code = codes.auth_100_2
 
-class WorkerHasNoStore(ProjectBaseException):
+class WorkerHasNoStoreException(ProjectBaseException):
     code = codes.auth_100_3

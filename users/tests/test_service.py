@@ -7,10 +7,11 @@ from model_mommy import mommy
 
 from stores.exceptions import StoreDoesNotBelongToWasherException
 from users.enums import GroupType
-from users.exceptions import (SmsCodeIsInvalid, SmsCodeIsNotCreated,
+from users.exceptions import (SmsCodeIsInvalidException,
+                              SmsCodeIsNotCreatedException,
                               UserGroupTypeInvalidException,
                               WorkerDoesNotBelongToWasherException,
-                              WorkerHasNoStore)
+                              WorkerHasNoStoreException)
 from users.models import CustomerProfile
 from users.service import SmsService, UserService, WorkerProfileService
 
@@ -181,7 +182,7 @@ class SmsServiceTest(TestCase):
         self.assertEqual(sms_obj.user, self.customer)
 
     def test_create_and_verify_sms(self):
-        with self.assertRaises(SmsCodeIsNotCreated):
+        with self.assertRaises(SmsCodeIsNotCreatedException):
             self.service.verify_sms(self.customer, ".")
 
         sms_obj = self.service.get_or_create_sms_code(self.customer)
@@ -194,16 +195,15 @@ class SmsServiceTest(TestCase):
         sms_obj = self.service.get_or_create_sms_code(self.customer)
         self.assertNotEqual(first_expire_time, sms_obj.expire_datetime)
 
-        with self.assertRaises(SmsCodeIsInvalid):
+        with self.assertRaises(SmsCodeIsInvalidException):
             self.service.verify_sms(self.customer, sms_obj.code+"wrong")
 
         self.assertEqual(sms_obj.is_expired, False)
 
-        print("not", self.customer.is_worker)
         self.service.verify_sms(self.customer, sms_obj.code)
         sms_obj.refresh_from_db()
         self.assertEqual(sms_obj.is_expired, True)
 
         sms_obj = self.service.get_or_create_sms_code(self.worker)
-        with self.assertRaises(WorkerHasNoStore):
+        with self.assertRaises(WorkerHasNoStoreException):
             self.service.verify_sms(self.worker, sms_obj.code)
