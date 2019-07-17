@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -19,7 +21,8 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
                                         phone_number="05555555555",
                                         washer_profile=self.washer.washer_profile)
 
-        with open('stores/tests/img.jpeg', mode='rb') as file:
+        path = os.path.join(settings.BASE_DIR, 'stores/tests/img.jpeg')
+        with open(path, mode='rb') as file:
             self.photo = file.read()
 
     def test_create_store(self):

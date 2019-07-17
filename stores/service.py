@@ -94,7 +94,7 @@ class StoreService:
         # NOTIFICATION
         instance.is_approved = True
         instance.save(update_fields=['is_approved'])
-        create_store_weekly_reservations.delay(instance.id)
+        create_store_weekly_reservations.delay(instance.id)  # TODO: test
         return instance
 
     def decline_store(self, instance):

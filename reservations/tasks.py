@@ -4,6 +4,8 @@ from celery.schedules import crontab
 from washer_project.celery import app
 
 
+# TODO: test tasks
+
 @app.task(name="reservations.prevent_occupying_reservation")
 def prevent_occupying_reservation(reservation_id):
     from reservations.models import Reservation

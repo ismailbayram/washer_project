@@ -1,6 +1,7 @@
 import json
+import os
 
-from django.core.files.storage import default_storage
+from django.conf import settings
 from django.test import TestCase
 from model_mommy import mommy
 from rest_framework import status
@@ -19,7 +20,8 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile,
                                  is_approved=True)
 
-        with open('stores/tests/img.txt', 'r') as file:
+        path = os.path.join(settings.BASE_DIR, 'stores/tests/img.txt')
+        with open(path, 'r') as file:
             self.photo = file.read()
 
     def test_create_store(self):
