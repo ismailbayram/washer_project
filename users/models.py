@@ -70,8 +70,8 @@ class WorkerProfile(StarterModel):
         return f'{self.user.get_full_name()}'
 
 
-class SmsMessageModel(StarterModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sms_models')
+class SmsMessage(StarterModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sms_messages')
     is_expired = models.BooleanField(default=False)
     expire_datetime = models.DateTimeField()
     code = models.CharField(max_length=6)

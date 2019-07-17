@@ -14,8 +14,8 @@ from users.exceptions import (SmsCodeExpiredException,
                               UserGroupTypeInvalidException,
                               WorkerDoesNotBelongToWasherException,
                               WorkerHasNoStoreException)
-from users.models import (CustomerProfile, SmsMessageModel, User,
-                          WasherProfile, WorkerProfile)
+from users.models import (CustomerProfile, SmsMessage, User, WasherProfile,
+                          WorkerProfile)
 
 
 class UserService:
@@ -157,37 +157,52 @@ class WorkerProfileService:
 
 
 class SmsService:
-    SMS_EXPIRE_TIME = 300 # sn
+    SMS_EXPIRE_TIME = 5 * 60 # sn
 
     def _create_sms_code(self, user):
         # TODO randomize the code
         now = timezone.now()
         randomized_code = '000000'
-        sms_obj = SmsMessageModel.objects.create(
+        sms_obj = SmsMessage.objects.create(
             user=user,
             code=randomized_code,
             expire_datetime=now + datetime.timedelta(seconds=self.SMS_EXPIRE_TIME)
         )
         return sms_obj
 
+    @atomic
     def get_or_create_sms_code(self, user):
         """
         :param user: User
-        :return: SmsMessageModel
+        :return: SmsMessage
         """
         now = timezone.now()
+
+        create_new_obj = False
+
         try:
-            sms_obj = user.sms_models.get(is_expired=False)
+            sms_obj = user.sms_messages.get(is_expired=False)
             if now > sms_obj.expire_datetime:
+                create_new_obj = True
                 sms_obj.is_expired = True
                 sms_obj.save(update_fields=['is_expired'])
-                sms_obj = self._create_sms_code(user)
-        except SmsMessageModel.DoesNotExist:
+
+        except SmsMessage.DoesNotExist:
+            create_new_obj = True
+
+        except SmsMessage.MultipleObjectsReturned:
+            # There is no normal way to get this exception but if some anormal
+            # things will happen, user can not login anyway. So this two lines
+            # solve this problem.
+            user.sms_messages.update(is_expired=True)
+            create_new_obj = True
+
+        if create_new_obj:
             sms_obj = self._create_sms_code(user)
 
         return sms_obj
 
-
+    @atomic
     def verify_sms(self, user, sms_code):
         """
         :param user: User
@@ -196,8 +211,8 @@ class SmsService:
         now = timezone.now()
 
         try:
-            sms_obj = SmsMessageModel.objects.get(user=user, is_expired=False)
-        except SmsMessageModel.DoesNotExist:
+            sms_obj = SmsMessage.objects.get(user=user, is_expired=False)
+        except SmsMessage.DoesNotExist:
             raise SmsCodeIsNotCreatedException
 
         if now > sms_obj.expire_datetime:
