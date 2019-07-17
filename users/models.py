@@ -1,7 +1,7 @@
-from django.db import models
-from django.utils.functional import cached_property
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
+from django.utils.functional import cached_property
 
 from base.models import StarterModel
 from users.enums import GroupType
@@ -69,4 +69,9 @@ class WorkerProfile(StarterModel):
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
-# TODO: add SmsMessageModel: [user, is_expired, expire_datetime, code]
+
+class SmsMessage(StarterModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sms_messages')
+    is_expired = models.BooleanField(default=False)
+    expire_datetime = models.DateTimeField()
+    code = models.CharField(max_length=6)
