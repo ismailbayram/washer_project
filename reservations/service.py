@@ -18,9 +18,6 @@ from reservations.exceptions import (ReservationNotAvailableException,
 from reservations.tasks import prevent_occupying_reservation
 
 
-timezone = pytz.timezone(settings.TIME_ZONE)
-
-
 class ReservationService(object):
     def _generate_reservation_number(self):
         number = get_random_string(length=10).upper()
@@ -52,6 +49,7 @@ class ReservationService(object):
         :param period: int
         :return: None
         """
+        timezone = pytz.timezone(settings.TIME_ZONE)
         config = store.config['reservation_hours']
         day = day_datetime.strftime("%A").lower()
 
@@ -85,7 +83,6 @@ class ReservationService(object):
             self.create_day_from_config(store, day_datetime, period)
 
     def occupy(self, reservation, customer_profile):
-        # TODO check expiring
         """
         :param reservation: Reservation
         :param customer_profile: CustomerProfile
@@ -108,9 +105,10 @@ class ReservationService(object):
         if not (reservation.store.is_active and reservation.store.is_approved):
             raise StoreNotAvailableException
 
+        timezone = pytz.timezone(settings.TIME_ZONE)
         dt = reservation.start_datetime
         now = timezone.localize(datetime.datetime.now())
-        if dt > now:
+        if dt < now:
             raise ReservationExpiredException
 
         occupy_timeout = 60 * 4
