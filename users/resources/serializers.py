@@ -30,7 +30,7 @@ class WorkerProfileSerializer(serializers.ModelSerializer):
 
 
 class AuthFirstStepSerializer(serializers.Serializer):
-    phone_number = serializers.CharField(max_length=10)
+    phone_number = serializers.CharField()
     group_type = EnumField(enum=GroupType)
 
 

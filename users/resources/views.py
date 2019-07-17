@@ -143,8 +143,10 @@ class AuthView(APIView):
         user_service = UserService()
         sms_service = SmsService()
         user, _ = user_service.get_or_create_user(**serializer.validated_data)
-        sms_obj = sms_service.get_or_create_and_send_sms_code(user)
-        return Response({"s":sms_obj.code}, status=status.HTTP_200_OK)
+        sms_obj = sms_service.get_or_create_sms_code(user)
+
+        # TODO send real sms
+        return Response({}, status=status.HTTP_200_OK)
 
 
 class SmsVerify(APIView):

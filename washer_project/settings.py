@@ -168,6 +168,7 @@ IMAGE_SIZES = {
 DEFAULT_PRODUCT_PRICE = Decimal('30.00')
 MINIMUM_PRODUCT_PRICE = Decimal('0.99')
 
+
 try:
     from washer_project.settings_local import *
 except ImportError:

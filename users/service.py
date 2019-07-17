@@ -156,9 +156,9 @@ class WorkerProfileService:
 
 
 class SmsService:
-    SMS_EXPIRE_TIME = 5
+    SMS_EXPIRE_TIME = 5 # sn
 
-    def __create_sms_code(self, user):
+    def _create_sms_code(self, user):
         # TODO randomize the code
         now = timezone.now()
         randomized_code = '000000'
@@ -169,7 +169,7 @@ class SmsService:
         )
         return sms_obj
 
-    def get_or_create_and_send_sms_code(self, user):
+    def get_or_create_sms_code(self, user):
         """
         :param user: User
         :return: SmsMessageModel
@@ -180,11 +180,10 @@ class SmsService:
             if now > sms_obj.expire_datetime:
                 sms_obj.is_expired = True
                 sms_obj.save(update_fields=['is_expired'])
-                sms_obj = self.__create_sms_code(user)
+                sms_obj = self._create_sms_code(user)
         except SmsMessageModel.DoesNotExist:
-            sms_obj = self.__create_sms_code(user)
+            sms_obj = self._create_sms_code(user)
 
-        # TODO send real sms
         return sms_obj
 
 
@@ -208,7 +207,7 @@ class SmsService:
         if sms_obj.code != sms_code:
             raise SmsCodeIsInvalid
 
-        if user.is_worker and user.washer_profile == None:
+        if user.is_worker and user.washer_profile is None:
             raise WorkerHasNoStore
 
         # So sms is accepted

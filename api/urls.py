@@ -49,7 +49,7 @@ app_name = 'api'
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
     path('basket/', basket_view, name='basket'),
-    path('auth/', AuthView.as_view()),
-    path('sms_verify/', SmsVerify.as_view()),
+    path('auth/', AuthView.as_view(), name="auth"),
+    path('sms_verify/', SmsVerify.as_view(), name="sms_verify"),
     path('docs/', schema_view),
 ]
