@@ -89,6 +89,7 @@ class BasketService:
 
     @atomic
     def complete_basket(self, basket):
+        # TODO write tests of exceptions
         """
         :param basket: Basket
         :return: Basket

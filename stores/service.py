@@ -1,9 +1,18 @@
-from django.db.transaction import atomic
+from io import BytesIO
 
-from base.utils import ordereddict_to_dict
-from stores.models import Store
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.db.transaction import atomic
+from PIL import Image
+
+from base.utils import (compress_image, ordereddict_to_dict,
+                        thumbnail_file_name_by_orginal_name)
 from products.service import ProductService
 from reservations.tasks import create_store_weekly_reservations
+from stores.exceptions import (ImageDidNotDelete, StoreHasNoLogo,
+                               StoreHasSoManyImageException)
+from stores.models import Store, StoreImageItem
 
 
 class StoreService:
@@ -98,3 +107,77 @@ class StoreService:
         instance.is_approved = False
         instance.save(update_fields=['is_approved'])
         return instance
+
+    def add_logo(self, store, logo):
+        """
+        :param store: Store
+        :param logo: ContentFile
+        :return: store
+        """
+
+        # If there is logo allready it need to be delete on as a file
+        if store.logo:
+            default_storage.delete(store.logo.name)
+
+        image = compress_image(logo, do_square=True)
+        store.logo = image
+        store.save()
+        return store
+
+    def delete_logo(self, store):
+        """
+        :param store: Store
+        """
+        if not store.logo:
+            raise StoreHasNoLogo
+        default_storage.delete(store.logo.name)
+        store.logo = None
+        store.save()
+
+    def add_image(self, store, image, washer_profile):
+        """
+        :param store: Store
+        :param image: ContentFile
+        :param washer_profile: WasherProfile
+        """
+        if StoreImageItem.objects.filter(store=store).count() > 9:
+            raise StoreHasSoManyImageException
+
+        image = compress_image(image, do_square=True)  # Compress the comming image
+
+        # Save StoreImageItem model
+        saved_image = StoreImageItem.objects.create(store=store, image=image,
+                                                    washer_profile=washer_profile)
+        saved_name_ext = saved_image.image.name.split(".")[-1]
+
+        # Saving thumbnail images
+        pil_image = Image.open(saved_image.image)
+        edge_size = min(pil_image.size)
+        for name, size in settings.IMAGE_SIZES.items():
+            croped_image = pil_image.crop((0, 0, edge_size, edge_size))
+            croped_image.thumbnail((size['height'], size['width'],), Image.ANTIALIAS)
+
+            # pillow image to ContentFile and save
+            f = BytesIO()
+            croped_image.save(f, saved_name_ext)
+            default_storage.save(
+                thumbnail_file_name_by_orginal_name(saved_image.image.name, name),
+                ContentFile(f.getvalue())
+            )
+
+    def delete_image(self, store_image_item, washer_profile):
+        """
+        :param store_image_item: StoreImageItem
+        :param washer_profeile: WasherProfile
+        :return: boolean
+        """
+        try:
+            store_image_item.delete()
+        except:
+            raise ImageDidNotDelete
+
+        default_storage.delete(store_image_item.image.name)
+        for name, _ in settings.IMAGE_SIZES.items():
+            default_storage.delete(
+                thumbnail_file_name_by_orginal_name(store_image_item.image.name, name)
+            )

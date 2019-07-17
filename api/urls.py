@@ -12,6 +12,7 @@ from baskets.resources.views import BasketViewSet
 from reservations.resources.views import ReservationViewSet
 
 from api.views import get_swagger_view
+
 schema_view = get_swagger_view(title='Washer Project API')
 
 router = DefaultRouter()

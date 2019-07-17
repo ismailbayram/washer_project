@@ -1,12 +1,14 @@
 import datetime
 
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from address.resources.serializers import AddressDetailedSerializer
-from stores.models import Store
+from api.fields import Base64ImageField
+from base.utils import thumbnail_file_name_by_orginal_name
+from stores.models import Store, StoreImageItem
 
 
 class DaySerializer(serializers.Serializer):
@@ -89,6 +91,29 @@ class ConfigSerializer(serializers.Serializer):
         return attrs
 
 
+class StoreImageSerializer(serializers.Serializer):
+    image = Base64ImageField(required=True)
+
+    class Meta:
+        model = StoreImageItem
+        fields = ('pk', 'image', )
+
+class StoreLogoSerializer(serializers.ModelSerializer):
+    logo = Base64ImageField(required=True)
+
+    class Meta:
+        model = Store
+        fields = ('logo', )
+
+
+class StoreImagesWithSizesSerializer(serializers.RelatedField):
+    def to_representation(self, obj):
+        images = {'full': obj.image.url}
+        for name, _ in settings.IMAGE_SIZES.items():
+            images[name] = thumbnail_file_name_by_orginal_name(obj.image.url, name)
+        return {"pk":obj.pk, "image":images}
+
+
 class StoreSerializer(serializers.ModelSerializer):
     address = AddressDetailedSerializer(read_only=True)
     rating = serializers.ReadOnlyField()
@@ -96,12 +121,14 @@ class StoreSerializer(serializers.ModelSerializer):
     is_active = serializers.ReadOnlyField()
     washer_profile = serializers.PrimaryKeyRelatedField(read_only=True)
     config = ConfigSerializer(default={}, partial=False)
+    images = StoreImagesWithSizesSerializer(many=True, read_only=True)
 
     class Meta:
         model = Store
         fields = ('pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
-                  'is_approved')
+                  'is_approved', 'logo', 'images')
+
 
 
 class StoreDetailedSerializer(StoreSerializer):
