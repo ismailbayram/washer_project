@@ -5,6 +5,8 @@ from django.db.transaction import atomic
 from django.utils.crypto import get_random_string
 from django.conf import settings
 
+from baskets.service import BasketService
+from stores.exceptions import StoreNotAvailableException
 from reservations.models import Reservation
 from reservations.enums import ReservationStatus
 from reservations.exceptions import (ReservationNotAvailableException,
@@ -13,7 +15,6 @@ from reservations.tasks import prevent_occupying_reservation
 
 
 class ReservationService(object):
-    # TODO: check basket is empty
     def _generate_reservation_number(self):
         number = get_random_string(length=10).upper()
         if Reservation.objects.filter(number=number).exists():
@@ -97,6 +98,8 @@ class ReservationService(object):
             if not reservation.customer_profile == customer_profile:
                 raise ReservationOccupiedBySomeoneException
             return reservation
+        if not (reservation.store.is_active and reservation.store.is_approved):
+            raise StoreNotAvailableException
 
         occupy_timeout = 60 * 4
         prevent_occupying_reservation.apply_async((reservation.pk, ), countdown=occupy_timeout)
@@ -106,7 +109,34 @@ class ReservationService(object):
 
         return reservation
 
+    @atomic
+    def reserve(self, reservation, customer_profile):
+        """
+        :param reservation: Reservation
+        :param customer_profile: CustomerProfile
+        :return: Reservation
+        """
+        if reservation.status > ReservationStatus.occupied:
+            raise ReservationNotAvailableException
+        if not customer_profile == reservation.customer_profile:
+            raise ReservationOccupiedBySomeoneException
+
+        basket_service = BasketService()
+        basket = basket_service.get_or_create_basket(customer_profile)
+        basket = basket_service.complete_basket(basket)
+
+        reservation.basket = basket
+        reservation.total_amount = basket.get_total_amount()
+        reservation.status = ReservationStatus.reserved
+        reservation.save()
+        # NOTIFICATION
+        return reservation
+
     def disable(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
         if not reservation.status == ReservationStatus.available:
             raise ReservationNotAvailableException
         # notification to washer
@@ -116,6 +146,10 @@ class ReservationService(object):
         return reservation
 
     def expire(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
         # notification to washer
         reservation.status = ReservationStatus.expired
         reservation.save(update_fields=['status'])

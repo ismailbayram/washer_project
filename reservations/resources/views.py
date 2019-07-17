@@ -30,6 +30,13 @@ class ReservationViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(instance=reservation)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['POST'], detail=True)
+    def reserve(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        reservation = self.service.reserve(reservation, request.user.customer_profile)
+        serializer = self.get_serializer(instance=reservation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(methods=["POST"], detail=True)
     def disable(self, request, *args, **kwargs):
         reservation = self.get_object()
