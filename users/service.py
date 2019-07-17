@@ -156,7 +156,7 @@ class WorkerProfileService:
 
 
 class SmsService:
-    SMS_EXPIRE_TIME = 5 # sn
+    SMS_EXPIRE_TIME = 300 # sn
 
     def _create_sms_code(self, user):
         # TODO randomize the code
