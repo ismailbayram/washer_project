@@ -13,8 +13,12 @@ from reservations.exceptions import (ReservationNotAvailableException,
                                      ReservationOccupiedBySomeoneException,
                                      ReservationStartedException,
                                      ReservationCompletedException,
-                                     ReservationCanNotCancelledException)
+                                     ReservationCanNotCancelledException,
+                                     ReservationExpiredException)
 from reservations.tasks import prevent_occupying_reservation
+
+
+timezone = pytz.timezone(settings.TIME_ZONE)
 
 
 class ReservationService(object):
@@ -50,7 +54,6 @@ class ReservationService(object):
         """
         config = store.config['reservation_hours']
         day = day_datetime.strftime("%A").lower()
-        timezone = pytz.timezone(settings.TIME_ZONE)
 
         start = config[day]['start']
         end = config[day]['end']
@@ -104,6 +107,11 @@ class ReservationService(object):
             return reservation
         if not (reservation.store.is_active and reservation.store.is_approved):
             raise StoreNotAvailableException
+
+        dt = reservation.start_datetime
+        now = timezone.localize(datetime.datetime.now())
+        if dt > now:
+            raise ReservationExpiredException
 
         occupy_timeout = 60 * 4
         prevent_occupying_reservation.apply_async((reservation.pk, ), countdown=occupy_timeout)

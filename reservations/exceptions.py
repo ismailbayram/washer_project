@@ -24,3 +24,8 @@ class ReservationCompletedException(ProjectBaseException):
 
 class ReservationCanNotCancelledException(ProjectBaseException):
     code = codes.reservations_100_5
+
+
+class ReservationExpiredException(ProjectBaseException):
+    code = codes.reservations_100_6
+

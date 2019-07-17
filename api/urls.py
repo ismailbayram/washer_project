@@ -45,13 +45,13 @@ basket_view = BasketViewSet.as_view({
 })
 
 # reservations
-router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')
-router.register('reservations', CustomerReservationViewSet, base_name='reservations')
+router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store
+router.register('reservations', CustomerReservationViewSet, base_name='reservations')  # for customers
 
 app_name = 'api'
 
 urlpatterns = [
-    path('reservation_list/', ReservationListView.as_view(), name='reservation_list'),
+    path('reservation_list/', ReservationListView.as_view(), name='reservation_list'),  # for everyone
     path('', include((router.urls, 'api'), namespace='router')),
     path('basket/', basket_view, name='basket'),
     path('auth/', AuthView.as_view()),
