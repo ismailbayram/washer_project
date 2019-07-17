@@ -23,6 +23,13 @@ class ReservationViewSet(viewsets.ReadOnlyModelViewSet):
         'cancel': [GroupType.washer, GroupType.worker],
     }
 
+    @action(methods=["POST"], detail=True)
+    def disable(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        self._check_object_permission(request, reservation)
+        self.service.disable(reservation)
+        return Response({}, status=status.HTTP_200_OK)
+
     @action(methods=['POST'], detail=True)
     def occupy(self, request, *args, **kwargs):
         reservation = self.get_object()
@@ -38,10 +45,24 @@ class ReservationViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=True)
-    def disable(self, request, *args, **kwargs):
+    def cancel(self, request, *args, **kwargs):
         reservation = self.get_object()
         self._check_object_permission(request, reservation)
-        self.service.disable(reservation)
+        self.service.cancel(reservation)
+        return Response({}, status=status.HTTP_200_OK)
+
+    @action(methods=["POST"], detail=True)
+    def start(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        self._check_object_permission(request, reservation)
+        self.service.start(reservation)
+        return Response({}, status=status.HTTP_200_OK)
+
+    @action(methods=["POST"], detail=True)
+    def complete(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        self._check_object_permission(request, reservation)
+        self.service.complete(reservation)
         return Response({}, status=status.HTTP_200_OK)
 
     def _check_object_permission(self, request, reservation):

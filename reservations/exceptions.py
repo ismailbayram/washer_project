@@ -12,3 +12,15 @@ class ReservationNotAvailableException(ProjectBaseException):
 
 class ReservationOccupiedBySomeoneException(ProjectBaseException):
     code = codes.reservations_100_2
+
+
+class ReservationStartedException(ProjectBaseException):
+    code = codes.reservations_100_3
+
+
+class ReservationCompletedException(ProjectBaseException):
+    code = codes.reservations_100_4
+
+
+class ReservationCanNotCancelledException(ProjectBaseException):
+    code = codes.reservations_100_5

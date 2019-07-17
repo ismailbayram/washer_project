@@ -10,7 +10,10 @@ from stores.exceptions import StoreNotAvailableException
 from reservations.models import Reservation
 from reservations.enums import ReservationStatus
 from reservations.exceptions import (ReservationNotAvailableException,
-                                     ReservationOccupiedBySomeoneException)
+                                     ReservationOccupiedBySomeoneException,
+                                     ReservationStartedException,
+                                     ReservationCompletedException,
+                                     ReservationCanNotCancelledException)
 from reservations.tasks import prevent_occupying_reservation
 
 
@@ -123,12 +126,57 @@ class ReservationService(object):
 
         basket_service = BasketService()
         basket = basket_service.get_or_create_basket(customer_profile)
+        if not basket.basketitem_set.first().product.store == reservation.store:
+            basket = basket_service.clean_basket(basket)
         basket = basket_service.complete_basket(basket)
 
         reservation.basket = basket
         reservation.total_amount = basket.get_total_amount()
         reservation.status = ReservationStatus.reserved
         reservation.save()
+        # NOTIFICATION
+        return reservation
+
+    def start(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
+        if reservation.status < ReservationStatus.reserved:
+            raise ReservationNotAvailableException
+        if reservation.status > ReservationStatus.reserved:
+            raise ReservationStartedException
+        reservation.status = ReservationStatus.started
+        reservation.save(update_fields=['status'])
+
+        # NOTIFICATION
+        return reservation
+
+    def complete(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
+        if reservation.status < ReservationStatus.started:
+            raise ReservationNotAvailableException
+        if reservation.status > ReservationStatus.started:
+            raise ReservationCompletedException
+        reservation.status = ReservationStatus.completed
+        reservation.save(update_fields=['status'])
+
+        # NOTIFICATION
+        return reservation
+
+    def cancel(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
+        if not reservation.status == ReservationStatus.reserved:
+            raise ReservationCanNotCancelledException
+        reservation.status = ReservationStatus.cancelled
+        reservation.save(update_fields=['status'])
+
         # NOTIFICATION
         return reservation
 

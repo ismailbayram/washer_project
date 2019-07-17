@@ -74,9 +74,11 @@ class BasketService:
     def clean_basket(self, basket):
         """
         :param basket: Basket
-        :return: None
+        :return: Basket
         """
         basket.basketitem_set.all().delete()
+
+        return basket
 
     def delete_basket_item(self, basket, product):
         """
