@@ -22,3 +22,4 @@ class Reservation(StarterModel):
 
     class Meta:
         unique_together = ('start_datetime', 'store', )
+        ordering = ['-start_datetime']

@@ -82,6 +82,7 @@ class ReservationService(object):
             self.create_day_from_config(store, day_datetime, period)
 
     def occupy(self, reservation, customer_profile):
+        # TODO check expiring
         """
         :param reservation: Reservation
         :param customer_profile: CustomerProfile
@@ -172,6 +173,7 @@ class ReservationService(object):
         :param reservation: Reservation
         :return: reservation
         """
+        # TODO: CancellationReason
         if not reservation.status == ReservationStatus.reserved:
             raise ReservationCanNotCancelledException
         reservation.status = ReservationStatus.cancelled
