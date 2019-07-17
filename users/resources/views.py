@@ -14,7 +14,7 @@ from users.resources.serializers import (AuthFirstStepSerializer,
                                          AuthSecondStepSerializer,
                                          UserSerializer,
                                          WorkerProfileSerializer)
-from users.service import UserService, WorkerProfileService
+from users.service import SmsService, UserService, WorkerProfileService
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -140,9 +140,10 @@ class AuthView(APIView):
     def post(self, request):
         serializer = AuthFirstStepSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        service = UserService()
-        user, _ = service.get_or_create_user(**serializer.validated_data)
-        sms_obj = service.get_or_create_and_send_sms_code(user)
+        user_service = UserService()
+        sms_service = SmsService()
+        user, _ = user_service.get_or_create_user(**serializer.validated_data)
+        sms_obj = sms_service.get_or_create_and_send_sms_code(user)
         return Response({"s":sms_obj.code}, status=status.HTTP_200_OK)
 
 
@@ -150,10 +151,11 @@ class SmsVerify(APIView):
     def post(self, request):
         serializer = AuthSecondStepSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        service = UserService()
-        user, token = service.get_or_create_user(**serializer.validated_data)
+        user_service = UserService()
+        sms_service = SmsService()
+        user, token = user_service.get_or_create_user(**serializer.validated_data)
 
-        service.verify_sms(
+        sms_service.verify_sms(
             user=user,
             sms_code=serializer.data.get('sms_code')
         )

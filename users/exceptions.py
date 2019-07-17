@@ -14,13 +14,13 @@ class WorkerDoesNotBelongToWasherException(ProjectBaseException):
     code = codes.workers_100_0
 
 class SmsCodeIsNotCreated(ProjectBaseException):
-    code = codes.workers_100_3
+    code = codes.auth_100_0
 
 class SmsCodeExpired(ProjectBaseException):
-    code = codes.workers_100_4
+    code = codes.auth_100_1
 
 class SmsCodeIsInvalid(ProjectBaseException):
-    code = codes.workers_100_5
+    code = codes.auth_100_2
 
 class WorkerHasNoStore(ProjectBaseException):
-    code = codes.workers_100_6
+    code = codes.auth_100_3

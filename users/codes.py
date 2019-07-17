@@ -6,14 +6,14 @@ users_100_1 = {"code": "users_100_1", "message": _("Kullanıcı grubu uygun değ
 workers_100_0 = {"code": "workers_100_0",
                  "message": _("Sizin çalışanınız değil.")}
 
-workers_100_3 = {"code": "workers_100_3",
+auth_100_0 = {"code": "auth_100_0",
                  "message": _("Sms kodu oluşturulmamış.")}
 
-workers_100_4 = {"code": "workers_100_4",
+auth_100_1 = {"code": "auth_100_1",
                  "message": _("Sms kodunun süresi geçmiş.")}
 
-workers_100_5 = {"code": "workers_100_5",
+auth_100_2 = {"code": "auth_100_2",
                  "message": _("Sms kodu hatalı.")}
 
-workers_100_6 = {"code": "workers_100_6",
+auth_100_3 = {"code": "auth_100_3",
                  "message": _("Çalışanın bir yıkamacısı yok.")}
