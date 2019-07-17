@@ -1,19 +1,20 @@
+from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework import viewsets, mixins, status
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser
 
-from api.permissions import (HasGroupPermission,
-                             IsWasherOrReadOnlyPermission)
-from users.enums import GroupType
-from users.resources.serializers import (UserSerializer,
-                                         WorkerProfileSerializer)
-from users.resources.filters import WorkerProfileFilterSet
-from users.models import User, WorkerProfile
-from users.service import UserService, WorkerProfileService
+from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from stores.models import Store
+from users.enums import GroupType
+from users.models import User, WorkerProfile
+from users.resources.filters import WorkerProfileFilterSet
+from users.resources.serializers import (AuthFirstStepSerializer,
+                                         AuthSecondStepSerializer,
+                                         UserSerializer,
+                                         WorkerProfileSerializer)
+from users.service import UserService, WorkerProfileService
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -137,9 +138,24 @@ class WorkerProfileViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin,
 
 class AuthView(APIView):
     def post(self, request):
-        pass
-        # serializer = AuthFirstStepSerializer(data=request.data)
-        # serializer.is_valid(raise_exception=True)
-        # service = UserService()
-        # token = service._create_token(**serializer.validated_data)
-        # return Response({'token': token}, status=status.HTTP_200_OK)
+        serializer = AuthFirstStepSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        service = UserService()
+        user, _ = service.get_or_create_user(**serializer.validated_data)
+        sms_obj = service.get_or_create_and_send_sms_code(user)
+        return Response({"s":sms_obj.code}, status=status.HTTP_200_OK)
+
+
+class SmsVerify(APIView):
+    def post(self, request):
+        serializer = AuthSecondStepSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        service = UserService()
+        user, token = service.get_or_create_user(**serializer.validated_data)
+
+        service.verify_sms(
+            user=user,
+            sms_code=serializer.data.get('sms_code')
+        )
+
+        return Response({'token':token})

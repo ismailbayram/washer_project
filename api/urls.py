@@ -1,17 +1,16 @@
 from django.urls import include, path
-
 from rest_framework.routers import DefaultRouter
 
-from users.resources.views import (UserViewSet, AuthView, WorkerProfileViewSet)
-from cars.resources.views import (CarViewSet)
-from address.resources.views import (CountryViewSet, CityViewSet,
+from address.resources.views import (CityViewSet, CountryViewSet,
                                      TownshipViewSet)
-from stores.resources.views import StoreViewSet, StoreListViewSet
-from products.resources.views import ProductViewSet, ProductListViewSet
-from baskets.resources.views import BasketViewSet
-from reservations.resources.views import ReservationViewSet
-
 from api.views import get_swagger_view
+from baskets.resources.views import BasketViewSet
+from cars.resources.views import CarViewSet
+from products.resources.views import ProductListViewSet, ProductViewSet
+from reservations.resources.views import ReservationViewSet
+from stores.resources.views import StoreListViewSet, StoreViewSet
+from users.resources.views import (AuthView, SmsVerify, UserViewSet,
+                                   WorkerProfileViewSet)
 
 schema_view = get_swagger_view(title='Washer Project API')
 
@@ -51,5 +50,6 @@ urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
     path('basket/', basket_view, name='basket'),
     path('auth/', AuthView.as_view()),
+    path('sms_verify/', SmsVerify.as_view()),
     path('docs/', schema_view),
 ]

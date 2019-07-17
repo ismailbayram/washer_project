@@ -1,14 +1,21 @@
+import datetime
 from uuid import uuid4
+
+from django.conf import settings
 from django.contrib.auth.models import Group, update_last_login
 from django.db.transaction import atomic
+from django.utils import timezone
 from rest_framework_jwt.settings import api_settings as jwt_settings
 
-from users.models import (User, CustomerProfile, WasherProfile,
-                          WorkerProfile)
-from users.enums import GroupType
-from users.exceptions import (UserGroupTypeInvalidException,
-                              WorkerDoesNotBelongToWasherException)
 from stores.exceptions import StoreDoesNotBelongToWasherException
+from users.enums import GroupType
+from users.exceptions import (SmsCodeExpired, SmsCodeIsInvalid,
+                              SmsCodeIsNotCreated,
+                              UserGroupTypeInvalidException,
+                              WorkerDoesNotBelongToWasherException,
+                              WorkerHasNoStore)
+from users.models import (CustomerProfile, SmsMessageModel, User,
+                          WasherProfile, WorkerProfile)
 
 
 class UserService:
@@ -23,9 +30,68 @@ class UserService:
         update_last_login(User, user)
         return jwt_encode_handler(payload)
 
+    def __create_sms_code(self, user):
+        # TODO randomize the code
+        now = timezone.now()
+        randomized_code = '000000'
+        sms_obj = SmsMessageModel.objects.create(
+            user=user,
+            code=randomized_code,
+            expire_datetime=now + datetime.timedelta(seconds=settings.SMS_EXPIRE_TIME)
+        )
+        return sms_obj
+
+    def get_or_create_and_send_sms_code(self, user):
+        """
+        :param user: User
+        :return: SmsMessageModel
+        """
+        now = timezone.now()
+        try:
+            sms_obj = user.sms_models.get(is_expired=False)
+            if now > sms_obj.expire_datetime:
+                sms_obj.is_expired = True
+                sms_obj.save(update_fields=['is_expired'])
+                sms_obj = self.__create_sms_code(user)
+        except SmsMessageModel.DoesNotExist:
+            sms_obj = self.__create_sms_code(user)
+
+        # TODO send real sms
+        return sms_obj
+
+
+    def verify_sms(self, user, sms_code):
+        """
+        :param user: User
+        :param sms_code: String
+        """
+        now = timezone.now()
+
+        try:
+            sms_obj = SmsMessageModel.objects.get(user=user, is_expired=False)
+        except SmsMessageModel.DoesNotExist:
+            raise SmsCodeIsNotCreated
+
+        if now > sms_obj.expire_datetime:
+            sms_obj.is_expired = True
+            sms_obj.save(update_fields=['is_expired'])
+            raise SmsCodeExpired
+
+        if sms_obj.code != sms_code:
+            raise SmsCodeIsInvalid
+
+        if user.is_worker and user.washer_profile == None:
+            raise WorkerHasNoStore
+
+        # So sms is accepted
+        sms_obj.is_expired = True
+        sms_obj.save(update_fields=['is_expired'])
+
+
+
     @atomic
     def get_or_create_user(self, phone_number, first_name='', last_name='',
-                           group_type=GroupType.customer):
+                           group_type=GroupType.customer, *args, **kwargs):
         """
         :param phone_number: str
         :param group_type: GroupType
