@@ -47,10 +47,7 @@ class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Reservation.objects.select_related('store', 'store__address',
-                                                  'store__address__country',
-                                                  'store__address__city',
-                                                  'store__address__township').all()
+    queryset = CustomerReservationViewSet.queryset
     serializer_class = ReservationSerializer
     service = ReservationService()
     permission_classes = (HasGroupPermission,)
@@ -76,29 +73,33 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
     def disable(self, request, *args, **kwargs):
         reservation = self.get_object()
         self._check_object_permission(request, reservation)
-        self.service.disable(reservation)
-        return Response({}, status=status.HTTP_200_OK)
+        reservation = self.service.disable(reservation)
+        serializer = self.get_serializer(instance=reservation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=True)
     def cancel(self, request, *args, **kwargs):
         reservation = self.get_object()
         self._check_object_permission(request, reservation)
-        self.service.cancel(reservation)
-        return Response({}, status=status.HTTP_200_OK)
+        reservation = self.service.cancel(reservation)
+        serializer = self.get_serializer(instance=reservation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=True)
     def start(self, request, *args, **kwargs):
         reservation = self.get_object()
         self._check_object_permission(request, reservation)
-        self.service.start(reservation)
-        return Response({}, status=status.HTTP_200_OK)
+        reservation = self.service.start(reservation)
+        serializer = self.get_serializer(instance=reservation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=True)
     def complete(self, request, *args, **kwargs):
         reservation = self.get_object()
         self._check_object_permission(request, reservation)
-        self.service.complete(reservation)
-        return Response({}, status=status.HTTP_200_OK)
+        reservation = self.service.complete(reservation)
+        serializer = self.get_serializer(instance=reservation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def _check_object_permission(self, request, reservation):
         washer_profile = request.user.washer_profile

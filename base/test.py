@@ -17,6 +17,7 @@ class BaseTestViewMixin:
             "group_type": GroupType.customer
         }
         self.customer, self.customer_token = service.get_or_create_user(**data)
+        self.customer_profile = self.customer.customer_profile
 
         data = {
             "first_name": "Customer 2",
@@ -25,6 +26,7 @@ class BaseTestViewMixin:
             "group_type": GroupType.customer
         }
         self.customer2, self.customer2_token = service.get_or_create_user(**data)
+        self.customer2_profile = self.customer2.customer_profile
 
         data = {
             "first_name": "Worker 1",
@@ -33,6 +35,7 @@ class BaseTestViewMixin:
             "group_type": GroupType.worker
         }
         self.worker, self.worker_token = service.get_or_create_user(**data)
+        self.worker_profile = self.worker.worker_profile
 
         data = {
             "first_name": "Worker 2",
@@ -41,6 +44,7 @@ class BaseTestViewMixin:
             "group_type": GroupType.worker
         }
         self.worker2, self.worker2_token = service.get_or_create_user(**data)
+        self.worker2_profile = self.worker2.worker_profile
 
         data = {
             "first_name": "Washer 1",
@@ -49,6 +53,7 @@ class BaseTestViewMixin:
             "group_type": GroupType.washer
         }
         self.washer, self.washer_token = service.get_or_create_user(**data)
+        self.washer_profile = self.washer.washer_profile
 
         data = {
             "first_name": "Washer 2",
@@ -57,3 +62,4 @@ class BaseTestViewMixin:
             "group_type": GroupType.washer
         }
         self.washer2, self.washer2_token = service.get_or_create_user(**data)
+        self.washer2_profile = self.washer2.washer_profile
