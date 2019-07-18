@@ -17,7 +17,6 @@ class BasketViewSetTest(TestCase, BaseTestViewMixin):
         self.product_service = ProductService()
         self.car_service = CarService()
         self.init_users()
-        self.customer_profile = self.customer.customer_profile
         self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile,
                                 is_approved=True, is_active=True)
         self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile,

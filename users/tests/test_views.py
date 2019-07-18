@@ -15,14 +15,12 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         self.user_service = UserService()
         super().setUp()
         self.init_users()
-        self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile)
-        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile)
-        self.store3 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile)
-        self.worker_profile = self.worker.worker_profile
+        self.store = mommy.make('stores.Store', washer_profile=self.washer_profile)
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2_profile)
+        self.store3 = mommy.make('stores.Store', washer_profile=self.washer2_profile)
         self.worker_profile.washer_profile = self.washer.washer_profile
         self.worker_profile.store = self.store
         self.worker_profile.save()
-        self.worker2_profile = self.worker2.worker_profile
         self.worker2_profile.washer_profile = self.washer2.washer_profile
         self.worker2_profile.store = self.store2
         self.worker2_profile.save()

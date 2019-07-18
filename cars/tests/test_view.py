@@ -1,13 +1,10 @@
 import json
 from model_mommy import mommy
 from django.test import TestCase
-from rest_framework.reverse import reverse_lazy, reverse
+from rest_framework.reverse import reverse_lazy
 from rest_framework import status
 
-from users.models import User
-from cars.models import (Car)
 from cars.enums import CarType
-from cars.service import CarService
 from base.test import BaseTestViewMixin
 
 
@@ -17,19 +14,19 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         self.car1 = mommy.make(
             'cars.Car',
             licence_plate="09 TK 40",
-            car_type = CarType.normal,
-            customer_profile = self.customer.customer_profile
+            car_type=CarType.normal,
+            customer_profile=self.customer_profile
         )
         self.car2 = mommy.make(
             'cars.Car',
             licence_plate="09 TK 41",
-            car_type = CarType.normal,
+            car_type=CarType.normal,
         )
         self.car3 = mommy.make(
             'cars.Car',
             licence_plate="09 TK 43",
-            car_type = CarType.normal,
-            customer_profile = self.customer.customer_profile
+            car_type=CarType.normal,
+            customer_profile=self.customer_profile
         )
 
     def test_list_action(self):
@@ -116,16 +113,6 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         self.assertEqual(response.data['licence_plate'], '01 ADN 01')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # dublicate
-        # data2 = {
-        #     'licence_plate': '01 ADN 01'
-        # }
-        # headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
-        # response = self.client.patch(url3, data=data2, content_type='application/json', **headers)
-        # self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
-
-
-        # can't update by customer by not his car
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer2_token}'}
         response = self.client.patch(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -166,6 +153,7 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         # after deletion we can't get
         response = self.client.get(url, **headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 class CarSelectViewSetTest(BaseTestViewMixin, TestCase):
     def setUp(self):
