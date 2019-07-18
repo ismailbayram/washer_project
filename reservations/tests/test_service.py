@@ -197,7 +197,6 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         with self.assertRaises(BasketEmptyException):
             self.service.reserve(reservation2, self.customer_profile)
 
-
     def test_start(self):
         dt = timezone.now()
         reservation = self.service._create_reservation(self.store, dt, 40)

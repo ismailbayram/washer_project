@@ -96,7 +96,36 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         response = self.client.post(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         jresponse = json.loads(response.content)
-        import ipdb
-        ipdb.set_trace()
         self.assertEqual(jresponse['pk'], self.reservation.pk)
         self.assertEqual(jresponse['status'], ReservationStatus.occupied.value)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer2_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_reserve(self):
+        url_occupy = reverse_lazy('api:router:reservations-occupy', args=[self.reservation.pk])
+        url = reverse_lazy('api:router:reservations-reserve', args=[self.reservation.pk])
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.post(url_occupy, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        basket = self.basket_service.get_or_create_basket(self.customer_profile)
+        self.basket_service.add_basket_item(basket, self.product1)
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresponse = json.loads(response.content)
+        self.assertEqual(jresponse['pk'], self.reservation.pk)
+        self.assertEqual(jresponse['status'], ReservationStatus.reserved.value)
