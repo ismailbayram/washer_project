@@ -6,6 +6,7 @@ from django.utils.crypto import get_random_string
 from django.conf import settings
 
 from baskets.service import BasketService
+from baskets.exceptions import BasketEmptyException
 from stores.exceptions import StoreNotAvailableException
 from reservations.models import Reservation
 from reservations.enums import ReservationStatus
@@ -25,7 +26,7 @@ class ReservationService(object):
             return self._generate_reservation_number()
         return number
 
-    def create_reservation(self, store, start_datetime, period):
+    def _create_reservation(self, store, start_datetime, period):
         """
         :param store: Store
         :param start_datetime: DateTime
@@ -68,7 +69,7 @@ class ReservationService(object):
         for p in range(period_count):
             start_dt = start_datetime + datetime.timedelta(minutes=(p * period))
             start_dt = timezone.localize(start_dt)
-            self.create_reservation(store=store, start_datetime=start_dt, period=period)
+            self._create_reservation(store=store, start_datetime=start_dt, period=period)
 
     @atomic
     def create_week_from_config(self, store):
@@ -133,6 +134,10 @@ class ReservationService(object):
 
         basket_service = BasketService()
         basket = basket_service.get_or_create_basket(customer_profile)
+
+        if basket.is_empty:
+            raise BasketEmptyException
+
         if not basket.basketitem_set.first().product.store == reservation.store:
             basket = basket_service.clean_basket(basket)
         basket = basket_service.complete_basket(basket)
