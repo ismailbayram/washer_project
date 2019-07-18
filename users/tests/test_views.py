@@ -1,11 +1,13 @@
 import json
-from model_mommy import mommy
+
 from django.test import TestCase
-from rest_framework.reverse import reverse_lazy
+from model_mommy import mommy
 from rest_framework import status
+from rest_framework.reverse import reverse_lazy
 
 from base.test import BaseTestViewMixin
-from users.service import UserService
+from users.enums import GroupType
+from users.service import SmsService, UserService
 
 
 class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
@@ -209,3 +211,80 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         response = self.client.delete(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class SmsViewsTest(TestCase, BaseTestViewMixin):
+    def setUp(self):
+        self.sms_service = SmsService()
+        super().setUp()
+
+    def test_login(self):
+        url = reverse_lazy("api:auth")
+        data = {
+            "phone_number": "0538835053",
+            "group_type": GroupType.customer.value
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = {
+            "phone_number": "0538835053",
+            "group_type": GroupType.washer.value
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = {
+            "group_type": GroupType.washer.value
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        data = {
+            "phone_number": "0538835053",
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_sms_verify(self):
+        url = reverse_lazy("api:auth")
+        data = {
+            "phone_number": "0538835053",
+            "group_type": GroupType.washer.value
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+
+
+        url = reverse_lazy("api:sms_verify")
+
+        data = {
+            "phone_number": "1234900",
+            "group_type": "customer",
+            "sms_code": "şlkajfşljşlkj"
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+        data = {
+            "phone_number": "1234900",
+            "group_type": "customer",
+            "sms_code": "000000"
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+        data = {
+            "phone_number": "0538835053",
+            "group_type": "customer",
+            "sms_code": "şlkajfşljşlkj"
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+        data = {
+            "phone_number": "0538835053",
+            "group_type": "customer",
+            "sms_code": "000000"
+        }
+        response = self.client.post(url, data=data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

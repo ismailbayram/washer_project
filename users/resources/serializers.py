@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from api.fields import EnumField
+from users.enums import GroupType
 from users.models import User, WorkerProfile
 
 
@@ -29,3 +31,10 @@ class WorkerProfileSerializer(serializers.ModelSerializer):
 
 class AuthFirstStepSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
+    group_type = EnumField(enum=GroupType)
+
+
+class AuthSecondStepSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
+    sms_code = serializers.CharField()
+    group_type = EnumField(enum=GroupType)
