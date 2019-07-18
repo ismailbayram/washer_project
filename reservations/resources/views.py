@@ -110,7 +110,7 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         return True
 
 
-class ReservationListView(views.APIView):
+class ReservationSearchView(views.APIView):
     def get(self, request, *args, **kwargs):
         # TODO: elasticsearch
         return Response({}, status=status.HTTP_200_OK)
