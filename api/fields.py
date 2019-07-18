@@ -16,7 +16,7 @@ class EnumField(serializers.ChoiceField):
         super(EnumField, self).__init__(**kwargs)
 
     def to_representation(self, obj):
-        return obj.name
+        return obj.value
 
     def to_internal_value(self, data):
         try:

@@ -3,11 +3,14 @@ from rest_framework.routers import DefaultRouter
 
 from address.resources.views import (CityViewSet, CountryViewSet,
                                      TownshipViewSet)
-from api.views import get_swagger_view
 from baskets.resources.views import BasketViewSet
+from reservations.resources.views import (CustomerReservationViewSet,
+                                          StoreReservationViewSet,
+                                          ReservationSearchView)
+
+from api.views import get_swagger_view
 from cars.resources.views import CarViewSet
 from products.resources.views import ProductListViewSet, ProductViewSet
-from reservations.resources.views import ReservationViewSet
 from stores.resources.views import StoreListViewSet, StoreViewSet
 from users.resources.views import (AuthView, SmsVerify, UserViewSet,
                                    WorkerProfileViewSet)
@@ -42,11 +45,13 @@ basket_view = BasketViewSet.as_view({
 })
 
 # reservations
-router.register('reservations', ReservationViewSet, base_name='reservations')
+router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store
+router.register('reservations', CustomerReservationViewSet, base_name='reservations')  # for customers
 
 app_name = 'api'
 
 urlpatterns = [
+    path('reservation_search/', ReservationSearchView.as_view(), name='reservation_search'),  # for everyone
     path('', include((router.urls, 'api'), namespace='router')),
     path('basket/', basket_view, name='basket'),
     path('auth/', AuthView.as_view(), name="auth"),

@@ -118,6 +118,7 @@ class StoreSerializer(serializers.ModelSerializer):
     address = AddressDetailedSerializer(read_only=True)
     rating = serializers.ReadOnlyField()
     is_approved = serializers.ReadOnlyField()
+    is_active = serializers.ReadOnlyField()
     washer_profile = serializers.PrimaryKeyRelatedField(read_only=True)
     config = ConfigSerializer(default={}, partial=False)
     images = StoreImagesWithSizesSerializer(many=True, read_only=True)

@@ -9,3 +9,7 @@ class PrimaryProductsQuantityMustOne(ProjectBaseException):
 class BasketInvalidException(ProjectBaseException):
     code = codes.baskets_100_1
 
+
+class BasketEmptyException(ProjectBaseException):
+    code = codes.baskets_100_2
+

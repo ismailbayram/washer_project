@@ -5,21 +5,28 @@ from django.db.transaction import atomic
 from django.utils.crypto import get_random_string
 from django.conf import settings
 
+from baskets.service import BasketService
+from baskets.exceptions import BasketEmptyException
+from stores.exceptions import StoreNotAvailableException
 from reservations.models import Reservation
 from reservations.enums import ReservationStatus
 from reservations.exceptions import (ReservationNotAvailableException,
-                                     ReservationOccupiedBySomeoneException)
+                                     ReservationOccupiedBySomeoneException,
+                                     ReservationStartedException,
+                                     ReservationCompletedException,
+                                     ReservationCanNotCancelledException,
+                                     ReservationExpiredException)
+from reservations.tasks import prevent_occupying_reservation
 
 
 class ReservationService(object):
-    # TODO: check basket is empty
     def _generate_reservation_number(self):
         number = get_random_string(length=10).upper()
         if Reservation.objects.filter(number=number).exists():
             return self._generate_reservation_number()
         return number
 
-    def create_reservation(self, store, start_datetime, period):
+    def _create_reservation(self, store, start_datetime, period):
         """
         :param store: Store
         :param start_datetime: DateTime
@@ -43,9 +50,9 @@ class ReservationService(object):
         :param period: int
         :return: None
         """
+        timezone = pytz.timezone(settings.TIME_ZONE)
         config = store.config['reservation_hours']
         day = day_datetime.strftime("%A").lower()
-        timezone = pytz.timezone(settings.TIME_ZONE)
 
         start = config[day]['start']
         end = config[day]['end']
@@ -62,7 +69,7 @@ class ReservationService(object):
         for p in range(period_count):
             start_dt = start_datetime + datetime.timedelta(minutes=(p * period))
             start_dt = timezone.localize(start_dt)
-            self.create_reservation(store=store, start_datetime=start_dt, period=period)
+            self._create_reservation(store=store, start_datetime=start_dt, period=period)
 
     @atomic
     def create_week_from_config(self, store):
@@ -96,10 +103,115 @@ class ReservationService(object):
             if not reservation.customer_profile == customer_profile:
                 raise ReservationOccupiedBySomeoneException
             return reservation
+        if not (reservation.store.is_active and reservation.store.is_approved):
+            raise StoreNotAvailableException
 
-        # TODO: add an async task and run after 60 * 4 seconds
+        timezone = pytz.timezone(settings.TIME_ZONE)
+        dt = reservation.start_datetime
+        now = timezone.localize(datetime.datetime.now())
+        if dt < now:
+            raise ReservationExpiredException
+
+        occupy_timeout = 60 * 4
+        prevent_occupying_reservation.apply_async((reservation.pk, ), countdown=occupy_timeout)
         reservation.status = ReservationStatus.occupied
         reservation.customer_profile = customer_profile
         reservation.save(update_fields=['status', 'customer_profile'])
 
+        return reservation
+
+    @atomic
+    def reserve(self, reservation, customer_profile):
+        """
+        :param reservation: Reservation
+        :param customer_profile: CustomerProfile
+        :return: Reservation
+        """
+        if reservation.status > ReservationStatus.occupied:
+            raise ReservationNotAvailableException
+        if not customer_profile == reservation.customer_profile:
+            raise ReservationOccupiedBySomeoneException
+
+        basket_service = BasketService()
+        basket = basket_service.get_or_create_basket(customer_profile)
+
+        if basket.is_empty:
+            raise BasketEmptyException
+
+        if not basket.basketitem_set.first().product.store == reservation.store:
+            basket = basket_service.clean_basket(basket)
+        basket = basket_service.complete_basket(basket)
+
+        reservation.basket = basket
+        reservation.total_amount = basket.get_total_amount()
+        reservation.status = ReservationStatus.reserved
+        reservation.save()
+        # NOTIFICATION
+        return reservation
+
+    def start(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
+        if reservation.status < ReservationStatus.reserved:
+            raise ReservationNotAvailableException
+        if reservation.status > ReservationStatus.reserved:
+            raise ReservationStartedException
+        reservation.status = ReservationStatus.started
+        reservation.save(update_fields=['status'])
+
+        # NOTIFICATION
+        return reservation
+
+    def complete(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
+        if reservation.status < ReservationStatus.started:
+            raise ReservationNotAvailableException
+        if reservation.status > ReservationStatus.started:
+            raise ReservationCompletedException
+        reservation.status = ReservationStatus.completed
+        reservation.save(update_fields=['status'])
+
+        # NOTIFICATION
+        return reservation
+
+    def cancel(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
+        # TODO: CancellationReason
+        if not reservation.status == ReservationStatus.reserved:
+            raise ReservationCanNotCancelledException
+        reservation.status = ReservationStatus.cancelled
+        reservation.save(update_fields=['status'])
+
+        # NOTIFICATION
+        return reservation
+
+    def disable(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
+        if not reservation.status == ReservationStatus.available:
+            raise ReservationNotAvailableException
+        # notification to washer
+
+        reservation.status = ReservationStatus.disabled
+        reservation.save(update_fields=['status'])
+        return reservation
+
+    def expire(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: reservation
+        """
+        # notification to washer
+        reservation.status = ReservationStatus.expired
+        reservation.save(update_fields=['status'])
         return reservation

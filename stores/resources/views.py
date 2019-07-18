@@ -33,6 +33,7 @@ class StoreViewSet(viewsets.GenericViewSet,
         'logo': [GroupType.washer],
     }
 
+    # TODO: add activate action
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.is_staff:

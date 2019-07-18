@@ -10,7 +10,9 @@ from products.service import ProductService
 from baskets.models import Basket
 from baskets.service import BasketService
 from baskets.enums import BasketStatus
-from baskets.exceptions import PrimaryProductsQuantityMustOne, BasketInvalidException
+from baskets.exceptions import (PrimaryProductsQuantityMustOne,
+                                BasketInvalidException,
+                                BasketEmptyException)
 
 
 @override_settings(DEFAULT_PRODUCT_PRICE=Decimal('20.00'))
@@ -94,6 +96,9 @@ class BasketServiceTest(TestCase, BaseTestViewMixin):
 
     def test_complete_basket(self):
         basket = self.service.get_or_create_basket(customer_profile=self.customer_profile)
+        with self.assertRaises(BasketEmptyException):
+            self.service.complete_basket(basket)
+
         self.service.add_basket_item(basket, self.product1)
         self.service.add_basket_item(basket, self.product2)
         self.service.add_basket_item(basket, self.product2)

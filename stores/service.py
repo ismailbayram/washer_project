@@ -9,6 +9,7 @@ from PIL import Image
 from base.utils import (compress_image, ordereddict_to_dict,
                         thumbnail_file_name_by_orginal_name)
 from products.service import ProductService
+from reservations.tasks import create_store_weekly_reservations
 from stores.exceptions import (ImageDidNotDelete, StoreHasNoLogo,
                                StoreHasSoManyImageException)
 from stores.models import Store, StoreImageItem
@@ -93,6 +94,7 @@ class StoreService:
         # NOTIFICATION
         instance.is_approved = True
         instance.save(update_fields=['is_approved'])
+        create_store_weekly_reservations.delay(instance.id)  # TODO: test
         return instance
 
     def decline_store(self, instance):
@@ -101,6 +103,7 @@ class StoreService:
         :return: Store
         """
         # NOTIFICATION
+        # TODO: check reservations
         instance.is_approved = False
         instance.save(update_fields=['is_approved'])
         return instance

@@ -21,6 +21,7 @@ class User(AbstractUser):
 
     @property
     def protected_name(self):
+        # TODO: check IndexError
         return f'{self.first_name} {self.last_name[0]}.'
 
     @cached_property

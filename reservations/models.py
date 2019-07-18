@@ -10,7 +10,7 @@ class Reservation(StarterModel):
     period = models.PositiveSmallIntegerField()
     start_datetime = models.DateTimeField(db_index=True)
     end_datetime = models.DateTimeField(db_index=True)
-    basket = models.ForeignKey('baskets.Basket', null=True, blank=True, on_delete=models.SET_NULL)
+    basket = models.OneToOneField('baskets.Basket', null=True, on_delete=models.SET_NULL)
     store = models.ForeignKey('stores.Store', on_delete=models.PROTECT)
     customer_profile = models.ForeignKey('users.CustomerProfile', null=True, default=None,
                                          on_delete=models.SET_NULL)
@@ -22,3 +22,4 @@ class Reservation(StarterModel):
 
     class Meta:
         unique_together = ('start_datetime', 'store', )
+        ordering = ['-start_datetime']

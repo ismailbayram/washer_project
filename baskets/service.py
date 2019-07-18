@@ -5,7 +5,9 @@ from django.db.transaction import atomic
 
 from baskets.models import Basket, BasketItem
 from baskets.enums import BasketStatus
-from baskets.exceptions import PrimaryProductsQuantityMustOne, BasketInvalidException
+from baskets.exceptions import (PrimaryProductsQuantityMustOne,
+                                BasketInvalidException,
+                                BasketEmptyException)
 from cars.exceptions import CustomerHasNoSelectedCarException
 
 
@@ -72,9 +74,11 @@ class BasketService:
     def clean_basket(self, basket):
         """
         :param basket: Basket
-        :return: None
+        :return: Basket
         """
         basket.basketitem_set.all().delete()
+
+        return basket
 
     def delete_basket_item(self, basket, product):
         """
@@ -94,6 +98,8 @@ class BasketService:
         is_basket_valid = self._check_basket_items(basket)
         if not is_basket_valid:
             raise BasketInvalidException
+        if basket.is_empty:
+            raise BasketEmptyException
 
         for bi in basket.basketitem_set.all():
             bi.amount = bi.get_price()
