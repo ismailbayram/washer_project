@@ -5,15 +5,16 @@ from address.resources.views import (CityViewSet, CountryViewSet,
                                      TownshipViewSet)
 from baskets.resources.views import BasketViewSet
 from reservations.resources.views import (CustomerReservationViewSet,
-                                          StoreReservationViewSet,
-                                          ReservationSearchView)
+                                          StoreReservationViewSet)
 
 from api.views import get_swagger_view
 from cars.resources.views import CarViewSet
 from products.resources.views import ProductListViewSet, ProductViewSet
-from stores.resources.views import StoreListViewSet, StoreViewSet
+from stores.resources.views import StoreViewSet
 from users.resources.views import (AuthView, SmsVerify, UserViewSet,
                                    WorkerProfileViewSet)
+from search.resources.views import (ReservationSearchView,
+                                    StoreListViewSet)
 
 schema_view = get_swagger_view(title='Washer Project API')
 

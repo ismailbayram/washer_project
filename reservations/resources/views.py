@@ -109,9 +109,3 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         elif washer_profile and not reservation.store.washer_profile == washer_profile:
             self.permission_denied(request)
         return True
-
-
-class ReservationSearchView(views.APIView):
-    def get(self, request, *args, **kwargs):
-        # TODO: elasticsearch
-        return Response({}, status=status.HTTP_200_OK)

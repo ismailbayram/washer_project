@@ -111,10 +111,3 @@ class StoreViewSet(viewsets.GenericViewSet,
             service = StoreService()
             service.delete_logo(self.get_object())
             return Response({}, status=status.HTTP_202_ACCEPTED)
-
-
-class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Store.objects.filter(is_active=True, is_approved=True)\
-                            .select_related('address')
-    # TODO: connect with google maps
-    serializer_class = StoreSerializer
