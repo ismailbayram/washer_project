@@ -15,9 +15,9 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
     def setUp(self):
         super().setUp()
         self.init_users()
-        self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile,
+        self.store = mommy.make('stores.Store', washer_profile=self.washer_profile,
                                 is_approved=False, is_active=False)
-        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile,
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2_profile,
                                  is_approved=True)
 
         path = os.path.join(settings.BASE_DIR, 'stores/tests/img.txt')

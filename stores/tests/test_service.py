@@ -19,7 +19,7 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         self.store = mommy.make('stores.Store', is_approved=True, phone_number="05555555555")
         self.washers_store = mommy.make('stores.Store', is_approved=True,
                                         phone_number="05555555555",
-                                        washer_profile=self.washer.washer_profile)
+                                        washer_profile=self.washer_profile)
 
         path = os.path.join(settings.BASE_DIR, 'stores/tests/img.jpeg')
         with open(path, mode='rb') as file:
@@ -28,7 +28,7 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
     def test_create_store(self):
         data = {
             "name": "Test Store",
-            "washer_profile": self.washer.washer_profile,
+            "washer_profile": self.washer_profile,
             "phone_number": "05555555555",
             "tax_office": "Tax Office",
             "tax_number": "000111222",
@@ -116,7 +116,7 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         content_file_logo.name = "img.jpeg"
 
         self.service.add_image(store=self.washers_store, image=content_file_logo,
-                               washer_profile=self.washer.washer_profile)
+                               washer_profile=self.washer_profile)
 
         file_name = self.washers_store.images.first().image.name
         self.assertTrue(default_storage.exists(file_name))
@@ -124,7 +124,7 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
             thumb_f_n = thumbnail_file_name_by_orginal_name(file_name, size_name)
             self.assertTrue(default_storage.exists(thumb_f_n))
 
-        self.service.delete_image(self.washers_store.images.first(), self.washer.washer_profile)
+        self.service.delete_image(self.washers_store.images.first(), self.washer_profile)
 
         self.assertFalse(default_storage.exists(file_name))
         for size_name in settings.IMAGE_SIZES.keys():

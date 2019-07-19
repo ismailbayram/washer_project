@@ -17,14 +17,14 @@ class ProductServiceTest(TestCase, BaseTestViewMixin):
     def setUp(self):
         self.init_users()
         self.service = ProductService()
-        self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile)
-        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile)
+        self.store = mommy.make('stores.Store', washer_profile=self.washer_profile)
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2_profile)
 
     def test_create(self):
         data = {
             "name": "Arac Parfumu",
             "store": self.store2,
-            "washer_profile": self.washer.washer_profile,
+            "washer_profile": self.washer_profile,
             "period": None,
             "product_type": ProductType.periodic,
             "description": "Description"

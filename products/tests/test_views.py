@@ -17,17 +17,17 @@ class ProductViewSetTestView(TestCase, BaseTestViewMixin):
         self.service = ProductService()
         self.init_users()
         self.store = store_service.create_store(name="Washer1Store",
-                                                washer_profile=self.washer.washer_profile,
+                                                washer_profile=self.washer_profile,
                                                 phone_number="021255", tax_office="a",
                                                 tax_number="1")
         self.store2 = store_service.create_store(name="Washer2Store",
-                                                washer_profile=self.washer2.washer_profile,
+                                                washer_profile=self.washer2_profile,
                                                 phone_number="021255", tax_office="a",
                                                 tax_number="1")
         self.product = self.service.create_product(name="Arac Parfumu", store=self.store,
-                                                   washer_profile=self.washer.washer_profile)
+                                                   washer_profile=self.washer_profile)
         self.product2 = self.service.create_product(name="Arac Parfumu", store=self.store2,
-                                                   washer_profile=self.washer2.washer_profile)
+                                                   washer_profile=self.washer2_profile)
 
     def test_list(self):
         url = reverse_lazy('api:router:my_products-list')
@@ -247,19 +247,19 @@ class ProductListViewSetTest(TestCase, BaseTestViewMixin):
         self.service = ProductService()
         self.init_users()
         self.store = store_service.create_store(name="Washer1Store",
-                                                washer_profile=self.washer.washer_profile,
+                                                washer_profile=self.washer_profile,
                                                 phone_number="021255", tax_office="a",
                                                 tax_number="1")
         self.store2 = store_service.create_store(name="Washer2Store",
-                                                washer_profile=self.washer2.washer_profile,
+                                                washer_profile=self.washer2_profile,
                                                 phone_number="021255", tax_office="a",
                                                 tax_number="1")
         self.store.is_approved = True
         self.store.save()
         self.product = self.service.create_product(name="Arac Parfumu", store=self.store,
-                                                   washer_profile=self.washer.washer_profile)
+                                                   washer_profile=self.washer_profile)
         self.product2 = self.service.create_product(name="Arac Parfumu", store=self.store2,
-                                                   washer_profile=self.washer2.washer_profile)
+                                                   washer_profile=self.washer2_profile)
 
     def test_list(self):
         url = reverse_lazy('api:router:products-list')
