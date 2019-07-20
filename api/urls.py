@@ -14,7 +14,7 @@ from stores.resources.views import StoreViewSet
 from users.resources.views import (AuthView, SmsVerify, UserViewSet,
                                    WorkerProfileViewSet)
 from search.resources.views import (ReservationSearchView,
-                                    StoreListViewSet)
+                                    StoreSearchView)
 
 schema_view = get_swagger_view(title='Washer Project API')
 
@@ -29,7 +29,7 @@ router.register('townships', TownshipViewSet, base_name='townships')
 
 # stores
 router.register('stores', StoreViewSet, base_name='my_stores')
-router.register('stores_list', StoreListViewSet, base_name='stores')
+# router.register('stores_list', StoreListViewSet, base_name='stores')
 
 # cars
 router.register('cars', CarViewSet, base_name='cars')
@@ -53,6 +53,7 @@ app_name = 'api'
 
 urlpatterns = [
     path('reservation_search/', ReservationSearchView.as_view(), name='reservation_search'),  # for everyone
+    path('store_search/', StoreSearchView.as_view(), name='store_search'),  # for everyone
     path('', include((router.urls, 'api'), namespace='router')),
     path('basket/', basket_view, name='basket'),
     path('auth/', AuthView.as_view(), name="auth"),

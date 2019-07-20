@@ -1,8 +1,5 @@
-from rest_framework import views, status, viewsets
+from rest_framework import views, status
 from rest_framework.response import Response
-
-from stores.models import Store
-from stores.resources.serializers import StoreSerializer
 
 
 class ReservationSearchView(views.APIView):
@@ -10,9 +7,7 @@ class ReservationSearchView(views.APIView):
         return Response({}, status=status.HTTP_200_OK)
 
 
-class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Store.objects.filter(is_active=True, is_approved=True)\
-                            .select_related('address')
-    # TODO: connect with google maps
-    serializer_class = StoreSerializer
+class StoreSearchView(views.APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({}, status=status.HTTP_200_OK)
 
