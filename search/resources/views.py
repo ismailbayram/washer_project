@@ -7,7 +7,6 @@ from stores.resources.serializers import StoreSerializer
 
 class ReservationSearchView(views.APIView):
     def get(self, request, *args, **kwargs):
-        # TODO: elasticsearch
         return Response({}, status=status.HTTP_200_OK)
 
 
