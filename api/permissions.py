@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class IsAuthenticatedAndActivated(BasePermission):
@@ -34,6 +34,19 @@ class IsCustomerOrReadOnlyPermission(BasePermission):
             return True
         return False
 
+class IsCommentOwnerPermisson(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if (request.user.is_authenticated and
+            request.user.customer_profile == obj.customer_profile):
+            return True
+        return False
+
+class IsReplyOwnerPermisson(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if (request.user.is_authenticated and
+            request.user.washer_profile == obj.store.washer_profile):
+            return True
+        return False
 
 class IsWasherOrReadOnlyPermission(BasePermission):
     def has_permission(self, request, view):

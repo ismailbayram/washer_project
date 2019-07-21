@@ -1,5 +1,5 @@
-from enumfields import EnumField
 from django.db import models
+from enumfields import EnumField
 
 from base.models import StarterModel
 from reservations.enums import ReservationStatus
@@ -23,3 +23,9 @@ class Reservation(StarterModel):
     class Meta:
         unique_together = ('start_datetime', 'store', )
         ordering = ['-start_datetime']
+
+class Comment(StarterModel):
+    raiting = models.IntegerField()
+    comment = models.CharField(max_length=255)
+    reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE, related_name='comment')
+    reply = models.CharField(max_length=255, null=True)

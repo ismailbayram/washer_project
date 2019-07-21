@@ -1,13 +1,17 @@
-from rest_framework import viewsets, status, views
+from rest_framework import mixins, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
-from api.permissions import HasGroupPermission
-from users.enums import GroupType
-from reservations.resources.serializers import ReservationSerializer
-from reservations.resources.filters import ReservationFilterSet
+from api.permissions import (HasGroupPermission, IsCommentOwnerPermisson,
+                             IsReplyOwnerPermisson)
 from reservations.models import Reservation
-from reservations.service import ReservationService
+from reservations.resources.filters import ReservationFilterSet
+from reservations.resources.serializers import (CommentSerializer,
+                                                ReplySerializer,
+                                                ReservationSerializer)
+from reservations.service import CommentService, ReservationService
+from users.enums import GroupType
 
 
 class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
@@ -109,6 +113,41 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         elif washer_profile and not reservation.store.washer_profile == washer_profile:
             self.permission_denied(request)
         return True
+
+
+class ReservationCommentView(mixins.ListModelMixin,
+                             mixins.RetrieveModelMixin,
+                             GenericViewSet):
+    """
+    # Permissions
+    :list: and :retrive: open for everyone including annonymUsers.
+    :comment: for just reservation customer
+    :reply: for just reservation.store.washer_profile
+    """
+
+    queryset = Reservation.objects.select_related('comment').all()
+    serializer_class = ReservationSerializer
+    service = CommentService()
+
+    @action(methods=['POST'], detail=True, permission_classes=(IsCommentOwnerPermisson,))
+    def comment(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        serializer = CommentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.instance = self.service.comment(reservation=reservation,
+                                                   **serializer.validated_data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=True, permission_classes=(IsReplyOwnerPermisson, ))
+    def reply(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        serializer = ReplySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.instance = self.service.reply(
+            **serializer.validated_data,
+            reservation=reservation,
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ReservationSearchView(views.APIView):

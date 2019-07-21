@@ -1,22 +1,24 @@
 import datetime
-import pytz
 
+import pytz
+from django.conf import settings
 from django.db.transaction import atomic
 from django.utils.crypto import get_random_string
-from django.conf import settings
 
-from baskets.service import BasketService
 from baskets.exceptions import BasketEmptyException
-from stores.exceptions import StoreNotAvailableException
-from reservations.models import Reservation
+from baskets.service import BasketService
 from reservations.enums import ReservationStatus
-from reservations.exceptions import (ReservationNotAvailableException,
-                                     ReservationOccupiedBySomeoneException,
-                                     ReservationStartedException,
+from reservations.exceptions import (ReservationCanNotCancelledException,
                                      ReservationCompletedException,
-                                     ReservationCanNotCancelledException,
-                                     ReservationExpiredException)
+                                     ReservationExpiredException,
+                                     ReservationHasNoComment,
+                                     ReservationIsNotComplated,
+                                     ReservationNotAvailableException,
+                                     ReservationOccupiedBySomeoneException,
+                                     ReservationStartedException)
+from reservations.models import Comment, Reservation
 from reservations.tasks import prevent_occupying_reservation
+from stores.exceptions import StoreNotAvailableException
 
 
 class ReservationService(object):
@@ -215,3 +217,40 @@ class ReservationService(object):
         reservation.status = ReservationStatus.expired
         reservation.save(update_fields=['status'])
         return reservation
+
+class CommentService:
+    def comment(self, raiting, comment, reservation):
+        """
+        :param raiting: Int
+        :param comment: String
+        :param reservation: Reservation
+        :return: Reservation
+        """
+        if reservation.status != ReservationStatus.completed:
+            raise ReservationIsNotComplated
+
+        if reservation.comment:
+            comment_obj = reservation.comment
+            comment_obj.raiting = raiting
+            comment_obj.comment = comment
+            comment_obj.save(update_fields=['raiting', 'comment'])
+            return comment_obj
+
+        comment = Comment.objects.create(raiting=raiting, comment=comment,
+                                         reservation=reservation)
+        return comment
+
+
+    def reply(self, reply, reservation):
+        """
+        :param reply: String
+        :param reservation: Reservation
+        :return: Reservation
+        """
+        if reservation.comment is None:
+            raise ReservationHasNoComment
+
+        comment = reservation.comment
+        comment.reply = reply
+        comment.save(update_fields=['reply'])
+        return comment
