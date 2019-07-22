@@ -1,4 +1,8 @@
+from django.conf import settings
+from django.core.paginator import PageNotAnInteger, EmptyPage
+
 from search.documents import StoreDoc
+from search.paginator import ESPaginator
 
 
 class StoreSearchService:
@@ -14,6 +18,8 @@ class StoreSearchService:
         township = query_params.get('township')
         credit_card = query_params.get('credit_card')
         cash = query_params.get('cash')
+        page = query_params.get('page')
+        limit = query_params.get('limit')
 
         response = {
             'count': 0,
@@ -45,9 +51,32 @@ class StoreSearchService:
             cash = True if cash else False
             query = query.filter('match', cash=cash)
 
+        if limit and limit.isdigit():
+            limit = int(limit)
+        else:
+            limit = settings.REST_FRAMEWORK['PAGE_SIZE']
+
+        if page and page.isdigit():
+            page = int(page)
+            start = (page - 1) * limit
+            end = start + limit
+        else:
+            page = 1
+            start = 0
+            end = limit
+        query = query[start:end]
+
         results = query.execute()
-        response['count'] = results.hits.total.value
-        for hit in results:
+        paginator = ESPaginator(results, limit)
+        try:
+            results = paginator.page(page)
+        except PageNotAnInteger:
+            results = paginator.page(1)
+        except EmptyPage:
+            results = paginator.page(paginator.num_pages)
+
+        response['count'] = paginator._count.value
+        for hit in results.object_list:
             response['results'].append(hit.to_dict())
 
         return response

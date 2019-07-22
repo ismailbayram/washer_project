@@ -13,6 +13,6 @@ class StoreSearchView(views.APIView):
     service = StoreSearchService()
 
     def get(self, request, *args, **kwargs):
-        results = self.service.query_stores(request.query_params)
-        return Response(results, status=status.HTTP_200_OK)
+        response = self.service.query_stores(request.query_params)
+        return Response(response, status=status.HTTP_200_OK)
 
