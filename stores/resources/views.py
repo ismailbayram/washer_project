@@ -31,6 +31,8 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
         'retrieve': [GroupType.washer],
         'approve': [],
         'decline': [],
+        'activate': [GroupType.washer],
+        'deactivate': [GroupType.washer],
         'address': [GroupType.washer],
         'add-image': [GroupType.washer],
         'delete-image': [GroupType.washer],
@@ -69,6 +71,20 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
         service = StoreService()
         instance = self.get_object()
         service.decline_store(instance)
+        return Response({}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'])
+    def activate(self, request, *args, **kwargs):
+        service = StoreService()
+        instance = self.get_object()
+        service.activate_store(instance)
+        return Response({}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'])
+    def deactivate(self, request, *args, **kwargs):
+        service = StoreService()
+        instance = self.get_object()
+        service.deactivate_store(instance)
         return Response({}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['POST'])

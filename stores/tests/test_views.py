@@ -124,6 +124,27 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         jresponse = json.loads(response.content)
         self.assertEqual(jresponse['name'], self.store.name)
 
+    def test_approve_store(self):
+        url = reverse_lazy('api:router:my_stores-approve', args=[self.store.pk])
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.superuser_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        store = Store.objects.get(pk=self.store.pk)
+        self.assertTrue(store.is_approved)
+
     def test_decline_store(self):
         url = reverse_lazy('api:router:my_stores-decline', args=[self.store2.pk])
 
@@ -145,8 +166,8 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         store = Store.objects.get(pk=self.store2.pk)
         self.assertFalse(store.is_approved)
 
-    def test_approve_store(self):
-        url = reverse_lazy('api:router:my_stores-approve', args=[self.store.pk])
+    def test_activate_store(self):
+        url = reverse_lazy('api:router:my_stores-activate', args=[self.store.pk])
 
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         response = self.client.post(url, content_type='application/json', **headers)
@@ -158,13 +179,26 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
 
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        store = Store.objects.get(pk=self.store.pk)
+        self.assertTrue(store.is_active)
+
+    def test_deactivate_store(self):
+        url = reverse_lazy('api:router:my_stores-deactivate', args=[self.store.pk])
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        headers = {'HTTP_AUTHORIZATION': f'Token {self.superuser_token}'}
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        response = self.client.post(url, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.post(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         store = Store.objects.get(pk=self.store.pk)
-        self.assertTrue(store.is_approved)
+        self.assertFalse(store.is_active)
 
     def test_address_store(self):
         url = reverse_lazy('api:router:my_stores-address', args=[self.store.pk])
