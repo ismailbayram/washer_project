@@ -77,6 +77,27 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         jresponse = json.loads(response.content)
         self.assertEqual(jresponse['name'], data['name'])
 
+        data.update({
+            'payment_options': {
+                'credit_card': True,
+                'cash': True
+            }
+        })
+        response = self.client.put(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresponse = json.loads(response.content)
+        self.assertTrue(jresponse['payment_options']['credit_card'])
+        self.assertTrue(jresponse['payment_options']['cash'])
+
+        data.update({
+            'payment_options': {
+                'credit_card': False,
+                'cash': False
+            }
+        })
+        response = self.client.put(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_list_stores(self):
         url = reverse_lazy('api:router:my_stores-list')
 

@@ -16,10 +16,13 @@ class Store(StarterModel):
     is_approved = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     config = JSONField(default=dict)  # open hours and open reservations
+    payment_options = JSONField(default=dict)
     latitude = models.FloatField(default=None, null=True)
     longitude = models.FloatField(default=None, null=True)
     rating = models.FloatField(default=None, null=True)
     logo = models.ImageField(null=True)
+
+
     objects = StoreManager()
 
     def __str__(self):
