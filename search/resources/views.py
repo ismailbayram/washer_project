@@ -1,6 +1,8 @@
 from rest_framework import views, status
 from rest_framework.response import Response
 
+from search.service import StoreSearchService
+
 
 class ReservationSearchView(views.APIView):
     def get(self, request, *args, **kwargs):
@@ -8,6 +10,9 @@ class ReservationSearchView(views.APIView):
 
 
 class StoreSearchView(views.APIView):
+    service = StoreSearchService()
+
     def get(self, request, *args, **kwargs):
-        return Response({}, status=status.HTTP_200_OK)
+        results = self.service.query_stores(request.query_params)
+        return Response(results, status=status.HTTP_200_OK)
 

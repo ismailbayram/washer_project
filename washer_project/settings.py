@@ -150,6 +150,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
 ES_HOST = 'http://127.0.0.1'
+ES_STORE_INDEX = 'stores'
+ES_RESERVATION_INDEX = 'reservations'
 
 AUTH_USER_MODEL = 'users.User'
 
