@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
+from api.fields import EnumField
 from stores.models import Store
+from reservations.models import Reservation
+from reservations.enums import ReservationStatus
 
 
 class StoreDocumentSerializer(serializers.ModelSerializer):
@@ -25,6 +28,16 @@ class StoreDocumentSerializer(serializers.ModelSerializer):
             'lat': latitude,
             'lon': longitude
         }
+
+
+class ReservationDocumentSerializer(serializers.ModelSerializer):
+    status = EnumField(enum=ReservationStatus)
+    store = StoreDocumentSerializer()
+
+    class Meta:
+        model = Reservation
+        fields = ('pk', 'period', 'status', 'start_datetime', 'end_datetime',
+                  'store')
 
 
 class StoreFilterSerializer(serializers.Serializer):

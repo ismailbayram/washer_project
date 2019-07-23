@@ -1,6 +1,11 @@
+from django.utils import timezone
+
 from stores.models import Store
-from search.documents import StoreDoc
+from reservations.models import Reservation
+from reservations.enums import ReservationStatus
+from search.documents import StoreDoc, ReservationDoc
 from search.resources.serializers import StoreDocumentSerializer
+from search.resources.serializers import ReservationDocumentSerializer
 
 
 class StoreIndexer:
@@ -34,3 +39,38 @@ class StoreIndexer:
         """
         doc = StoreDoc()
         doc.delete(id=store.pk)
+
+
+class ReservationIndexer:
+    def index_reservation(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: None
+        """
+        serializer = ReservationDocumentSerializer(instance=reservation)
+        doc = ReservationDoc(**serializer.data)
+        doc.meta.id = reservation.pk
+        doc.save(index=ReservationDoc.Index.name)
+
+    def index_reservations(self):
+        """
+        :return: None
+        """
+        now = timezone.now()
+        q = Reservation.objects.filter(status__in=[ReservationStatus.available, ReservationStatus.occupied],
+                                       store__is_approved=True, store__is_active=True, start_datetime__gt=now)\
+            .select_related('store', 'store__address', 'store__address__city', 'store__address__township')
+        k = 0
+        count = q.count()
+        for store in q:
+            k += 1
+            print(f'{k}/{count} indexed of reservations.')
+            self.index_reservation(store)
+
+    def delete_reservation(self, reservation):
+        """
+        :param reservation: Reservation
+        :return: None
+        """
+        doc = ReservationDoc()
+        doc.delete(id=reservation.pk)
