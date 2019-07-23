@@ -1,33 +1,24 @@
 from django.conf import settings
-from django.core.paginator import PageNotAnInteger, EmptyPage
 
 from search.documents import StoreDoc
-from search.paginator import ESPaginator
 from search.resources.serializers import StoreFilterSerializer
 
 
 class StoreSearchService:
     def query_stores(self, query_params):
+        """
+        :param query_params: QueryDict
+        :return: function
+        """
         # TODO: sorters
+        # TODO: filter by primary product price
         serializer = StoreFilterSerializer(data=query_params)
         if not serializer.is_valid():
             # TODO: Log here
             print('LOG HERE!')
 
         data = serializer.validated_data
-        page = data.get('page', 1)
-        limit = data.get('limit', settings.REST_FRAMEWORK['PAGE_SIZE'])
         # TODO: cache by hashing query params: hash(data)
-
-        import ipdb
-        ipdb.set_trace()
-
-        response = {
-            'count': 0,
-            'next': None,
-            'previous': None,
-            'results': []
-        }
 
         query = StoreDoc.search()
         if 'name' in data:
@@ -46,25 +37,27 @@ class StoreSearchService:
         if 'cash' in data:
             query = query.filter('match', cash=data['cash'])
 
+        return self._paginate_response(query, data.get('page'), data.get('limit'))
+
+    def _paginate_response(self, query, page, limit):
+        """
+        :param query: ESSearch
+        :param page: int
+        :param limit: int
+        :return: dict
+        """
+        page = page or 1
+        limit = limit or settings.REST_FRAMEWORK['PAGE_SIZE']
+
         start = (page - 1) * limit
         end = start + limit
+
         count = query.count()
-        if count < end:
-            end = count
-            start = end - limit
-
         query = query[start:end]
-        results = query.execute()
-        paginator = ESPaginator(results, limit)
-        try:
-            results = paginator.page(page)
-        except PageNotAnInteger:
-            results = paginator.page(1)
-        except EmptyPage:
-            results = paginator.page(paginator.num_pages)
+        response = query.execute()
 
-        response['count'] = paginator._count.value
-        for hit in results.object_list:
-            response['results'].append(hit.to_dict())
+        results = []
+        for hit in response:
+            results.append(hit.to_dict())
 
-        return response
+        return count, results
