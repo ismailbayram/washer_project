@@ -34,12 +34,11 @@ class StoreDocumentSerializer(serializers.ModelSerializer):
 
 class ReservationDocumentSerializer(serializers.ModelSerializer):
     status = EnumField(enum=ReservationStatus)
-    store = StoreDocumentSerializer()
+    # store = StoreDocumentSerializer()
 
     class Meta:
         model = Reservation
-        fields = ('pk', 'period', 'status', 'start_datetime', 'end_datetime',
-                  'store')
+        fields = ('pk', 'period', 'status', 'start_datetime', 'end_datetime')
 
 
 class StoreFilterSerializer(serializers.Serializer):

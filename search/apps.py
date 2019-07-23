@@ -9,5 +9,6 @@ class SearchConfig(AppConfig):
 
     def ready(self):
         connections.create_connection(hosts=[settings.ES_HOST], timeout=60)
-        from search.documents import StoreDoc
+        from search.documents import StoreDoc, ReservationDoc
         StoreDoc.init()
+        ReservationDoc.init()

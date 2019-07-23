@@ -18,6 +18,7 @@ def prevent_occupying_reservation(reservation_id):
 
 @app.task(name="reservations.create_store_weekly_reservations")
 def create_store_weekly_reservations(store_id):
+    # TODO: seperate chunk by chunk
     from stores.models import Store
     from reservations.service import ReservationService
 

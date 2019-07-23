@@ -56,6 +56,7 @@ class ReservationIndexer:
         """
         :return: None
         """
+        # TODO: create periodic task
         now = timezone.now()
         q = Reservation.objects.filter(status__in=[ReservationStatus.available, ReservationStatus.occupied],
                                        store__is_approved=True, store__is_active=True, start_datetime__gt=now)\
