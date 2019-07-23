@@ -55,6 +55,7 @@ class StoreFilterSerializer(serializers.Serializer):
     cash = serializers.NullBooleanField(required=False)
     limit = serializers.IntegerField(default=settings.REST_FRAMEWORK['PAGE_SIZE'])
     page = serializers.IntegerField(default=1)
+    sort = serializers.CharField(default='-rating')
 
     def __init__(self, *args, **kwargs):
         self.distance_metric = kwargs.get('distance_metric', 'm')
@@ -64,6 +65,11 @@ class StoreFilterSerializer(serializers.Serializer):
         if page < 1:
             page = 1
         return page
+
+    def validate_sort(self, sort):
+        if not sort in ['-rating', 'rating']:
+            return '-rating'
+        return sort
 
     def validate(self, attrs):
         lat = attrs.get('lat', None)

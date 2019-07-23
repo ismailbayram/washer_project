@@ -12,12 +12,12 @@ class StoreIndexer:
     def index_store(self, store):
         """
         :param store: Store
-        :return: None
+        :return: str
         """
         serializer = StoreDocumentSerializer(instance=store)
         doc = StoreDoc(**serializer.data)
         doc.meta.id = store.pk
-        doc.save(index=StoreDoc.Index.name)
+        return doc.save(index=StoreDoc.Index.name)
 
     def index_stores(self):
         """
@@ -29,8 +29,8 @@ class StoreIndexer:
         count = q.count()
         for store in q:
             k += 1
-            print(f'{k}/{count} indexed of stores.')
-            self.index_store(store)
+            resp = self.index_store(store)
+            print(f'{k}/{count} indexed of stores.[{resp}]')
 
     def delete_store(self, store):
         """
@@ -50,7 +50,7 @@ class ReservationIndexer:
         serializer = ReservationDocumentSerializer(instance=reservation)
         doc = ReservationDoc(**serializer.data)
         doc.meta.id = reservation.pk
-        doc.save(index=ReservationDoc.Index.name)
+        return doc.save(index=ReservationDoc.Index.name)
 
     def index_reservations(self):
         """
@@ -64,8 +64,8 @@ class ReservationIndexer:
         count = q.count()
         for store in q:
             k += 1
-            print(f'{k}/{count} indexed of reservations.')
-            self.index_reservation(store)
+            resp = self.index_reservation(store)
+            print(f'{k}/{count} indexed of reservations.[{resp}]')
 
     def delete_reservation(self, reservation):
         """

@@ -27,6 +27,7 @@ class ReservationDoc(es.Document):
     start_datetime = es.Date()
     end_datetime = es.Date()
     store = es.Nested(StoreDoc)
+    price = es.Object()
 
     class Index:
         name = settings.ES_RESERVATION_INDEX

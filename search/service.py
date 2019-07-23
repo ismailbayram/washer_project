@@ -10,8 +10,6 @@ class StoreSearchService:
         :param query_params: QueryDict
         :return: function
         """
-        # TODO: sorters
-        # TODO: filter by primary product price
         serializer = StoreFilterSerializer(data=query_params)
         if not serializer.is_valid():
             # TODO: Log here
@@ -37,6 +35,8 @@ class StoreSearchService:
         if 'cash' in data:
             query = query.filter('match', cash=data['cash'])
 
+        query = query.sort(data['sort'])
+
         return self._paginate_response(query, data.get('page'), data.get('limit'))
 
     def _paginate_response(self, query, page, limit):
@@ -61,3 +61,8 @@ class StoreSearchService:
             results.append(hit.to_dict())
 
         return count, results
+
+
+class ReservationSearchService:
+    # TODO: filter by primary product price
+    pass
