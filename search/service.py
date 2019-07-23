@@ -3,23 +3,24 @@ from django.core.paginator import PageNotAnInteger, EmptyPage
 
 from search.documents import StoreDoc
 from search.paginator import ESPaginator
+from search.resources.serializers import StoreFilterSerializer
 
 
 class StoreSearchService:
     def query_stores(self, query_params):
-        # TODO: cache by hashing query params
+        # TODO: sorters
+        serializer = StoreFilterSerializer(data=query_params)
+        if not serializer.is_valid():
+            # TODO: Log here
+            print('LOG HERE!')
 
-        lat = query_params.get('lat')
-        lon = query_params.get('lon')
-        distance = query_params.get('distance')
-        name = query_params.get('name')
-        rating = query_params.get('rating')
-        city = query_params.get('city')
-        township = query_params.get('township')
-        credit_card = query_params.get('credit_card')
-        cash = query_params.get('cash')
-        page = query_params.get('page')
-        limit = query_params.get('limit')
+        data = serializer.validated_data
+        page = data.get('page', 1)
+        limit = data.get('limit', settings.REST_FRAMEWORK['PAGE_SIZE'])
+        # TODO: cache by hashing query params: hash(data)
+
+        import ipdb
+        ipdb.set_trace()
 
         response = {
             'count': 0,
@@ -29,43 +30,30 @@ class StoreSearchService:
         }
 
         query = StoreDoc.search()
-        if name:
-            query = query.query("match", name=name)
-        if rating and rating.isdigit():
-            query = query.filter('range', rating={'gte': int(rating)})
-        if lat and lon and distance and distance.isdigit():
-            try:
-                lat = float(lat)
-                lon = float(lon)
-                query = query.filter('geo_distance', distance=f'{distance}m', location=[lon, lat])
-            except ValueError:
-                pass
-        if city and city.isdigit():
-            query = query.filter('match', city=int(city))
-        if township and township.isdigit():
-            query = query.filter('match', township=int(township))
-        if credit_card:
-            credit_card = True if credit_card else False
-            query = query.filter('match', credit_card=credit_card)
-        if cash:
-            cash = True if cash else False
-            query = query.filter('match', cash=cash)
+        if 'name' in data:
+            query = query.query("match", name=data['name'])
+        if 'rating' in data:
+            query = query.filter('range', rating={'gte': data['rating']})
+        if 'location' in data:
+            query = query.filter('geo_distance', distance=f'{data["distance"]}{serializer.distance_metric}',
+                                 location=data['location'])
+        if 'city' in data:
+            query = query.filter('match', city=data['city'])
+        if 'township' in data:
+            query = query.filter('match', township=data['township'])
+        if 'credit_card' in data:
+            query = query.filter('match', credit_card=data['credit_card'])
+        if 'cash' in data:
+            query = query.filter('match', cash=data['cash'])
 
-        if limit and limit.isdigit():
-            limit = int(limit)
-        else:
-            limit = settings.REST_FRAMEWORK['PAGE_SIZE']
+        start = (page - 1) * limit
+        end = start + limit
+        count = query.count()
+        if count < end:
+            end = count
+            start = end - limit
 
-        if page and page.isdigit():
-            page = int(page)
-            start = (page - 1) * limit
-            end = start + limit
-        else:
-            page = 1
-            start = 0
-            end = limit
         query = query[start:end]
-
         results = query.execute()
         paginator = ESPaginator(results, limit)
         try:

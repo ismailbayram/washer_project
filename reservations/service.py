@@ -20,6 +20,7 @@ from reservations.tasks import prevent_occupying_reservation
 
 
 class ReservationService(object):
+    # TODO: check ESDocuments when changed reservation
     def _generate_reservation_number(self):
         number = get_random_string(length=10).upper()
         if Reservation.objects.filter(number=number).exists():
