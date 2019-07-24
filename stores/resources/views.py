@@ -6,20 +6,25 @@ from rest_framework.response import Response
 from address.resources.serializers import AddressSerializer
 from address.service import AddressService
 from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
+from api.views import MultiSerializerViewMixin
 from reservations.models import Comment
 from reservations.resources.serializers import CommentSerializer
 from stores.models import Store, StoreImageItem
-from stores.resources.serializers import (StoreImageSerializer,
+from stores.resources.serializers import (StoreDetailedSerializer,
+                                          StoreImageSerializer,
                                           StoreLogoSerializer, StoreSerializer)
 from stores.service import StoreService
 from users.enums import GroupType
 
 
-class StoreViewSet(viewsets.GenericViewSet,
+class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
                    mixins.CreateModelMixin, mixins.UpdateModelMixin,
                    mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = Store.objects.prefetch_stores()
     serializer_class = StoreSerializer
+    action_serializers = {
+        'retrieve': StoreDetailedSerializer
+    }
     permission_classes = (HasGroupPermission, IsWasherOrReadOnlyPermission,)
     permission_groups = {
         'create': [GroupType.washer],
@@ -29,13 +34,14 @@ class StoreViewSet(viewsets.GenericViewSet,
         'retrieve': [GroupType.washer],
         'approve': [],
         'decline': [],
+        'activate': [GroupType.washer],
+        'deactivate': [GroupType.washer],
         'address': [GroupType.washer],
         'add-image': [GroupType.washer],
         'delete-image': [GroupType.washer],
         'logo': [GroupType.washer],
     }
 
-    # TODO: add activate action
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.request.user.is_staff:
@@ -70,6 +76,20 @@ class StoreViewSet(viewsets.GenericViewSet,
         return Response({}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['POST'])
+    def activate(self, request, *args, **kwargs):
+        service = StoreService()
+        instance = self.get_object()
+        service.activate_store(instance)
+        return Response({}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'])
+    def deactivate(self, request, *args, **kwargs):
+        service = StoreService()
+        instance = self.get_object()
+        service.deactivate_store(instance)
+        return Response({}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'])
     def address(self, request, *args, **kwargs):
         service = AddressService()
         store = self.get_object()
@@ -90,7 +110,6 @@ class StoreViewSet(viewsets.GenericViewSet,
 
         return Response({}, status=status.HTTP_202_ACCEPTED)
 
-
     @action(detail=True, methods=['DELETE'], url_path='photo_gallery/(?P<image_pk>[0-9]+)')
     def delete_image(self, request, image_pk=None, *args, **kwargs):
         service = StoreService()
@@ -98,7 +117,6 @@ class StoreViewSet(viewsets.GenericViewSet,
                                              washer_profile=request.user.washer_profile)
         service.delete_image(store_image_item, request.user.washer_profile)
         return Response({}, status=status.HTTP_202_ACCEPTED)
-
 
     @action(detail=True, methods=['POST', 'DELETE'], url_path='logo')
     def logo(self, request, *args, **kwargs):
@@ -117,7 +135,6 @@ class StoreViewSet(viewsets.GenericViewSet,
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Store.objects.filter(is_active=True, is_approved=True)\
-                            .select_related('address')
+    queryset = Store.objects.actives().select_related('address')
     # TODO: connect with google maps
     serializer_class = StoreSerializer

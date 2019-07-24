@@ -43,6 +43,7 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         self.assertTrue(store.is_active)
         self.assertFalse(store.is_approved)
         self.assertEqual(store.config, {'opening_hours': {}, 'reservation_hours': {}})
+        self.assertEqual(store.payment_options, {'credit_card': False, 'cash': True})
 
         self.assertEqual(store.product_set.count(), 1)
         self.assertEqual(store.product_set.filter(is_primary=True).count(), 1)
@@ -98,6 +99,16 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         store = mommy.make('stores.Store', is_approved=True)
         store = self.service.decline_store(store)
         self.assertFalse(store.is_approved)
+
+    def test_active(self):
+        store = mommy.make('stores.Store', is_active=False)
+        store = self.service.activate_store(store)
+        self.assertTrue(store.is_active)
+
+    def test_deactivate(self):
+        store = mommy.make('stores.Store', is_active=True)
+        store = self.service.deactivate_store(store)
+        self.assertFalse(store.is_active)
 
     def test_add_delete_logo(self):
         content_file_logo = ContentFile(self.photo)
