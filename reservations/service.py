@@ -219,9 +219,9 @@ class ReservationService(object):
         return reservation
 
 class CommentService:
-    def comment(self, raiting, comment, reservation):
+    def comment(self, rating, comment, reservation):
         """
-        :param raiting: Int
+        :param rating: Int
         :param comment: String
         :param reservation: Reservation
         :return: Reservation
@@ -231,12 +231,12 @@ class CommentService:
 
         if reservation.comment:
             comment_obj = reservation.comment
-            comment_obj.raiting = raiting
+            comment_obj.rating = rating
             comment_obj.comment = comment
-            comment_obj.save(update_fields=['raiting', 'comment'])
+            comment_obj.save(update_fields=['rating', 'comment'])
             return comment_obj
 
-        comment = Comment.objects.create(raiting=raiting, comment=comment,
+        comment = Comment.objects.create(rating=rating, comment=comment,
                                          reservation=reservation)
         return comment
 

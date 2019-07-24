@@ -25,7 +25,7 @@ class Reservation(StarterModel):
         ordering = ['-start_datetime']
 
 class Comment(StarterModel):
-    raiting = models.IntegerField()
+    rating = models.IntegerField()
     comment = models.CharField(max_length=255)
     reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE, related_name='comment')
     reply = models.CharField(max_length=255, null=True)

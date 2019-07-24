@@ -7,19 +7,15 @@ from stores.resources.serializers import StoreSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    raiting = serializers.IntegerField(min_value=1, max_value=10)
+    rating = serializers.IntegerField(min_value=1, max_value=10)
 
     class Meta:
         model = Comment
-        fields = ('pk', 'raiting', 'comment', 'reservation', 'reply', )
+        fields = ('pk', 'rating', 'comment', 'reservation', 'reply', )
         read_only_fields = ('reply', 'reservation',)
 
-class ReplySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Comment
-        fields = ('reply',)
-        extra_kwargs = {'reply': {'required': True}}
+class ReplySerializer(serializers.Serializer):
+    reply = serializers.CharField(max_length=255)
 
 
 class ReservationSerializer(serializers.ModelSerializer):
