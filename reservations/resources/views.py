@@ -18,7 +18,8 @@ class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Reservation.objects.select_related('store', 'store__address',
                                                   'store__address__country',
                                                   'store__address__city',
-                                                  'store__address__township').all()
+                                                  'store__address__township',
+                                                  'comment').all()
     serializer_class = ReservationSerializer
     service = ReservationService()
     permission_classes = (HasGroupPermission, )
