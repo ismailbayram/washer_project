@@ -1,23 +1,28 @@
 import datetime
-from model_mommy import mommy
 from decimal import Decimal
+
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from model_mommy import mommy
 
 from base.test import BaseTestViewMixin
-from baskets.service import BasketService
 from baskets.exceptions import BasketEmptyException
+from baskets.service import BasketService
 from cars.enums import CarType
 from cars.service import CarService
 from products.service import ProductService
-from reservations.service import ReservationService
 from reservations.enums import ReservationStatus
-from reservations.exceptions import (ReservationNotAvailableException,
+from reservations.exceptions import (ReservationAlreadyCommented,
+                                     ReservationAlreadyReplyed,
                                      ReservationCanNotCancelledException,
                                      ReservationCompletedException,
-                                     ReservationStartedException,
                                      ReservationExpiredException,
-                                     ReservationOccupiedBySomeoneException)
+                                     ReservationHasNoComment,
+                                     ReservationIsNotComplated,
+                                     ReservationNotAvailableException,
+                                     ReservationOccupiedBySomeoneException,
+                                     ReservationStartedException)
+from reservations.service import CommentService, ReservationService
 from stores.exceptions import StoreNotAvailableException
 
 
@@ -251,3 +256,72 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         reservation = self.service._create_reservation(self.store, dt, 40)
         reservation = self.service.expire(reservation)
         self.assertEqual(reservation.status, ReservationStatus.expired)
+
+
+class CommentServiceTest(TestCase, BaseTestViewMixin):
+    def setUp(self):
+        self.service = CommentService()
+        self.reservation_service = ReservationService()
+        self.product_service = ProductService()
+        self.car_service = CarService()
+        self.basket_service = BasketService()
+        self.init_users()
+
+        self.store = mommy.make('stores.Store', washer_profile=self.washer_profile,
+                                is_approved=True, is_active=True)
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2_profile,
+                                 is_approved=True, is_active=True)
+        self.product1 = self.product_service.create_primary_product(self.store)
+        self.product2 = self.product_service.create_product(name='Parfume', store=self.store,
+                                                            washer_profile=self.store.washer_profile)
+        self.product3 = self.product_service.create_primary_product(self.store2)
+        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.normal,
+                                               customer_profile=self.customer_profile)
+
+        self.reservation_service = ReservationService()
+
+        dt = datetime.datetime(2019, 7, 18, 5, 51)
+        dt2 = dt + datetime.timedelta(hours=-1)
+        dt3 = dt2 + datetime.timedelta(hours=-1)
+        self.reservation = self.reservation_service._create_reservation(self.store, dt, 40)
+        self.reservation2 = self.reservation_service._create_reservation(self.store, dt2, 40)
+        self.reservation3 = self.reservation_service._create_reservation(self.store, dt3, 40)
+
+    def test_comment(self):
+        with self.assertRaises(ReservationIsNotComplated):
+            self.service.comment(rating=10, comment="naber", reservation=self.reservation)
+        self.reservation.status = ReservationStatus.completed
+        self.reservation.save()
+        self.reservation2.status = ReservationStatus.completed
+        self.reservation2.save()
+        self.reservation3.status = ReservationStatus.completed
+        self.reservation3.save()
+
+        self.service.comment(rating=10, comment="naber", reservation=self.reservation)
+
+        self.assertEqual(self.reservation.comment.comment, 'naber')
+        self.assertEqual(self.reservation.comment.rating, 10)
+        self.assertEqual(self.reservation.store.rating, 10)
+
+        with self.assertRaises(ReservationAlreadyCommented):
+            self.service.comment(rating=10, comment="naber", reservation=self.reservation)
+
+
+        self.service.comment(rating=5, comment="naber", reservation=self.reservation2)
+        self.service.comment(rating=3, comment="naber", reservation=self.reservation3)
+
+        self.assertEqual(self.store.rating, 6)
+
+    def test_reply(self):
+        with self.assertRaises(ReservationHasNoComment):
+            self.service.reply("kadir", self.reservation)
+
+        self.reservation.status = ReservationStatus.completed
+        self.reservation.save()
+        self.service.comment(rating=10, comment="naber", reservation=self.reservation)
+
+        self.service.reply(reply='kadir', reservation=self.reservation)
+        self.assertEqual(self.reservation.comment.reply, "kadir")
+
+        with self.assertRaises(ReservationAlreadyReplyed):
+            self.service.reply("kadir", self.reservation)

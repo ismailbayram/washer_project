@@ -157,10 +157,10 @@ max-branchs=12
 max-statements=50
 
 # Maximum number of parents for a class (see R0901).
-max-parents=7
+max-parents=12
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=7
+max-attributes=12
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods=0
@@ -246,7 +246,7 @@ ignore-docstrings=yes
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=80
+max-line-length=99
 
 # Maximum number of lines in a module
 max-module-lines=1000
