@@ -229,10 +229,7 @@ class CommentService:
         """
 
         com_count = Comment.objects.filter(reservation__in=store.reservation_set.all()).count()
-        print(com_count)
-
         avg_rating = store.rating
-        print(avg_rating)
 
         if not avg_rating:
             avg_rating = 0

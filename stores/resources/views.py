@@ -118,11 +118,7 @@ class StoreViewSet(viewsets.GenericViewSet,
 
     @action(detail=True, methods=['GET'], url_path='comments', permission_classes=(ReadOnly, ))
     def comments(self, request, *args, **kwargs):
-
         store = get_object_or_404(Store, pk=self.kwargs['pk'])
-        print(
-            Comment.objects.filter(reservation__in=store.reservation_set.all()).count()
-        )
         serializer = CommentSerializer(
             Comment.objects.filter(reservation__in=store.reservation_set.all()),
             many=True)
