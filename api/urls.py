@@ -29,7 +29,6 @@ router.register('townships', TownshipViewSet, base_name='townships')
 
 # stores
 router.register('stores', StoreViewSet, base_name='my_stores')
-# router.register('stores_list', StoreListViewSet, base_name='stores')
 
 # cars
 router.register('cars', CarViewSet, base_name='cars')

@@ -90,6 +90,7 @@ class ReservationService(object):
         :param customer_profile: CustomerProfile
         :return: Reservation
         """
+        # TODO: update index status
         try:
             occupied = customer_profile.reservation_set.get(status=ReservationStatus.occupied)
             occupied.status = ReservationStatus.available
@@ -128,6 +129,7 @@ class ReservationService(object):
         :param customer_profile: CustomerProfile
         :return: Reservation
         """
+        # TODO: update index status
         if reservation.status > ReservationStatus.occupied:
             raise ReservationNotAvailableException
         if not customer_profile == reservation.customer_profile:

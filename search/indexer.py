@@ -1,6 +1,7 @@
 from django.utils import timezone
 
 from stores.models import Store
+from products.models import Product
 from reservations.models import Reservation
 from reservations.enums import ReservationStatus
 from search.documents import StoreDoc, ReservationDoc
@@ -48,24 +49,32 @@ class ReservationIndexer:
         :return: None
         """
         serializer = ReservationDocumentSerializer(instance=reservation)
+        store_data = serializer.data.get('store')
         doc = ReservationDoc(**serializer.data)
         doc.meta.id = reservation.pk
+        doc.store = StoreDoc(**store_data)
+
+        price = {}
+        product = Product.objects.filter(store=reservation.store, is_primary=True).first()
+        for pp in product.productprice_set.all():
+            price[pp.car_type.value] = float(pp.price)
+        doc.price = price
+
         return doc.save(index=ReservationDoc.Index.name)
 
     def index_reservations(self):
         """
         :return: None
         """
-        # TODO: create periodic task
         now = timezone.now()
         q = Reservation.objects.filter(status__in=[ReservationStatus.available, ReservationStatus.occupied],
                                        store__is_approved=True, store__is_active=True, start_datetime__gt=now)\
             .select_related('store', 'store__address', 'store__address__city', 'store__address__township')
         k = 0
         count = q.count()
-        for store in q:
+        for reservation in q:
             k += 1
-            resp = self.index_reservation(store)
+            resp = self.index_reservation(reservation)
             print(f'{k}/{count} indexed of reservations.[{resp}]')
 
     def delete_reservation(self, reservation):

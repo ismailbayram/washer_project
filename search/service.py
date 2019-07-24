@@ -35,7 +35,7 @@ class StoreSearchService:
         if 'cash' in data:
             query = query.filter('match', cash=data['cash'])
 
-        query = query.sort(data['sort'])
+        query = query.sort(data['sort'], '-rating')
 
         return self._paginate_response(query, data.get('page'), data.get('limit'))
 

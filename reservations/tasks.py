@@ -8,7 +8,7 @@ from washer_project.celery import app
 def prevent_occupying_reservation(reservation_id):
     from reservations.models import Reservation
     from reservations.enums import ReservationStatus
-
+    # TODO: update index status
     reservation = Reservation.objects.get(pk=reservation_id)
     if reservation.status == ReservationStatus.occupied:
         reservation.customer_profile = None
@@ -41,6 +41,7 @@ def check_expired_reservations():
     dt = timezone.localize(datetime.now())
     res_service = ReservationService()
 
+    # TODO: delete es index
     for reservation in Reservation.objects.filter(status=ReservationStatus.available,
                                                   start_datetime__lt=dt):
         res_service.expire(reservation)
