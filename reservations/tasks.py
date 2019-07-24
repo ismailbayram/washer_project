@@ -56,6 +56,6 @@ def create_next_week_day():
     start_datetime = datetime.datetime.today() + datetime.timedelta(days=7)
     res_service = ReservationService()
 
-    for store in Store.objects.filter(is_active=True, is_approved=True):
+    for store in Store.objects.actives():
         period = store.product_set.filter(is_primary=True).order_by('-period').first().period
         res_service.create_day_from_config(store, start_datetime, period)

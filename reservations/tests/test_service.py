@@ -29,11 +29,9 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         self.car_service = CarService()
         self.basket_service = BasketService()
         self.init_users()
-        self.customer_profile = self.customer.customer_profile
-        self.customer2_profile = self.customer2.customer_profile
-        self.store = mommy.make('stores.Store', washer_profile=self.washer.washer_profile,
+        self.store = mommy.make('stores.Store', washer_profile=self.washer_profile,
                                 is_approved=True, is_active=True)
-        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2.washer_profile,
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2_profile,
                                  is_approved=True, is_active=True)
         self.product1 = self.product_service.create_primary_product(self.store)
         self.product2 = self.product_service.create_product(name='Parfume', store=self.store,
