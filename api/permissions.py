@@ -34,10 +34,6 @@ class IsCustomerOrReadOnlyPermission(BasePermission):
             return True
         return False
 
-class ReadOnly(BasePermission):
-    def has_permission(self, request, view):
-        return request.method in SAFE_METHODS
-
 class IsWasherOrReadOnlyPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:

@@ -5,8 +5,7 @@ from rest_framework.response import Response
 
 from address.resources.serializers import AddressSerializer
 from address.service import AddressService
-from api.permissions import (HasGroupPermission, IsWasherOrReadOnlyPermission,
-                             ReadOnly)
+from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from reservations.models import Comment
 from reservations.resources.serializers import CommentSerializer
 from stores.models import Store, StoreImageItem
@@ -34,7 +33,6 @@ class StoreViewSet(viewsets.GenericViewSet,
         'add-image': [GroupType.washer],
         'delete-image': [GroupType.washer],
         'logo': [GroupType.washer],
-        # 'comments'
     }
 
     # TODO: add activate action
