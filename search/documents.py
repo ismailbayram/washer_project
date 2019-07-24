@@ -24,9 +24,9 @@ class ReservationDoc(es.Document):
     pk = es.Integer()
     period = es.Integer()
     status = es.Text()
-    start_datetime = es.Date()
-    end_datetime = es.Date()
-    store = es.Nested(StoreDoc)
+    start_datetime = es.Date(default_timezone=settings.TIME_ZONE)
+    end_datetime = es.Date(default_timezone=settings.TIME_ZONE)
+    store = es.Object()
     price = es.Object()
 
     class Index:

@@ -52,7 +52,7 @@ class ReservationIndexer:
         store_data = serializer.data.get('store')
         doc = ReservationDoc(**serializer.data)
         doc.meta.id = reservation.pk
-        doc.store = StoreDoc(**store_data)
+        doc.store = store_data
 
         price = {}
         product = Product.objects.filter(store=reservation.store, is_primary=True).first()
@@ -84,3 +84,10 @@ class ReservationIndexer:
         """
         doc = ReservationDoc()
         doc.delete(id=reservation.pk)
+
+
+"""
+def bulk_indexing():
+    ReservationDoc.init(index='reservations')
+    bulk(client=es, actions=(b.indexing() for b in ReservationDoc.objects.all().iterator()))
+"""

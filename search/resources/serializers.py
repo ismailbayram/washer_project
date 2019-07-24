@@ -49,7 +49,7 @@ class StoreFilterSerializer(serializers.Serializer):
     location = serializers.ListField(read_only=True)
     city = serializers.IntegerField(required=False)
     township = serializers.IntegerField(required=False)
-    rating = serializers.FloatField(required=False)
+    rating__gte = serializers.FloatField(required=False)
     credit_card = serializers.NullBooleanField(required=False)
     cash = serializers.NullBooleanField(required=False)
     limit = serializers.IntegerField(default=settings.REST_FRAMEWORK['PAGE_SIZE'])
@@ -83,3 +83,38 @@ class StoreFilterSerializer(serializers.Serializer):
             attrs['location'] = [lon, lat]
 
         return attrs
+
+
+class ReservationFilterSerializer(serializers.Serializer):
+    store = serializers.IntegerField(required=False)
+    city = serializers.IntegerField(required=False)
+    township = serializers.IntegerField(required=False)
+    rating__gte = serializers.FloatField(required=False)
+    credit_card = serializers.NullBooleanField(required=False)
+    cash = serializers.NullBooleanField(required=False)
+    limit = serializers.IntegerField(default=settings.REST_FRAMEWORK['PAGE_SIZE'])
+    page = serializers.IntegerField(default=1)
+    sort = serializers.CharField(default='start_datetime')
+    start_datetime__lte = serializers.DateTimeField(required=False)
+    start_datetime__gte = serializers.DateTimeField(required=False)
+
+    def validate_page(self, page):
+        if page < 1:
+            page = 1
+        return page
+
+    def validate_sort(self, sort):
+        if not sort in ['-start_datetime', 'start_datetime',
+                        'rating', '-rating']:
+            return 'start_datetime'
+        return sort
+
+    def to_internal_value(self, data):
+        d = dict(data)
+        if data.get('start_datetime__lte', None):
+            d['start_datetime__lte'] = data['start_datetime__lte'].strip().replace(' ', '+')
+
+        if data.get('start_datetime__gte', None):
+            d['start_datetime__gte'] = data['start_datetime__gte'].strip().replace(' ', '+')
+
+        return super().to_internal_value(d)
