@@ -108,6 +108,28 @@ class StoreService:
         instance.save(update_fields=['is_approved'])
         return instance
 
+    def activate_store(self, instance):
+        """
+        :param instance: Store
+        :return: Store
+        """
+        # NOTIFICATION
+        instance.is_active = True
+        instance.save(update_fields=['is_active'])
+        create_store_weekly_reservations.delay(instance.id)  # TODO: test
+        return instance
+
+    def deactivate_store(self, instance):
+        """
+        :param instance: Store
+        :return: Store
+        """
+        # NOTIFICATION
+        # TODO: check reservations
+        instance.is_active = False
+        instance.save(update_fields=['is_active'])
+        return instance
+
     def add_logo(self, store, logo):
         """
         :param store: Store

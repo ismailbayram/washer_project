@@ -99,6 +99,16 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         store = self.service.decline_store(store)
         self.assertFalse(store.is_approved)
 
+    def test_active(self):
+        store = mommy.make('stores.Store', is_active=False)
+        store = self.service.activate_store(store)
+        self.assertTrue(store.is_active)
+
+    def test_deactivate(self):
+        store = mommy.make('stores.Store', is_active=True)
+        store = self.service.deactivate_store(store)
+        self.assertFalse(store.is_active)
+
     def test_add_delete_logo(self):
         content_file_logo = ContentFile(self.photo)
         content_file_logo.name = "img.jpeg"
