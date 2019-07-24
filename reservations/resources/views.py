@@ -1,20 +1,25 @@
-from rest_framework import viewsets, status, views
+from rest_framework import mixins, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
-from api.permissions import HasGroupPermission
+from api.permissions import HasGroupPermission, IsCustomerOrReadOnlyPermission
+from reservations.models import Comment, Reservation
+from reservations.resources.filters import (CommentFilterSet,
+                                            ReservationFilterSet)
+from reservations.resources.serializers import (CommentSerializer,
+                                                ReplySerializer,
+                                                ReservationSerializer)
+from reservations.service import CommentService, ReservationService
 from users.enums import GroupType
-from reservations.resources.serializers import ReservationSerializer
-from reservations.resources.filters import ReservationFilterSet
-from reservations.models import Reservation
-from reservations.service import ReservationService
 
 
 class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Reservation.objects.select_related('store', 'store__address',
                                                   'store__address__country',
                                                   'store__address__city',
-                                                  'store__address__township').all()
+                                                  'store__address__township',
+                                                  'comment').all()
     serializer_class = ReservationSerializer
     service = ReservationService()
     permission_classes = (HasGroupPermission, )
@@ -43,6 +48,15 @@ class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
         reservation = self.get_object()
         reservation = self.service.reserve(reservation, request.user.customer_profile)
         serializer = self.get_serializer(instance=reservation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=True, permission_classes=(IsCustomerOrReadOnlyPermission,))
+    def comment(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        serializer = CommentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.instance = CommentService().comment(reservation=reservation,
+                                                   **serializer.validated_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -101,6 +115,19 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(instance=reservation)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['POST'], detail=True)
+    def reply(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        self._check_object_permission(request, reservation)
+        serializer = ReplySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.instance = CommentService().reply(
+            **serializer.validated_data,
+            reservation=reservation,
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     def _check_object_permission(self, request, reservation):
         washer_profile = request.user.washer_profile
         worker_profile = request.user.worker_profile
@@ -109,3 +136,17 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         elif washer_profile and not reservation.store.washer_profile == washer_profile:
             self.permission_denied(request)
         return True
+
+
+class CommentListViewSet(mixins.ListModelMixin,
+                         mixins.RetrieveModelMixin,
+                         GenericViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    filter_class = CommentFilterSet
+
+
+class ReservationSearchView(views.APIView):
+    def get(self, request, *args, **kwargs):
+        # TODO: elasticsearch
+        return Response({}, status=status.HTTP_200_OK)

@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class IsAuthenticatedAndActivated(BasePermission):
@@ -33,7 +33,6 @@ class IsCustomerOrReadOnlyPermission(BasePermission):
         if (request.user.customer_profile == obj.customer_profile) or request.user.is_staff:
             return True
         return False
-
 
 class IsWasherOrReadOnlyPermission(BasePermission):
     def has_permission(self, request, view):

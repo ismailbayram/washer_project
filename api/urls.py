@@ -3,13 +3,14 @@ from rest_framework.routers import DefaultRouter
 
 from address.resources.views import (CityViewSet, CountryViewSet,
                                      TownshipViewSet)
-from baskets.resources.views import BasketViewSet
-from reservations.resources.views import (CustomerReservationViewSet,
-                                          StoreReservationViewSet)
 
 from api.views import get_swagger_view
+from baskets.resources.views import BasketViewSet
 from cars.resources.views import CarViewSet
 from products.resources.views import ProductListViewSet, ProductViewSet
+from reservations.resources.views import (CommentListViewSet,
+                                          CustomerReservationViewSet,
+                                          StoreReservationViewSet)
 from stores.resources.views import StoreViewSet
 from users.resources.views import (AuthView, SmsVerify, UserViewSet,
                                    WorkerProfileViewSet)
@@ -47,6 +48,7 @@ basket_view = BasketViewSet.as_view({
 # reservations
 router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store
 router.register('reservations', CustomerReservationViewSet, base_name='reservations')  # for customers
+router.register('comments', CommentListViewSet, base_name='comments')
 
 app_name = 'api'
 

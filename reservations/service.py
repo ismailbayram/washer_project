@@ -1,22 +1,28 @@
 import datetime
-import pytz
 
+import pytz
+from django.conf import settings
+from django.db.models import F, Sum
+from django.db.models.functions import Coalesce
 from django.db.transaction import atomic
 from django.utils.crypto import get_random_string
-from django.conf import settings
 
-from baskets.service import BasketService
 from baskets.exceptions import BasketEmptyException
-from stores.exceptions import StoreNotAvailableException
-from reservations.models import Reservation
+from baskets.service import BasketService
 from reservations.enums import ReservationStatus
-from reservations.exceptions import (ReservationNotAvailableException,
-                                     ReservationOccupiedBySomeoneException,
-                                     ReservationStartedException,
-                                     ReservationCompletedException,
+from reservations.exceptions import (ReservationAlreadyCommented,
+                                     ReservationAlreadyReplyed,
                                      ReservationCanNotCancelledException,
-                                     ReservationExpiredException)
+                                     ReservationCompletedException,
+                                     ReservationExpiredException,
+                                     ReservationHasNoComment,
+                                     ReservationIsNotComplated,
+                                     ReservationNotAvailableException,
+                                     ReservationOccupiedBySomeoneException,
+                                     ReservationStartedException)
+from reservations.models import Comment, Reservation
 from reservations.tasks import prevent_occupying_reservation
+from stores.exceptions import StoreNotAvailableException
 
 
 class ReservationService(object):
@@ -218,3 +224,56 @@ class ReservationService(object):
         reservation.status = ReservationStatus.expired
         reservation.save(update_fields=['status'])
         return reservation
+
+class CommentService:
+    def _update_store_rating(self, store, new_rating):
+        """
+        :param store: Store
+        :param new_rating: Int
+        """
+        q = Comment.objects.filter(reservation__store=store)
+        total_rating = q.aggregate(score=Coalesce(Sum('rating'),0)).get('score')
+        total_count = q.count()
+        store.rating = (total_rating + new_rating) / float(total_count + 1)
+        store.save(update_fields=['rating'])
+
+    @atomic
+    def comment(self, rating, comment, reservation):
+        """
+        :param rating: Int
+        :param comment: String
+        :param reservation: Reservation
+        :return: Reservation
+        """
+        if reservation.status != ReservationStatus.completed:
+            raise ReservationIsNotComplated
+
+        try:
+            _ = reservation.comment
+            raise ReservationAlreadyCommented
+        except Reservation.comment.RelatedObjectDoesNotExist:
+            pass
+
+        self._update_store_rating(store=reservation.store, new_rating=rating)
+        comment = Comment.objects.create(rating=rating, comment=comment,
+                                         reservation=reservation)
+        return comment
+
+
+    def reply(self, reply, reservation):
+        """
+        :param reply: String
+        :param reservation: Reservation
+        :return: Reservation
+        """
+        try:
+            comment = reservation.comment
+        except Reservation.comment.RelatedObjectDoesNotExist:
+            raise ReservationHasNoComment
+
+        if comment.reply:
+            raise ReservationAlreadyReplyed
+
+        comment.reply = reply
+        comment.save(update_fields=['reply'])
+        return comment

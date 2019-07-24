@@ -7,8 +7,11 @@ from address.resources.serializers import AddressSerializer
 from address.service import AddressService
 from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from api.views import MultiSerializerViewMixin
+from reservations.models import Comment
+from reservations.resources.serializers import CommentSerializer
 from stores.models import Store, StoreImageItem
-from stores.resources.serializers import (StoreImageSerializer, StoreDetailedSerializer,
+from stores.resources.serializers import (StoreDetailedSerializer,
+                                          StoreImageSerializer,
                                           StoreLogoSerializer, StoreSerializer)
 from stores.service import StoreService
 from users.enums import GroupType

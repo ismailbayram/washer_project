@@ -9,4 +9,3 @@ stores_100_2 = {"code": "stores_100_0", "message": _("You can upload 10 images a
 stores_100_3 = {"code": "stores_100_2", "message": _("Store does not have a logo.")}
 
 stores_100_4 = {"code": "stores_100_4", "message": _("Image could not be deleted.")}
-
