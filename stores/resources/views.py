@@ -72,19 +72,19 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
         service.decline_store(instance)
         return Response({}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['POST'])
-    def activate(self, request, *args, **kwargs):
-        service = StoreService()
-        instance = self.get_object()
-        service.activate_store(instance)
-        return Response({}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['POST'])
-    def deactivate(self, request, *args, **kwargs):
-        service = StoreService()
-        instance = self.get_object()
-        service.deactivate_store(instance)
-        return Response({}, status=status.HTTP_200_OK)
+    # @action(detail=True, methods=['POST'])
+    # def activate(self, request, *args, **kwargs):
+    #     service = StoreService()
+    #     instance = self.get_object()
+    #     service.activate_store(instance)
+    #     return Response({}, status=status.HTTP_200_OK)
+    #
+    # @action(detail=True, methods=['POST'])
+    # def deactivate(self, request, *args, **kwargs):
+    #     service = StoreService()
+    #     instance = self.get_object()
+    #     service.deactivate_store(instance)
+    #     return Response({}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['POST'])
     def address(self, request, *args, **kwargs):

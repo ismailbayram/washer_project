@@ -40,6 +40,7 @@ class StoreIndexer:
         """
         doc = StoreDoc()
         doc.delete(id=store.pk)
+        ReservationDoc.search().filter({"match": {"store.pk": store.pk}}).delete()
 
 
 class ReservationIndexer:

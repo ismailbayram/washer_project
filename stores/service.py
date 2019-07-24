@@ -13,6 +13,7 @@ from reservations.tasks import create_store_weekly_reservations
 from stores.exceptions import (ImageDidNotDelete, StoreHasNoLogo,
                                StoreHasSoManyImageException)
 from stores.models import Store, StoreImageItem
+from stores.tasks import delete_store_index
 
 
 class StoreService:
@@ -56,23 +57,18 @@ class StoreService:
         config = kwargs.get('config', None)
         payment_options = kwargs.get('payment_options', None)
         update_fields = ['name', 'phone_number', 'tax_office', 'tax_number']
+        declined = False
 
         if latitude:
             store.latitude = latitude
             update_fields.append('latitude')
-            store.is_approved = False
-            update_fields.append('is_approved')
-
+            declined = True
         if longitude:
             store.longitude = longitude
             update_fields.append('longitude')
-            store.is_approved = False
-            update_fields.append('is_approved')
-
+            declined = True
         if not store.phone_number == phone_number:
-            store.is_approved = False
-            update_fields.append('is_approved')
-
+            declined = True
         if is_active is not None:
             store.is_active = is_active
             update_fields.append('is_active')
@@ -85,11 +81,14 @@ class StoreService:
             store.payment_options = ordereddict_to_dict(payment_options)
             update_fields.append('payment_options')
 
-        store.name = name
-        store.phone_number = phone_number
-        store.tax_office = tax_office
-        store.tax_number = tax_number
-        store.save(update_fields=[*set(update_fields)])
+        with atomic():
+            if declined:
+                self.decline_store(store)
+            store.name = name
+            store.phone_number = phone_number
+            store.tax_office = tax_office
+            store.tax_number = tax_number
+            store.save(update_fields=[*set(update_fields)])
 
         return store
 
@@ -99,6 +98,7 @@ class StoreService:
         :return: Store
         """
         # NOTIFICATION
+        # TODO: index store and reservations
         instance.is_approved = True
         instance.save(update_fields=['is_approved'])
         create_store_weekly_reservations.delay(instance.id)  # TODO: test
@@ -109,10 +109,10 @@ class StoreService:
         :param instance: Store
         :return: Store
         """
-        # NOTIFICATION
         # TODO: check reservations
         instance.is_approved = False
         instance.save(update_fields=['is_approved'])
+        delete_store_index.delay(instance.id)
         return instance
 
     def activate_store(self, instance):
@@ -120,7 +120,7 @@ class StoreService:
         :param instance: Store
         :return: Store
         """
-        # NOTIFICATION
+        # NOT AVAILABLE FOR NOW
         instance.is_active = True
         instance.save(update_fields=['is_active'])
         create_store_weekly_reservations.delay(instance.id)  # TODO: test
@@ -131,8 +131,7 @@ class StoreService:
         :param instance: Store
         :return: Store
         """
-        # NOTIFICATION
-        # TODO: check reservations
+        # NOT AVAILABLE FOR NOW
         instance.is_active = False
         instance.save(update_fields=['is_active'])
         return instance

@@ -21,6 +21,7 @@ class StoreSearchService:
 
         query = StoreDoc.search()
         if 'name' in data:
+            #FIXME: fix name query
             query = query.query("match", name=data['name'])
         if 'rating__gte' in data:
             query = query.filter('range', rating={'gte': data['rating__gte']})
