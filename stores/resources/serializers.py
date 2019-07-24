@@ -66,6 +66,25 @@ class ReservationHoursSerializer(WeekSerializer):
     pass
 
 
+class PaymentOptionsSerializer(serializers.Serializer):
+    credit_card = serializers.BooleanField(required=True)
+    cash = serializers.BooleanField(required=True)
+
+    def to_representation(self, instance):
+        if not instance:
+            return {'credit_card': False, 'cash': True}
+        return super().to_representation(instance)
+
+    def validate(self, attrs):
+        credit_card = attrs.get('credit_card')
+        cash = attrs.get('cash')
+
+        if not (credit_card or cash):
+            raise ValidationError(_("One of payment options must be available."))
+
+        return attrs
+
+
 class ConfigSerializer(serializers.Serializer):
     opening_hours = OpeningHoursSerializer()
     reservation_hours = ReservationHoursSerializer()
@@ -118,13 +137,14 @@ class StoreImagesWithSizesSerializer(serializers.RelatedField):
 class StoreSerializer(serializers.ModelSerializer):
     address = AddressDetailedSerializer(read_only=True)
     washer_profile = serializers.PrimaryKeyRelatedField(read_only=True)
-    config = ConfigSerializer(default={}, partial=False)
+    config = ConfigSerializer(default=dict, partial=False)
+    payment_options = PaymentOptionsSerializer(default=dict, partial=False)
 
     class Meta:
         model = Store
         fields = ('pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
-                  'is_approved', 'logo')
+                  'is_approved', 'logo', 'payment_options')
         extra_kwargs = {
             'rating': {'read_only': True},
             'is_active': {'read_only': True},
