@@ -136,19 +136,14 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         return True
 
 
-class ReservationCommentViewSet(mixins.ListModelMixin,
-                                mixins.RetrieveModelMixin,
+class CommentListViewSet(mixins.RetrieveModelMixin,
                                 GenericViewSet):
     """
     # Permissions
-    :list: and :retrive: open for everyone including annonymUsers.
-    :comment: for just reservation customer
-    :reply: for just reservation.store.washer_profile
+    retrive: open for everyone including annonymUsers.
     """
-
     queryset = Reservation.objects.select_related('comment').all()
     serializer_class = ReservationSerializer
-    service = CommentService()
 
 
 class ReservationSearchView(views.APIView):

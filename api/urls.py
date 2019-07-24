@@ -7,8 +7,8 @@ from api.views import get_swagger_view
 from baskets.resources.views import BasketViewSet
 from cars.resources.views import CarViewSet
 from products.resources.views import ProductListViewSet, ProductViewSet
-from reservations.resources.views import (CustomerReservationViewSet,
-                                          ReservationCommentViewSet,
+from reservations.resources.views import (CommentListViewSet,
+                                          CustomerReservationViewSet,
                                           ReservationSearchView,
                                           StoreReservationViewSet)
 from stores.resources.views import StoreListViewSet, StoreViewSet
@@ -47,7 +47,7 @@ basket_view = BasketViewSet.as_view({
 # reservations
 router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store
 router.register('reservations', CustomerReservationViewSet, base_name='reservations')  # for customers
-router.register('comments', ReservationCommentViewSet, base_name='reservation')
+router.register('comments', CommentListViewSet, base_name='reservation')
 
 app_name = 'api'
 

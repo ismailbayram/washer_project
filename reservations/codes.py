@@ -10,3 +10,5 @@ reservations_100_5 = {"code": "reservations_100_5", "message": _("Reservation ca
 reservations_100_6 = {"code": "reservations_100_6", "message": _("Reservation date expired.")}
 reservations_100_7 = {"code": "reservations_100_7", "message": _("Reservation is not completed.")}
 reservations_100_8 = {"code": "reservations_100_8", "message": _("Reservation has no comment.")}
+reservations_100_9 = {"code": "reservations_100_9", "message": _("Reservation already commented.")}
+reservations_100_10 = {"code": "reservations_100_10", "message": _("Reservation already replyed.")}

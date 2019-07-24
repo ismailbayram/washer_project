@@ -5,7 +5,10 @@ from rest_framework.response import Response
 
 from address.resources.serializers import AddressSerializer
 from address.service import AddressService
-from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
+from api.permissions import (HasGroupPermission, IsWasherOrReadOnlyPermission,
+                             ReadOnly)
+from reservations.models import Comment
+from reservations.resources.serializers import CommentSerializer
 from stores.models import Store, StoreImageItem
 from stores.resources.serializers import (StoreImageSerializer,
                                           StoreLogoSerializer, StoreSerializer)
@@ -31,6 +34,7 @@ class StoreViewSet(viewsets.GenericViewSet,
         'add-image': [GroupType.washer],
         'delete-image': [GroupType.washer],
         'logo': [GroupType.washer],
+        # 'comments'
     }
 
     # TODO: add activate action
@@ -111,6 +115,19 @@ class StoreViewSet(viewsets.GenericViewSet,
             service = StoreService()
             service.delete_logo(self.get_object())
             return Response({}, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=True, methods=['GET'], url_path='comments', permission_classes=(ReadOnly, ))
+    def comments(self, request, *args, **kwargs):
+
+        store = get_object_or_404(Store, pk=self.kwargs['pk'])
+        print(
+            Comment.objects.filter(reservation__in=store.reservation_set.all()).count()
+        )
+        serializer = CommentSerializer(
+            Comment.objects.filter(reservation__in=store.reservation_set.all()),
+            many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):

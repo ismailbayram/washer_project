@@ -8,7 +8,9 @@ from django.utils.crypto import get_random_string
 from baskets.exceptions import BasketEmptyException
 from baskets.service import BasketService
 from reservations.enums import ReservationStatus
-from reservations.exceptions import (ReservationCanNotCancelledException,
+from reservations.exceptions import (ReservationAlreadyCommented,
+                                     ReservationAlreadyReplyed,
+                                     ReservationCanNotCancelledException,
                                      ReservationCompletedException,
                                      ReservationExpiredException,
                                      ReservationHasNoComment,
@@ -219,6 +221,29 @@ class ReservationService(object):
         return reservation
 
 class CommentService:
+    def _update_store_rating(self, store, new_rating):
+        """
+        :param store: Store
+        :param new_rating: Int
+        :param old_rating: Int
+        """
+
+        com_count = Comment.objects.filter(reservation__in=store.reservation_set.all()).count()
+        print(com_count)
+
+        avg_rating = store.rating
+        print(avg_rating)
+
+        if not avg_rating:
+            avg_rating = 0
+
+        rating = ((com_count * avg_rating) + new_rating) / (com_count + 1)
+
+        store.rating = rating
+        store.save(update_fields=['rating'])
+
+
+    @atomic
     def comment(self, rating, comment, reservation):
         """
         :param rating: Int
@@ -229,13 +254,13 @@ class CommentService:
         if reservation.status != ReservationStatus.completed:
             raise ReservationIsNotComplated
 
-        if reservation.comment:
-            comment_obj = reservation.comment
-            comment_obj.rating = rating
-            comment_obj.comment = comment
-            comment_obj.save(update_fields=['rating', 'comment'])
-            return comment_obj
+        try:
+            _ = reservation.comment
+            raise ReservationAlreadyCommented
+        except Reservation.comment.RelatedObjectDoesNotExist:
+            pass
 
+        self._update_store_rating(store=reservation.store, new_rating=rating)
         comment = Comment.objects.create(rating=rating, comment=comment,
                                          reservation=reservation)
         return comment
@@ -247,10 +272,14 @@ class CommentService:
         :param reservation: Reservation
         :return: Reservation
         """
-        if reservation.comment is None:
+        try:
+            comment = reservation.comment
+        except Reservation.comment.RelatedObjectDoesNotExist:
             raise ReservationHasNoComment
 
-        comment = reservation.comment
+        if comment.reply:
+            raise ReservationAlreadyReplyed
+
         comment.reply = reply
         comment.save(update_fields=['reply'])
         return comment

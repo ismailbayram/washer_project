@@ -34,3 +34,9 @@ class ReservationIsNotComplated(ProjectBaseException):
 
 class ReservationHasNoComment(ProjectBaseException):
     code = codes.reservations_100_8
+
+class ReservationAlreadyCommented(ProjectBaseException):
+    code = codes.reservations_100_9
+
+class ReservationAlreadyReplyed(ProjectBaseException):
+    code = codes.reservations_100_10
