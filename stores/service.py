@@ -31,9 +31,11 @@ class StoreService:
         :return: Store
         """
         config = {'opening_hours': {}, 'reservation_hours': {}}
+        payment_options = {'credit_card': False, 'cash': True}
         store = Store.objects.create(name=name, washer_profile=washer_profile,
                                      phone_number=phone_number, tax_office=tax_office, config=config,
-                                     tax_number=tax_number, latitude=latitude, longitude=longitude)
+                                     tax_number=tax_number, latitude=latitude, longitude=longitude,
+                                     payment_options=payment_options)
         product_service = ProductService()
         product_service.create_primary_product(store)
         return store
@@ -52,6 +54,7 @@ class StoreService:
         longitude = kwargs.get('longitude', None)
         is_active = kwargs.get('is_active', None)
         config = kwargs.get('config', None)
+        payment_options = kwargs.get('payment_options', None)
         update_fields = ['name', 'phone_number', 'tax_office', 'tax_number']
 
         if latitude:
@@ -77,6 +80,10 @@ class StoreService:
         if config:
             store.config = ordereddict_to_dict(config)
             update_fields.append('config')
+
+        if payment_options:
+            store.payment_options = ordereddict_to_dict(payment_options)
+            update_fields.append('payment_options')
 
         store.name = name
         store.phone_number = phone_number

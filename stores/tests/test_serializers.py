@@ -1,7 +1,8 @@
 from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
-from stores.resources.serializers import DaySerializer, WeekSerializer, ConfigSerializer
+from stores.resources.serializers import (DaySerializer, WeekSerializer,
+                                          ConfigSerializer, PaymentOptionsSerializer)
 
 
 class StoreSerializersTest(TestCase):
@@ -180,3 +181,16 @@ class StoreSerializersTest(TestCase):
         serializer.is_valid(raise_exception=True)
         self.assertEqual(data['reservation_hours'], serializer.validated_data['reservation_hours'])
         self.assertEqual(data['opening_hours'], serializer.validated_data['opening_hours'])
+
+    def test_payment_options_serializer(self):
+        data = {}
+        serializer = PaymentOptionsSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+
+        data.update({'credit_card': False, 'cash': False})
+        serializer = PaymentOptionsSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+
+        data.update({'credit_card': False, 'cash': True})
+        serializer = PaymentOptionsSerializer(data=data)
+        self.assertTrue(serializer.is_valid())

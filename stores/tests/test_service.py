@@ -43,6 +43,7 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         self.assertTrue(store.is_active)
         self.assertFalse(store.is_approved)
         self.assertEqual(store.config, {'opening_hours': {}, 'reservation_hours': {}})
+        self.assertEqual(store.payment_options, {'credit_card': False, 'cash': True})
 
         self.assertEqual(store.product_set.count(), 1)
         self.assertEqual(store.product_set.filter(is_primary=True).count(), 1)
