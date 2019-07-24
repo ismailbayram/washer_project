@@ -47,7 +47,7 @@ basket_view = BasketViewSet.as_view({
 # reservations
 router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store
 router.register('reservations', CustomerReservationViewSet, base_name='reservations')  # for customers
-router.register('comments', CommentListViewSet, base_name='reservation')
+router.register('comments', CommentListViewSet, base_name='comments')
 
 app_name = 'api'
 
