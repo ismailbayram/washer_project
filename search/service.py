@@ -79,8 +79,6 @@ class ReservationSearchService:
         # TODO: cache by hashing query params: hash(data)
         query = ReservationDoc.search()
 
-        # start,end datetime, price
-
         if "store" in data:
             query = query.filter({
                 "match": {"store.pk": data["store"]}
@@ -106,9 +104,16 @@ class ReservationSearchService:
                 "match": {"store.cash": data["cash"]}
             })
         if "start_datetime__lte" in data:
+            # example: 2019-07-24T23:59:00.002308%2B03:00
             query = query.filter('range', start_datetime={"lte": data['start_datetime__lte']})
         if "start_datetime__gte" in data:
             query = query.filter('range', start_datetime={"gte": data['start_datetime__gte']})
+        if "car_type" in data:
+            car_type = data['car_type'].value
+            query = query.filter({
+                "range": {f"price.{car_type}": {"gte": data['price__gte'],
+                                                "lte": data['price__lte']}}
+            })
 
         query = query.sort(data.get('sort', 'start_datetime'))
 

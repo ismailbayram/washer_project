@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.conf import settings
 
 from api.fields import EnumField
+from cars.enums import CarType
 from stores.models import Store
 from reservations.models import Reservation
 from reservations.enums import ReservationStatus
@@ -97,6 +98,9 @@ class ReservationFilterSerializer(serializers.Serializer):
     sort = serializers.CharField(default='start_datetime')
     start_datetime__lte = serializers.DateTimeField(required=False)
     start_datetime__gte = serializers.DateTimeField(required=False)
+    price__lte = serializers.FloatField(required=False)
+    price__gte = serializers.FloatField(required=False)
+    car_type = EnumField(enum=CarType, required=False)
 
     def validate_page(self, page):
         if page < 1:
@@ -104,17 +108,28 @@ class ReservationFilterSerializer(serializers.Serializer):
         return page
 
     def validate_sort(self, sort):
-        if not sort in ['-start_datetime', 'start_datetime',
-                        'rating', '-rating']:
+        sortings = {
+            'rating': 'store.rating',
+            '-rating': '-store.rating',
+            'start_datetime': 'start_datetime',
+            '-start_datetime': '-start_datetime',
+        }
+        for car_type, label in CarType.choices():
+            sortings[f'price_{car_type}'] = f'price.{car_type}'
+            sortings[f'-price_{car_type}'] = f'-price.{car_type}'
+        try:
+            return sortings[sort]
+        except KeyError:
             return 'start_datetime'
-        return sort
 
-    def to_internal_value(self, data):
-        d = dict(data)
-        if data.get('start_datetime__lte', None):
-            d['start_datetime__lte'] = data['start_datetime__lte'].strip().replace(' ', '+')
+    def validate(self, attrs):
+        price__lte = attrs.get('price__lte', None)
+        price__gte = attrs.get('price__gte', None)
+        car_type = attrs.get('car_type', None)
 
-        if data.get('start_datetime__gte', None):
-            d['start_datetime__gte'] = data['start_datetime__gte'].strip().replace(' ', '+')
+        if not (price__lte and car_type and price__gte):
+            attrs.pop('price__gte', None)
+            attrs.pop('price__lte', None)
+            attrs.pop('car_type', None)
 
-        return super().to_internal_value(d)
+        return attrs
