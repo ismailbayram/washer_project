@@ -98,6 +98,7 @@ class StoreImageSerializer(serializers.Serializer):
         model = StoreImageItem
         fields = ('pk', 'image', )
 
+
 class StoreLogoSerializer(serializers.ModelSerializer):
     logo = Base64ImageField(required=True)
 
@@ -116,24 +117,24 @@ class StoreImagesWithSizesSerializer(serializers.RelatedField):
 
 class StoreSerializer(serializers.ModelSerializer):
     address = AddressDetailedSerializer(read_only=True)
-    rating = serializers.ReadOnlyField()
-    is_approved = serializers.ReadOnlyField()
-    is_active = serializers.ReadOnlyField()
     washer_profile = serializers.PrimaryKeyRelatedField(read_only=True)
     config = ConfigSerializer(default={}, partial=False)
-    images = StoreImagesWithSizesSerializer(many=True, read_only=True)
 
     class Meta:
         model = Store
         fields = ('pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
-                  'is_approved', 'logo', 'images')
-
+                  'is_approved', 'logo')
+        extra_kwargs = {
+            'rating': {'read_only': True},
+            'is_active': {'read_only': True},
+            'is_approved': {'read_only': True},
+        }
 
 
 class StoreDetailedSerializer(StoreSerializer):
-    # workerprofile_set =
+    images = StoreImagesWithSizesSerializer(many=True, read_only=True)
 
     class Meta(StoreSerializer.Meta):
         fields = StoreSerializer.Meta.fields + ('created_date', 'modified_date',
-                                                'workerprofile_set')
+                                                'images')

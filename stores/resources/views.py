@@ -6,18 +6,22 @@ from rest_framework.response import Response
 from address.resources.serializers import AddressSerializer
 from address.service import AddressService
 from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
+from api.views import MultiSerializerViewMixin
 from stores.models import Store, StoreImageItem
-from stores.resources.serializers import (StoreImageSerializer,
+from stores.resources.serializers import (StoreImageSerializer, StoreDetailedSerializer,
                                           StoreLogoSerializer, StoreSerializer)
 from stores.service import StoreService
 from users.enums import GroupType
 
 
-class StoreViewSet(viewsets.GenericViewSet,
+class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
                    mixins.CreateModelMixin, mixins.UpdateModelMixin,
                    mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = Store.objects.prefetch_stores()
     serializer_class = StoreSerializer
+    action_serializers = {
+        'retrieve': StoreDetailedSerializer
+    }
     permission_classes = (HasGroupPermission, IsWasherOrReadOnlyPermission,)
     permission_groups = {
         'create': [GroupType.washer],
@@ -88,7 +92,6 @@ class StoreViewSet(viewsets.GenericViewSet,
 
         return Response({}, status=status.HTTP_202_ACCEPTED)
 
-
     @action(detail=True, methods=['DELETE'], url_path='photo_gallery/(?P<image_pk>[0-9]+)')
     def delete_image(self, request, image_pk=None, *args, **kwargs):
         service = StoreService()
@@ -96,7 +99,6 @@ class StoreViewSet(viewsets.GenericViewSet,
                                              washer_profile=request.user.washer_profile)
         service.delete_image(store_image_item, request.user.washer_profile)
         return Response({}, status=status.HTTP_202_ACCEPTED)
-
 
     @action(detail=True, methods=['POST', 'DELETE'], url_path='logo')
     def logo(self, request, *args, **kwargs):
@@ -114,7 +116,6 @@ class StoreViewSet(viewsets.GenericViewSet,
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Store.objects.filter(is_active=True, is_approved=True)\
-                            .select_related('address')
+    queryset = Store.objects.actives().select_related('address')
     # TODO: connect with google maps
     serializer_class = StoreSerializer
