@@ -277,69 +277,6 @@ class CommentServiceTest(TestCase, BaseTestViewMixin):
         self.product3 = self.product_service.create_primary_product(self.store2)
         self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.normal,
                                                customer_profile=self.customer_profile)
-        self.store.config = {
-            "opening_hours": {
-                "monday": {
-                    "start": "09:00",
-                    "end": "20:00"
-                },
-                "tuesday": {
-                    "start": "09:00",
-                    "end": "20:00"
-                },
-                "wednesday": {
-                    "start": "09:00",
-                    "end": "20:00"
-                },
-                "thursday": {
-                    "start": "09:00",
-                    "end": "20:00"
-                },
-                "friday": {
-                    "start": "09:00",
-                    "end": "20:00"
-                },
-                "saturday": {
-                    "start": "09:00",
-                    "end": "18:00"
-                },
-                "sunday": {
-                    "start": None,
-                    "end": None
-                }
-            },
-            "reservation_hours": {
-                "monday": {
-                    "start": None,
-                    "end": None
-                },
-                "tuesday": {
-                    "start": None,
-                    "end": None
-                },
-                "wednesday": {
-                    "start": None,
-                    "end": None
-                },
-                "thursday": {
-                    "start": "09:00",
-                    "end": "13:00"
-                },
-                "friday": {
-                    "start": "19:15",
-                    "end": "20:00"
-                },
-                "saturday": {
-                    "start": "16:00",
-                    "end": "19:00"
-                },
-                "sunday": {
-                    "start": None,
-                    "end": None
-                }
-            }
-        }
-        self.store.save()
 
         self.reservation_service = ReservationService()
 

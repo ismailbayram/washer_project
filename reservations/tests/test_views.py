@@ -1,18 +1,19 @@
 import datetime
 import json
-from model_mommy import mommy
+
 from django.test import TestCase
 from django.utils import timezone
-from rest_framework.reverse import reverse_lazy
+from model_mommy import mommy
 from rest_framework import status
+from rest_framework.reverse import reverse_lazy
 
 from base.test import BaseTestViewMixin
 from baskets.service import BasketService
 from cars.enums import CarType
 from cars.service import CarService
 from products.service import ProductService
-from reservations.service import ReservationService
 from reservations.enums import ReservationStatus
+from reservations.service import ReservationService
 
 
 class CustomerReservationViewSetTest(TestCase, BaseTestViewMixin):
@@ -35,6 +36,10 @@ class CustomerReservationViewSetTest(TestCase, BaseTestViewMixin):
         dt = timezone.now() + datetime.timedelta(minutes=30)
         self.reservation = self.service._create_reservation(self.store, dt, 40)
         self.reservation2 = self.service._create_reservation(self.store2, dt, 40)
+
+        dt = timezone.now() + datetime.timedelta(minutes=60)
+        self.reservation3 = self.service._create_reservation(self.store, dt, 40)
+
 
     def test_list(self):
         url = reverse_lazy('api:router:reservations-list')
@@ -125,6 +130,76 @@ class CustomerReservationViewSetTest(TestCase, BaseTestViewMixin):
         jresponse = json.loads(response.content)
         self.assertEqual(jresponse['pk'], self.reservation.pk)
         self.assertEqual(jresponse['status'], ReservationStatus.reserved.value)
+
+    def test_comment(self):
+        url_occupy = reverse_lazy('api:router:reservations-occupy', args=[self.reservation3.pk])
+        url_complete = reverse_lazy('api:router:my_reservations-complete', args=[self.reservation3.pk])
+        url_comment = reverse_lazy('api:router:reservations-comment', args=[self.reservation3.pk])
+
+        customer_headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        customer2_headers = {'HTTP_AUTHORIZATION': f'Token {self.customer2_token}'}
+        washer_headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        data = {
+            "rating": 8,
+            "comment": "Guzel musteri memnuniyetilkh. ll."
+        }
+        response = self.client.post(url_comment, data=data, content_type='application/json', **customer_headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.post(url_occupy, content_type='application/json', **customer_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.post(url_comment, data=data, content_type='application/json', **customer_headers)
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+        self.reservation3.refresh_from_db()
+        self.reservation3.status = ReservationStatus.completed
+        self.reservation3.save()
+
+        response = self.client.post(url_comment, data=data, content_type='application/json', **customer2_headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.post(url_comment, data=data, content_type='application/json', **customer_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['comment'], "Guzel musteri memnuniyetilkh. ll.")
+
+
+
+    def test_reply(self):
+        url_occupy = reverse_lazy('api:router:reservations-occupy', args=[self.reservation3.pk])
+        url_complete = reverse_lazy('api:router:my_reservations-complete', args=[self.reservation3.pk])
+        url_comment = reverse_lazy('api:router:reservations-comment', args=[self.reservation3.pk])
+        url_reply = reverse_lazy('api:router:my_reservations-reply', args=[self.reservation3.pk])
+
+        customer_headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        washer_headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        washer2_headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
+        data = {
+            "rating": 8,
+            "comment": "Guzel musteri memnuniyetilkh. ll."
+        }
+        response = self.client.post(url_occupy, content_type='application/json', **customer_headers)
+        self.reservation3.refresh_from_db()
+        self.reservation3.status = ReservationStatus.completed
+        self.reservation3.save()
+        response = self.client.post(url_comment, data=data, content_type='application/json', **customer_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['comment'], "Guzel musteri memnuniyetilkh. ll.")
+
+        data = {
+            'reply': "eyv birader"
+        }
+        response = self.client.post(url_reply, data=data, content_type='application/json', **washer2_headers)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        response = self.client.post(url_reply, data=data, content_type='application/json', **washer_headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.post(url_reply, data=data, content_type='application/json', **washer_headers)
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+
+
 
 
 class StoreReservationViewSetTest(TestCase, BaseTestViewMixin):
@@ -321,4 +396,3 @@ class StoreReservationViewSetTest(TestCase, BaseTestViewMixin):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         jresponse = json.loads(response.content)
         self.assertEqual(jresponse['status'], ReservationStatus.completed.value)
-
