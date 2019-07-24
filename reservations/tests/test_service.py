@@ -361,9 +361,10 @@ class CommentServiceTest(TestCase, BaseTestViewMixin):
         self.reservation3.save()
 
         self.service.comment(rating=10, comment="naber", reservation=self.reservation)
+
         self.assertEqual(self.reservation.comment.comment, 'naber')
         self.assertEqual(self.reservation.comment.rating, 10)
-        self.assertEqual(self.store.rating, 10)
+        self.assertEqual(self.reservation.store.rating, 10)
 
         with self.assertRaises(ReservationAlreadyCommented):
             self.service.comment(rating=10, comment="naber", reservation=self.reservation)

@@ -2,6 +2,8 @@ import datetime
 
 import pytz
 from django.conf import settings
+from django.db.models import F, Sum
+from django.db.models.functions import Coalesce
 from django.db.transaction import atomic
 from django.utils.crypto import get_random_string
 
@@ -225,20 +227,12 @@ class CommentService:
         """
         :param store: Store
         :param new_rating: Int
-        :param old_rating: Int
         """
-
-        com_count = Comment.objects.filter(reservation__in=store.reservation_set.all()).count()
-        avg_rating = store.rating
-
-        if not avg_rating:
-            avg_rating = 0
-
-        rating = ((com_count * avg_rating) + new_rating) / (com_count + 1)
-
-        store.rating = rating
+        q = Comment.objects.filter(reservation__store=store)
+        total_rating = q.aggregate(score=Coalesce(Sum('rating'),0)).get('score')
+        total_count = q.count()
+        store.rating = (total_rating + new_rating) / float(total_count + 1)
         store.save(update_fields=['rating'])
-
 
     @atomic
     def comment(self, rating, comment, reservation):
