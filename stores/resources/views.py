@@ -116,14 +116,6 @@ class StoreViewSet(viewsets.GenericViewSet,
             service.delete_logo(self.get_object())
             return Response({}, status=status.HTTP_202_ACCEPTED)
 
-    @action(detail=True, methods=['GET'], url_path='comments', permission_classes=(ReadOnly, ))
-    def comments(self, request, *args, **kwargs):
-        store = get_object_or_404(Store, pk=self.kwargs['pk'])
-        serializer = CommentSerializer(
-            Comment.objects.filter(reservation__in=store.reservation_set.all()),
-            many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 
 class StoreListViewSet(viewsets.ReadOnlyModelViewSet):

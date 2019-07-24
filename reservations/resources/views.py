@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from api.permissions import HasGroupPermission, IsCustomerOrReadOnlyPermission
-from reservations.models import Reservation
-from reservations.resources.filters import ReservationFilterSet
+from reservations.models import Comment, Reservation
+from reservations.resources.filters import (CommentFilterSet,
+                                            ReservationFilterSet)
 from reservations.resources.serializers import (CommentSerializer,
                                                 ReplySerializer,
                                                 ReservationSerializer)
@@ -136,14 +137,12 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         return True
 
 
-class CommentListViewSet(mixins.RetrieveModelMixin,
-                                GenericViewSet):
-    """
-    # Permissions
-    retrive: open for everyone including annonymUsers.
-    """
-    queryset = Reservation.objects.select_related('comment').all()
-    serializer_class = ReservationSerializer
+class CommentListViewSet(mixins.ListModelMixin,
+                         mixins.RetrieveModelMixin,
+                         GenericViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    filter_class = CommentFilterSet
 
 
 class ReservationSearchView(views.APIView):
