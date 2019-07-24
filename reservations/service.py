@@ -120,7 +120,6 @@ class ReservationService(object):
 
         return reservation
 
-    @atomic
     def reserve(self, reservation, customer_profile):
         """
         :param reservation: Reservation
@@ -140,13 +139,15 @@ class ReservationService(object):
 
         if not basket.basketitem_set.first().product.store == reservation.store:
             basket = basket_service.clean_basket(basket)
-        basket = basket_service.complete_basket(basket)
 
-        reservation.basket = basket
-        reservation.total_amount = basket.get_total_amount()
-        reservation.status = ReservationStatus.reserved
-        reservation.save()
-        # NOTIFICATION
+        with atomic():
+            basket = basket_service.complete_basket(basket)
+
+            reservation.basket = basket
+            reservation.total_amount = basket.get_total_amount()
+            reservation.status = ReservationStatus.reserved
+            reservation.save()
+            # NOTIFICATION
         return reservation
 
     def start(self, reservation):
