@@ -10,6 +10,7 @@ from reservations.enums import ReservationStatus
 
 
 class StoreDocumentSerializer(serializers.ModelSerializer):
+    search_text = serializers.SerializerMethodField()
     city = serializers.IntegerField(source='address.city.pk')
     township = serializers.IntegerField(source='address.township.pk')
     location = serializers.SerializerMethodField()
@@ -18,7 +19,7 @@ class StoreDocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Store
-        fields = ('pk', 'name', 'location', 'rating', 'city', 'township',
+        fields = ('pk', 'name', 'search_text', 'location', 'rating', 'city', 'township',
                   'credit_card', 'cash')
         extra_kwargs = {
             'rating': {'default': 0}
@@ -32,6 +33,9 @@ class StoreDocumentSerializer(serializers.ModelSerializer):
             'lon': longitude
         }
 
+    def get_search_text(self, instance):
+        return f'{instance.name} {instance.address.city.name} {instance.address.township.name}'
+
 
 class ReservationDocumentSerializer(serializers.ModelSerializer):
     status = EnumField(enum=ReservationStatus)
@@ -43,7 +47,7 @@ class ReservationDocumentSerializer(serializers.ModelSerializer):
 
 
 class StoreFilterSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False)
+    search_text = serializers.CharField(required=False)
     distance = serializers.IntegerField(required=False)
     lat = serializers.FloatField(required=False)
     lon = serializers.FloatField(required=False)
@@ -55,7 +59,7 @@ class StoreFilterSerializer(serializers.Serializer):
     cash = serializers.NullBooleanField(required=False)
     limit = serializers.IntegerField(default=settings.REST_FRAMEWORK['PAGE_SIZE'])
     page = serializers.IntegerField(default=1)
-    sort = serializers.CharField(default='-rating')
+    sort = serializers.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
         self.distance_metric = kwargs.get('distance_metric', 'm')
@@ -68,7 +72,7 @@ class StoreFilterSerializer(serializers.Serializer):
 
     def validate_sort(self, sort):
         if not sort in ['-rating', 'rating']:
-            return '-rating'
+            return
         return sort
 
     def validate(self, attrs):

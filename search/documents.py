@@ -6,6 +6,7 @@ from django.conf import settings
 class StoreDoc(es.Document):
     pk = es.Integer()
     name = es.Text()
+    search_text = es.Text()
     location = es.GeoPoint()
     rating = es.Float()
     city = es.Integer()

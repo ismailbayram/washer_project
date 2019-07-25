@@ -24,8 +24,9 @@ class StoreIndexer:
         """
         :return: None
         """
-        q = Store.objects.filter(is_approved=True, is_active=True) \
-            .select_related('address', 'address__city', 'address__township')
+        q = Store.objects.actives().select_related('address',
+                                                   'address__city',
+                                                   'address__township')
         k = 0
         count = q.count()
         for store in q:

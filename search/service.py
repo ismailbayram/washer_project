@@ -20,9 +20,8 @@ class StoreSearchService:
         # TODO: cache by hashing query params: hash(data)
 
         query = StoreDoc.search()
-        if 'name' in data:
-            #FIXME: fix name query
-            query = query.query("match", name=data['name'])
+        if 'search_text' in data:
+            query = query.query("match", search_text=data['search_text'])
         if 'rating__gte' in data:
             query = query.filter('range', rating={'gte': data['rating__gte']})
         if 'location' in data:
@@ -37,7 +36,8 @@ class StoreSearchService:
         if 'cash' in data:
             query = query.filter('match', cash=data['cash'])
 
-        query = query.sort(data.get('sort', '-rating'))
+        if 'sort' in data:
+            query = query.sort(data['sort'])
 
         return self._paginate_response(query, data.get('page'), data.get('limit'))
 
