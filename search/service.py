@@ -20,13 +20,8 @@ class StoreSearchService:
         # TODO: cache by hashing query params: hash(data)
 
         query = StoreDoc.search()
-        if 'search_text' in data:
-            query = query.query("match", search_text=data['search_text'])
         if 'rating__gte' in data:
             query = query.filter('range', rating={'gte': data['rating__gte']})
-        if 'location' in data:
-            query = query.filter('geo_distance', distance=f'{data["distance"]}{serializer.distance_metric}',
-                                 location=data['location'])
         if 'city' in data:
             query = query.filter('match', city=data['city'])
         if 'township' in data:
@@ -35,6 +30,11 @@ class StoreSearchService:
             query = query.filter('match', credit_card=data['credit_card'])
         if 'cash' in data:
             query = query.filter('match', cash=data['cash'])
+        if 'location' in data:
+            query = query.filter('geo_distance', distance=f'{data["distance"]}{serializer.distance_metric}',
+                                 location=data['location'])
+        if 'search_text' in data:
+            query = query.query("match", search_text=data['search_text'])
 
         if 'sort' in data:
             query = query.sort(data['sort'])

@@ -84,6 +84,7 @@ class StoreService:
         with atomic():
             if declined:
                 self.decline_store(store)
+            # TODO: update store info if declined is not True
             store.name = name
             store.phone_number = phone_number
             store.tax_office = tax_office
@@ -115,26 +116,26 @@ class StoreService:
         delete_store_index.delay(instance.id)
         return instance
 
-    def activate_store(self, instance):
-        """
-        :param instance: Store
-        :return: Store
-        """
-        # NOT AVAILABLE FOR NOW
-        instance.is_active = True
-        instance.save(update_fields=['is_active'])
-        create_store_weekly_reservations.delay(instance.id)  # TODO: test
-        return instance
+    # def activate_store(self, instance):
+    #     """
+    #     :param instance: Store
+    #     :return: Store
+    #     """
+    #     # NOT AVAILABLE FOR NOW
+    #     instance.is_active = True
+    #     instance.save(update_fields=['is_active'])
+    #     create_store_weekly_reservations.delay(instance.id)  # TODO: test
+    #     return instance
 
-    def deactivate_store(self, instance):
-        """
-        :param instance: Store
-        :return: Store
-        """
-        # NOT AVAILABLE FOR NOW
-        instance.is_active = False
-        instance.save(update_fields=['is_active'])
-        return instance
+    # def deactivate_store(self, instance):
+    #     """
+    #     :param instance: Store
+    #     :return: Store
+    #     """
+    #     # NOT AVAILABLE FOR NOW
+    #     instance.is_active = False
+    #     instance.save(update_fields=['is_active'])
+    #     return instance
 
     def add_logo(self, store, logo):
         """

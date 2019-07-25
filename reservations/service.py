@@ -26,7 +26,6 @@ from stores.exceptions import StoreNotAvailableException
 
 
 class ReservationService(object):
-    # TODO: check ESDocuments when changed reservation
     def _generate_reservation_number(self):
         number = get_random_string(length=10).upper()
         if Reservation.objects.filter(number=number).exists():
@@ -42,12 +41,13 @@ class ReservationService(object):
         """
         try:
             reservation = Reservation.objects.get(store=store, start_datetime=start_datetime)
+            # TODO: if start time greater than now make status available else nothing
         except Reservation.DoesNotExist:
             end_datetime = start_datetime + datetime.timedelta(minutes=period)
             reservation = Reservation.objects.create(store=store, start_datetime=start_datetime,
                                                      end_datetime=end_datetime, period=period,
                                                      number=self._generate_reservation_number())
-
+        # TODO: index reservation
         return reservation
 
     def create_day_from_config(self, store, day_datetime, period):
@@ -194,6 +194,7 @@ class ReservationService(object):
         :return: reservation
         """
         # TODO: CancellationReason
+        # TODO: update index status
         if not reservation.status == ReservationStatus.reserved:
             raise ReservationCanNotCancelledException
         reservation.status = ReservationStatus.cancelled
@@ -207,6 +208,7 @@ class ReservationService(object):
         :param reservation: Reservation
         :return: reservation
         """
+        # TODO: update index status
         if not reservation.status == ReservationStatus.available:
             raise ReservationNotAvailableException
         # notification to washer
@@ -225,12 +227,14 @@ class ReservationService(object):
         reservation.save(update_fields=['status'])
         return reservation
 
+
 class CommentService:
     def _update_store_rating(self, store, new_rating):
         """
         :param store: Store
         :param new_rating: Int
         """
+        # TODO: update store index
         q = Comment.objects.filter(reservation__store=store)
         total_rating = q.aggregate(score=Coalesce(Sum('rating'),0)).get('score')
         total_count = q.count()
