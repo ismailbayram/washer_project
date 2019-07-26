@@ -76,7 +76,7 @@ class BasketService:
         :param basket: Basket
         :return: Basket
         """
-        basket.basketitem_set.all().delete()
+        BasketItem.objects.filter(basket=basket).delete()
 
         return basket
 
@@ -95,11 +95,11 @@ class BasketService:
         :param basket: Basket
         :return: Basket
         """
+        if basket.is_empty:
+            raise BasketEmptyException
         is_basket_valid = self._check_basket_items(basket)
         if not is_basket_valid:
             raise BasketInvalidException
-        if basket.is_empty:
-            raise BasketEmptyException
 
         for bi in basket.basketitem_set.all():
             bi.amount = bi.get_price()
