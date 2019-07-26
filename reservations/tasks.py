@@ -58,11 +58,18 @@ def create_next_week_day():
     # every day at 4 am
     import datetime
     from stores.models import Store
+    from reservations.models import Reservation
     from reservations.service import ReservationService
+    from search.indexer import ReservationIndexer
 
     start_datetime = datetime.datetime.today() + datetime.timedelta(days=7)
     res_service = ReservationService()
 
+    res_pk_list = []
     for store in Store.objects.actives():
         period = store.product_set.filter(is_primary=True).order_by('-period').first().period
-        res_service.create_day_from_config(store, start_datetime, period)
+        res_pk_list += res_service.create_day_from_config(store, start_datetime, period)
+
+    reservation_queryset = Reservation.objects.filter(pk__in=res_pk_list)
+    res_indexer = ReservationIndexer()
+    res_indexer.index_reservations(reservation_queryset)

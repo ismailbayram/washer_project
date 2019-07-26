@@ -39,9 +39,8 @@ class StoreIndexer:
         :param store: Store
         :return: None
         """
-        doc = StoreDoc().get(id=store.pk, ignore=404)
-        if doc:
-            doc.delete(id=store.pk)
+        doc = StoreDoc().get(id=store.pk)
+        doc.delete(id=store.pk)
         ReservationDoc.search().filter({"match": {"store.pk": store.pk}}).delete()
 
 
@@ -88,7 +87,6 @@ class ReservationIndexer:
         :param reservation: Reservation
         :return: None
         """
-        doc = ReservationDoc().get(id=reservation.pk, ignore=404)
-        if doc:
-            doc.delete(id=reservation.pk)
+        doc = ReservationDoc().get(id=reservation.pk)
+        doc.delete(id=reservation.pk)
 
