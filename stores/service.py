@@ -99,7 +99,6 @@ class StoreService:
         :return: Store
         """
         # NOTIFICATION
-        # TODO: index store and reservations
         instance.is_approved = True
         instance.save(update_fields=['is_approved'])
         create_store_weekly_reservations.delay(instance.id)  # TODO: test

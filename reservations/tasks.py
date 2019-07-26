@@ -18,13 +18,19 @@ def prevent_occupying_reservation(reservation_id):
 
 @app.task(name="reservations.create_store_weekly_reservations")
 def create_store_weekly_reservations(store_id):
-    # TODO: seperate chunk by chunk
     from stores.models import Store
+    from reservations.models import Reservation
     from reservations.service import ReservationService
+    from search.indexer import ReservationIndexer, StoreIndexer
 
     res_service = ReservationService()
     store = Store.objects.get(pk=store_id)
-    res_service.create_week_from_config(store)
+    res_pk_list = res_service.create_week_from_config(store)
+    reservation_queryset = Reservation.objects.filter(pk__in=res_pk_list)
+    store_indexer = StoreIndexer()
+    store_indexer.index_store(store)
+    res_indexer = ReservationIndexer()
+    res_indexer.index_reservations(reservation_queryset)
     # NOTIFICATION
 
 

@@ -122,17 +122,23 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
 
     def test_create_day_from_config(self):
         dt = datetime.datetime(2019, 7, 18, 5, 51)  # Thursday
-        self.service.create_day_from_config(self.store, dt, 30)
+        res_pk_list = self.service.create_day_from_config(self.store, dt, 30)
+        self.assertIsInstance(res_pk_list, list)
+        self.assertEqual(len(res_pk_list), 8)
         self.assertEqual(self.store.reservation_set.count(), 8)
 
         dt = datetime.datetime(2019, 7, 21, 5, 51, 0, 0)  # Sunday
         dt2 = datetime.datetime(2019, 7, 21, 5, 51, 23, 59)  # Sunday
-        self.service.create_day_from_config(self.store, dt, 30)
+        res_pk_list = self.service.create_day_from_config(self.store, dt, 30)
+        self.assertIsInstance(res_pk_list, list)
+        self.assertEqual(len(res_pk_list), 0)
         self.assertEqual(self.store.reservation_set.filter(start_datetime__gt=dt,
                                                            end_datetime__lt=dt2).count(), 0)
 
     def test_create_week_from_config(self):
-        self.service.create_week_from_config(self.store)
+        res_pk_list = self.service.create_week_from_config(self.store)
+        self.assertIsInstance(res_pk_list, set)
+        self.assertEqual(len(res_pk_list), 10)
         self.assertEqual(self.store.reservation_set.count(), 10)
 
     def test_occupy(self):
