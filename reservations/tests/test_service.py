@@ -199,6 +199,8 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         self.basket_service.add_basket_item(basket, self.product3)
         with self.assertRaises(BasketEmptyException):
             self.service.reserve(reservation2, self.customer_profile)
+        basket = self.basket_service.get_or_create_basket(self.customer_profile)
+        self.assertTrue(basket.is_empty)
 
     def test_start(self):
         dt = timezone.now()
