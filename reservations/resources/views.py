@@ -50,6 +50,8 @@ class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
     def reserve(self, request, *args, **kwargs):
         reservation = self.get_object()
         reservation = self.service.reserve(reservation, request.user.customer_profile)
+        res_indexer = ReservationIndexer()
+        res_indexer.index_reservation(reservation)
         serializer = self.get_serializer(instance=reservation)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -91,6 +93,8 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         reservation = self.get_object()
         self._check_object_permission(request, reservation)
         reservation = self.service.disable(reservation)
+        res_indexer = ReservationIndexer()
+        res_indexer.delete_reservation(reservation)
         serializer = self.get_serializer(instance=reservation)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -130,7 +134,6 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
     def _check_object_permission(self, request, reservation):
         washer_profile = request.user.washer_profile
         worker_profile = request.user.worker_profile
@@ -147,9 +150,3 @@ class CommentListViewSet(mixins.ListModelMixin,
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filter_class = CommentFilterSet
-
-
-class ReservationSearchView(views.APIView):
-    def get(self, request, *args, **kwargs):
-        # TODO: elasticsearch
-        return Response({}, status=status.HTTP_200_OK)

@@ -138,7 +138,6 @@ class ReservationService(object):
         :param customer_profile: CustomerProfile
         :return: Reservation
         """
-        # TODO: update index status
         if reservation.status > ReservationStatus.occupied:
             raise ReservationNotAvailableException
         if not customer_profile == reservation.customer_profile:
@@ -199,7 +198,6 @@ class ReservationService(object):
         :return: reservation
         """
         # TODO: CancellationReason
-        # TODO: update index status
         if not reservation.status == ReservationStatus.reserved:
             raise ReservationCanNotCancelledException
         reservation.status = ReservationStatus.cancelled
@@ -213,7 +211,6 @@ class ReservationService(object):
         :param reservation: Reservation
         :return: reservation
         """
-        # TODO: update index status
         if not reservation.status == ReservationStatus.available:
             raise ReservationNotAvailableException
         # notification to washer
