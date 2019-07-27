@@ -12,7 +12,6 @@ class NotificationTest(BaseTestViewMixin, TestCase):
         self.init_users()
         self.service = NotificationService()
 
-        # TODO store ayarları
         self.store = mommy.make('stores.Store', is_approved=True, phone_number="05555555555")
         self.store.washer_profile = self.washer_profile
         self.store.save()
