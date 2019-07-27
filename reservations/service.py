@@ -41,7 +41,6 @@ class ReservationService(object):
         """
         try:
             reservation = Reservation.objects.get(store=store, start_datetime=start_datetime)
-            # TODO: if start time greater than now make status available else nothing
         except Reservation.DoesNotExist:
             end_datetime = start_datetime + datetime.timedelta(minutes=period)
             reservation = Reservation.objects.create(store=store, start_datetime=start_datetime,

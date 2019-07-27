@@ -22,7 +22,7 @@ class StoreIndexer:
         doc.meta.id = store.pk
         return doc.save(index=StoreDoc.Index.name)
 
-    def index_stores(self):
+    def index_stores(self, silence=False):
         """
         :return: None
         """
@@ -34,7 +34,8 @@ class StoreIndexer:
         for store in q:
             k += 1
             resp = self.index_store(store)
-            print(f'{k}/{count} indexed of stores.[{resp}]')
+            if not silence:
+                print(f'{k}/{count} indexed of stores.[{resp}]')
 
     def update_store_index(self, store):
         """
@@ -89,7 +90,7 @@ class ReservationIndexer:
 
         return doc.save(index=ReservationDoc.Index.name)
 
-    def index_reservations(self, res_list=None):
+    def index_reservations(self, res_list=None, silence=False):
         """
         :return: None
         """
@@ -104,7 +105,8 @@ class ReservationIndexer:
         for reservation in q:
             k += 1
             resp = self.index_reservation(reservation)
-            print(f'{k}/{count} indexed of reservations.[{resp}]')
+            if not silence:
+                print(f'{k}/{count} indexed of reservations.[{resp}]')
 
     def delete_reservation(self, reservation):
         """
