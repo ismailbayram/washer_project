@@ -61,7 +61,6 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         store = self.service.update_store(self.store, **data)
         self.assertEqual(store.name, data['name'])
         self.assertEqual(store.phone_number, data['phone_number'])
-        self.assertTrue(store.is_approved)
 
         data.update({
             "phone_number": "05555555551",
@@ -69,7 +68,6 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
 
         store = self.service.update_store(self.store, **data)
         self.assertEqual(store.phone_number, data['phone_number'])
-        self.assertFalse(store.is_approved)
 
         data.update({
             "is_active": False
@@ -88,7 +86,6 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         store = self.service.update_store(self.store, **data)
         self.assertEqual(store.latitude, data['latitude'])
         self.assertEqual(store.longitude, data['longitude'])
-        self.assertFalse(store.is_approved)
 
     def test_approve(self):
         store = mommy.make('stores.Store', is_approved=False)

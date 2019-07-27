@@ -82,7 +82,6 @@ class StoreService:
 
         with atomic():
             # TODO: if declined send notification to admin
-            # TODO: update store info if declined is not True
             store.name = name
             store.phone_number = phone_number
             store.tax_office = tax_office

@@ -236,7 +236,6 @@ class CommentService:
         :param store: Store
         :param new_rating: Int
         """
-        # TODO: update store index
         q = Comment.objects.filter(reservation__store=store)
         total_rating = q.aggregate(score=Coalesce(Sum('rating'),0)).get('score')
         total_count = q.count()

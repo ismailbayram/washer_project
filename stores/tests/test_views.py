@@ -15,10 +15,14 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
     def setUp(self):
         super().setUp()
         self.init_users()
+        self.address = mommy.make('address.Address')
+        self.address2 = mommy.make('address.Address')
         self.store = mommy.make('stores.Store', washer_profile=self.washer_profile,
-                                is_approved=False, is_active=False)
+                                is_approved=False, is_active=False, address=self.address,
+                                latitude=35, longitude=34)
         self.store2 = mommy.make('stores.Store', washer_profile=self.washer2_profile,
-                                 is_approved=True)
+                                 is_approved=True, address=self.address2,
+                                latitude=35, longitude=34)
 
         path = os.path.join(settings.BASE_DIR, 'stores/tests/img.txt')
         with open(path, 'r') as file:

@@ -23,10 +23,14 @@ class CustomerReservationViewSetTest(TestCase, BaseTestViewMixin):
         self.car_service = CarService()
         self.basket_service = BasketService()
         self.init_users()
+        self.address = mommy.make('address.Address')
+        self.address2 = mommy.make('address.Address')
         self.store = mommy.make('stores.Store', washer_profile=self.washer_profile,
-                                is_approved=True, is_active=True)
+                                is_approved=True, is_active=True, address=self.address,
+                                latitude=35, longitude=34)
         self.store2 = mommy.make('stores.Store', washer_profile=self.washer2_profile,
-                                 is_approved=True, is_active=True)
+                                 is_approved=True, is_active=True, address=self.address2,
+                                 latitude=35, longitude=34)
         self.product1 = self.product_service.create_primary_product(self.store)
         self.product2 = self.product_service.create_product(name='Parfume', store=self.store,
                                                             washer_profile=self.store.washer_profile)
@@ -133,12 +137,10 @@ class CustomerReservationViewSetTest(TestCase, BaseTestViewMixin):
 
     def test_comment(self):
         url_occupy = reverse_lazy('api:router:reservations-occupy', args=[self.reservation3.pk])
-        url_complete = reverse_lazy('api:router:my_reservations-complete', args=[self.reservation3.pk])
         url_comment = reverse_lazy('api:router:reservations-comment', args=[self.reservation3.pk])
 
         customer_headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         customer2_headers = {'HTTP_AUTHORIZATION': f'Token {self.customer2_token}'}
-        washer_headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         data = {
             "rating": 8,
             "comment": "Guzel musteri memnuniyetilkh. ll."
