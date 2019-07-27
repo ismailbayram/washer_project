@@ -10,5 +10,5 @@ class NotificationType(Enum):
         if self.value == 'reservation_completed':
             return _('Your reservation has been completed')
 
-        elif self.value == 'reservation_completed':
+        elif self.value == 'reservation_started':
             return _('Your reservation has been completed')

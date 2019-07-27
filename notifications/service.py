@@ -33,3 +33,9 @@ class NotificationService:
                 view=view,
                 view_id=view_id
             )
+
+    def set_read_notifications(self, notifications):
+        """
+        :param notification: QuerySet<Notification>
+        """
+        notifications.update(is_readed=True)

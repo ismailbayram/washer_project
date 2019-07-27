@@ -13,8 +13,11 @@ class Notification(StarterModel):
     data = JSONField(default=dict)
     view = models.CharField(max_length=32)
     view_id = models.CharField(max_length=32)
-    is_readed = models.BooleanField(default=False)
+    read = models.BooleanField(default=False)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
+
+    def __str__(self):
+        return self.notification_type.value

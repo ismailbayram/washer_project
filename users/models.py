@@ -45,7 +45,7 @@ class User(AbstractUser):
 
 class CustomerProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='customer_profile')
-    notifications = GenericRelation(Notification)
+    notifications = GenericRelation(Notification, related_query_name="customer_profile")
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
@@ -60,7 +60,7 @@ class CustomerProfile(StarterModel):
 
 class WasherProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='washer_profile')
-    notifications = GenericRelation(Notification)
+    notifications = GenericRelation(Notification, related_query_name="washer_profile")
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
@@ -70,7 +70,7 @@ class WorkerProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='worker_profile')
     store = models.ForeignKey('stores.Store', on_delete=models.SET_NULL, null=True)
     washer_profile = models.ForeignKey(to=WasherProfile, on_delete=models.SET_NULL, null=True)
-    notifications = GenericRelation(Notification)
+    notifications = GenericRelation(Notification, related_query_name="worker_profile")
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
