@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.functional import cached_property
 
 from base.models import StarterModel
+from notifications.models import Notification
 from users.enums import GroupType
 
 
@@ -43,6 +45,7 @@ class User(AbstractUser):
 
 class CustomerProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='customer_profile')
+    notifications = GenericRelation(Notification)
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
@@ -57,6 +60,7 @@ class CustomerProfile(StarterModel):
 
 class WasherProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='washer_profile')
+    notifications = GenericRelation(Notification)
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
@@ -66,6 +70,7 @@ class WorkerProfile(StarterModel):
     user = models.OneToOneField(to=User, on_delete=models.PROTECT, related_name='worker_profile')
     store = models.ForeignKey('stores.Store', on_delete=models.SET_NULL, null=True)
     washer_profile = models.ForeignKey(to=WasherProfile, on_delete=models.SET_NULL, null=True)
+    notifications = GenericRelation(Notification)
 
     def __str__(self):
         return f'{self.user.get_full_name()}'
