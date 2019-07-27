@@ -12,7 +12,7 @@ from reservations.resources.serializers import (CommentSerializer,
                                                 ReservationSerializer)
 from reservations.service import CommentService, ReservationService
 from users.enums import GroupType
-from search.indexer import ReservationIndexer
+from search.indexer import ReservationIndexer, StoreIndexer
 
 
 class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
@@ -62,6 +62,8 @@ class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.instance = CommentService().comment(reservation=reservation,
                                                    **serializer.validated_data)
+        store_indexer = StoreIndexer()
+        store_indexer.update_store_index(reservation.store)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
