@@ -47,6 +47,13 @@ def compress_image(image, do_square=False):
         pil_image = pil_image.crop((0, 0, edge_size, edge_size))
 
     f = BytesIO()
+
+    fill_color = '#ffffff'  # your background
+    if pil_image.mode in ('RGBA', 'LA'):
+        background = Image.new(pil_image.mode[:-1], pil_image.size, fill_color)
+        background.paste(pil_image, pil_image.split()[-1])
+        pil_image = background
+
     pil_image.save(f, "JPEG", quality=90)
     image = ContentFile(f.getvalue())
     image.name = "{0}.{1}".format(not_saved_pure_name, "jpeg")
