@@ -1,4 +1,6 @@
+from elasticsearch_dsl import UpdateByQuery
 from django.utils import timezone
+from django.conf import settings
 
 from stores.models import Store
 from products.models import Product
@@ -33,6 +35,28 @@ class StoreIndexer:
             k += 1
             resp = self.index_store(store)
             print(f'{k}/{count} indexed of stores.[{resp}]')
+
+    def update_store_index(self, store):
+        """
+        :param store: Store
+        :return: None
+        """
+        self.index_store(store)
+        serializer = StoreDocumentSerializer(instance=store)
+        query = {
+            "query": {
+                "match": {"store.pk": store.pk}
+            },
+            "script": {
+                "source": "ctx._source.store=params.store",
+                "lang": "painless",
+                "params": {
+                    "store": serializer.data
+                }
+            }
+        }
+        ubq = UpdateByQuery(index=settings.ES_RESERVATION_INDEX).update_from_dict(query)
+        ubq.execute()
 
     def delete_store(self, store):
         """

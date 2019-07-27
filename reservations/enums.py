@@ -12,7 +12,6 @@ class ReservationStatus(Enum):
     cancelled = '500'  # cancel !reserved! reservation by washer or worker or customer
     disabled = '550'   # disable by washer or worker
     expired = '600'    # expire by system
-    # closed = '650'   # close by system
 
     class Labels:
         available = _('Available')
