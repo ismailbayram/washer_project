@@ -87,6 +87,15 @@ class ReservationIndexer:
         :param reservation: Reservation
         :return: None
         """
-        doc = ReservationDoc().get(id=reservation.pk)
-        doc.delete(id=reservation.pk)
+        doc = ReservationDoc().get(id=reservation.pk, ignore=404)
+        if doc:
+            doc.delete(id=reservation.pk)
 
+    def delete_expired(self, datetime):
+        """
+        :param datetime: Datetime
+        :return: None
+        """
+        ReservationDoc.search().filter({"match": {"status": ReservationStatus.available.value}})\
+                               .filter({"range": {"start_datetime": {"lte": datetime.isoformat()}}})\
+                               .delete()

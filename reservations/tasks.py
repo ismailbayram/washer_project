@@ -8,12 +8,14 @@ from washer_project.celery import app
 def prevent_occupying_reservation(reservation_id):
     from reservations.models import Reservation
     from reservations.enums import ReservationStatus
-    # TODO: update index status
+    from search.indexer import ReservationIndexer
     reservation = Reservation.objects.get(pk=reservation_id)
     if reservation.status == ReservationStatus.occupied:
         reservation.customer_profile = None
         reservation.status = ReservationStatus.available
         reservation.save()
+        res_indexer = ReservationIndexer()
+        res_indexer.index_reservation(reservation)
 
 
 @app.task(name="reservations.create_store_weekly_reservations")
@@ -42,15 +44,17 @@ def check_expired_reservations():
     from reservations.models import Reservation
     from reservations.enums import ReservationStatus
     from reservations.service import ReservationService
+    from search.indexer import ReservationIndexer
 
     timezone = pytz.timezone(settings.TIME_ZONE)
     dt = timezone.localize(datetime.now())
     res_service = ReservationService()
 
-    # TODO: delete es index
     for reservation in Reservation.objects.filter(status=ReservationStatus.available,
                                                   start_datetime__lt=dt):
         res_service.expire(reservation)
+    res_indexer = ReservationIndexer()
+    res_indexer.delete_expired(dt)
 
 
 @periodic_task(run_every=(crontab(hour='4', minute='0')), name="reservations.create_next_week_day")

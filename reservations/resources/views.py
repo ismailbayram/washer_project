@@ -12,6 +12,7 @@ from reservations.resources.serializers import (CommentSerializer,
                                                 ReservationSerializer)
 from reservations.service import CommentService, ReservationService
 from users.enums import GroupType
+from search.indexer import ReservationIndexer
 
 
 class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
@@ -40,6 +41,8 @@ class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
     def occupy(self, request, *args, **kwargs):
         reservation = self.get_object()
         reservation = self.service.occupy(reservation, request.user.customer_profile)
+        res_indexer = ReservationIndexer()
+        res_indexer.index_reservation(reservation)
         serializer = self.get_serializer(instance=reservation)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
