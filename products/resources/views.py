@@ -10,6 +10,7 @@ from products.resources.serializers import (ProductDetailedSerializer,
 from products.resources.filters import ProductFilterSet
 from products.models import Product, ProductPrice
 from products.service import ProductService
+from search.indexer import ReservationIndexer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -57,6 +58,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = ProductPriceSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.service.update_price(product_price, **serializer.validated_data)
+
+        if product.store.product_set.filter(is_primary=True).order_by('-period').first() == product:
+            res_indexer = ReservationIndexer()
+            res_indexer.update_price_on_reservations(product.store, product)
         return Response({}, status=status.HTTP_200_OK)
 
 

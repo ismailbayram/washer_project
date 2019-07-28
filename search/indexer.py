@@ -108,6 +108,31 @@ class ReservationIndexer:
             if not silence:
                 print(f'{k}/{count} indexed of reservations.[{resp}]')
 
+    def update_price_on_reservations(self, store, product):
+        """
+        :param store: Store
+        :param product: product
+        :return: None
+        """
+        price = {}
+        for pp in product.productprice_set.all():
+            price[pp.car_type.value] = float(pp.price)
+
+        query = {
+            "query": {
+                "match": {"store.pk": store.pk}
+            },
+            "script": {
+                "source": "ctx._source.price=params.price",
+                "lang": "painless",
+                "params": {
+                    "price": price
+                }
+            }
+        }
+        ubq = UpdateByQuery(index=settings.ES_RESERVATION_INDEX).update_from_dict(query)
+        ubq.execute()
+
     def delete_reservation(self, reservation):
         """
         :param reservation: Reservation
