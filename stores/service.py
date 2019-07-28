@@ -102,7 +102,7 @@ class StoreService:
 
         notif_service = NotificationService()
         notif_service.send(instance=instance, to=instance.washer_profile,
-                           notif_type=NotificationType.reservation_started,)
+                           notif_type=NotificationType.store_approved)
 
         return instance
 

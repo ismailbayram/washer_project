@@ -199,7 +199,7 @@ class ReservationService(object):
 
         notif_service = NotificationService()
         notif_service.send(instance=reservation, to=reservation.store,
-                           notif_type=NotificationType.reservation_started,)
+                           notif_type=NotificationType.reservation_completed)
 
         return reservation
 
@@ -216,7 +216,7 @@ class ReservationService(object):
 
         notif_service = NotificationService()
         notif_service.send(instance=reservation, to=reservation.store,
-                           notif_type=NotificationType.reservation_started,)
+                           notif_type=NotificationType.reservation_canceled)
         return reservation
 
     def disable(self, reservation):
@@ -229,7 +229,7 @@ class ReservationService(object):
 
         notif_service = NotificationService()
         notif_service.send(instance=reservation, to=reservation.store,
-                           notif_type=NotificationType.reservation_disabled,)
+                           notif_type=NotificationType.reservation_disabled)
 
 
         reservation.status = ReservationStatus.disabled
@@ -244,7 +244,7 @@ class ReservationService(object):
 
         notif_service = NotificationService()
         notif_service.send(instance=reservation, to=reservation.store,
-                           notif_type=NotificationType.reservation_expired,)
+                           notif_type=NotificationType.reservation_expired)
 
         reservation.status = ReservationStatus.expired
         reservation.save(update_fields=['status'])

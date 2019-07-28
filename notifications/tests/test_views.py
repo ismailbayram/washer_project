@@ -85,3 +85,27 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
 
         response = self.client.get(url, content_type='application/json', **self.error_headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_send_notification(self):
+        self.notif_service.send(instance=self.worker_profile,
+                                notif_type=NotificationType.reservation_started,
+                                to=self.washer_profile)
+        self.assertEqual(self.washer_profile.notifications.count(), 1)
+        self.assertEqual(self.washer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_started)
+
+
+        self.notif_service.send(instance=self.worker_profile,
+                                notif_type=NotificationType.reservation_canceled,
+                                to=self.store)
+        self.assertEqual(self.washer_profile.notifications.count(), 2)
+        self.assertEqual(self.washer_profile.notifications.first().notification_type,
+                         NotificationType.reservation_canceled)
+        self.assertEqual(self.worker_profile.notifications.count(), 1)
+        self.assertEqual(self.worker_profile.notifications.first().notification_type,
+                         NotificationType.reservation_canceled)
+
+        self.notif_service.send(instance=self.worker_profile,
+                                notif_type=NotificationType.reservation_started,
+                                to=self.washer_profile)
+        self.assertEqual(self.washer_profile.notifications.count(), 3)
