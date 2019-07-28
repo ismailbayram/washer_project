@@ -22,13 +22,13 @@ class NotificationTest(BaseTestViewMixin, TestCase):
 
     def test_create_notification(self):
         create_data = {
-            "notification_type": NotificationType.reservation_started.value,
+            "notification_type": NotificationType.you_fired.value,
             "data": {"bir": "haha", "iki": "ha?"},
             "view": "store",
             "view_id": "1",
             "receiver": self.washer.washer_profile
         }
-        self.service.create_notification(**create_data)
+        self.service._create_notification(**create_data)
 
         db_notif = Notification.objects.last()
         self.assertEqual(db_notif.notification_type.value, create_data['notification_type'])
@@ -38,7 +38,7 @@ class NotificationTest(BaseTestViewMixin, TestCase):
         self.assertEqual(db_notif.content_object, create_data['receiver'])
 
         create_data['receiver'] = self.customer.customer_profile
-        self.service.create_notification(**create_data)
+        self.service._create_notification(**create_data)
         db_notif = self.customer.customer_profile.notifications.first()
 
         self.assertEqual(db_notif.notification_type.value, create_data['notification_type'])
@@ -48,7 +48,7 @@ class NotificationTest(BaseTestViewMixin, TestCase):
         self.assertEqual(db_notif.content_object, create_data['receiver'])
 
         create_data['receiver'] = self.worker.worker_profile
-        self.service.create_notification(**create_data)
+        self.service._create_notification(**create_data)
         db_notif = self.worker.worker_profile.notifications.first()
 
         self.assertEqual(db_notif.notification_type.value, create_data['notification_type'])
@@ -62,7 +62,7 @@ class NotificationTest(BaseTestViewMixin, TestCase):
         create_data['receiver'] = self.store
         create_data['view'] = "store2"
         create_data['view_id'] = "15"
-        self.service.create_notification(**create_data)
+        self.service._create_notification(**create_data)
 
         self.assertEqual(self.washer.washer_profile.notifications.count(), 2)
         self.assertEqual(self.worker.worker_profile.notifications.count(), 2)

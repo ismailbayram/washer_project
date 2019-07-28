@@ -1,5 +1,5 @@
-from celery.task import periodic_task
 from celery.schedules import crontab
+from celery.task import periodic_task
 
 from washer_project.celery import app
 

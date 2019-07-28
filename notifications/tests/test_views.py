@@ -43,8 +43,8 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         url = reverse_lazy('api:router:notifications-list')
 
         create_data = {
-            "notification_type": NotificationType.reservation_started.value,
-            "data": {"bir": "haha", "iki": "ha?"},
+            "notification_type": NotificationType.you_fired.value,
+            "data": {"bir": "haha", "worker_name": "ha?"},
             "view": "store",
             "view_id": "1",
             "receiver": self.washer.washer_profile
@@ -52,9 +52,9 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
 
 
         # Create 2 notification and retrive test
-        self.notif_service.create_notification(**create_data)
+        self.notif_service._create_notification(**create_data)
         create_data["view"] = 'sotre2'
-        self.notif_service.create_notification(**create_data)
+        self.notif_service._create_notification(**create_data)
 
         response = self.client.get(url, content_type='application/json', **self.washer_headers)
         self.assertEqual(response.data['count'], 2)
@@ -63,7 +63,7 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
 
         # Create store notfication and list control for stores personel
         create_data['receiver'] = self.store
-        self.notif_service.create_notification(**create_data)
+        self.notif_service._create_notification(**create_data)
 
         response = self.client.get(url, content_type='application/json', **self.washer_headers)
         self.assertEqual(response.data['count'], 3)
