@@ -1,6 +1,8 @@
 from decimal import Decimal
 from enumfields.fields import EnumField
+
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
 from base.models import StarterModel
 from baskets.enums import BasketStatus, PromotionType
@@ -33,6 +35,12 @@ class Basket(StarterModel):
             total_quantity += bi.quantity
         return total_quantity
 
+    def get_net_amount(self):
+        total = self.get_total_amount()
+        for di in self.discountitem_set.all():
+            total -= di.amount
+        return total
+
     @property
     def is_empty(self):
         return not self.basketitem_set.exists()
@@ -52,6 +60,12 @@ class BasketItem(StarterModel):
     def __str__(self):
         return f'{self.product.name} {self.quantity}'
 
+    def __getattribute__(self, item):
+        try:
+            return super().__getattribute__(item)
+        except ObjectDoesNotExist:
+            return None
+
 
 class Campaign(StarterModel):
     name = models.CharField(max_length=128)
@@ -70,5 +84,7 @@ class Campaign(StarterModel):
 
 class DiscountItem(StarterModel):
     basket = models.ForeignKey(to=Basket, on_delete=models.CASCADE)
+    basket_item = models.OneToOneField(to=BasketItem, on_delete=models.CASCADE,
+                                       related_name='discount_item', null=True)
     name = models.CharField(max_length=128)
     amount = models.DecimalField(decimal_places=2, max_digits=6)

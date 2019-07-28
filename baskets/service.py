@@ -28,7 +28,6 @@ class BasketService:
             basket = Basket.objects.create(customer_profile=customer_profile,
                                            status=BasketStatus.active,
                                            car=customer_profile.selected_car)
-        self.apply_discounts(basket)
         return basket
 
     def apply_discounts(self, basket):
@@ -77,19 +76,30 @@ class BasketService:
             basket_item.quantity = F('quantity') + 1
             basket_item.save()
         except BasketItem.DoesNotExist:
+            primary_count = basket.basketitem_set.filter(product__is_primary=True).count()
+            if primary_count > 0 and product.is_primary:
+                raise PrimaryProductsQuantityMustOne
             basket_item = BasketItem.objects.create(basket=basket, product=product)
 
         self._check_basket_items(basket)
-
+        self.apply_discounts(basket)
         return basket_item
+
+    def clean_discounts(self, basket):
+        """
+        :param basket: Basket
+        :return: basket
+        """
+        basket.discountitem_set.all().delete()
+        return basket
 
     def clean_basket(self, basket):
         """
         :param basket: Basket
         :return: Basket
         """
-        BasketItem.objects.filter(basket=basket).delete()
-
+        basket.basketitem_set.all().delete()
+        self.clean_discounts(basket)
         return basket
 
     def delete_basket_item(self, basket, product):
@@ -112,6 +122,7 @@ class BasketService:
         is_basket_valid = self._check_basket_items(basket)
         if not is_basket_valid:
             raise BasketInvalidException
+        # TODO: check amount less than 0
 
         for bi in basket.basketitem_set.all():
             bi.amount = bi.get_price()
