@@ -3,7 +3,17 @@ import elasticsearch_dsl as es
 from django.conf import settings
 
 
-class StoreDoc(es.Document):
+class ESBaseDocument(es.Document):
+    def save(self, *args, **kwargs):
+        # for fixing KeyError in elasticserach_dsl
+        try:
+            super().save(*args, **kwargs)
+        except KeyError:
+            # TODO: log here with args and kwargs
+            return None
+
+
+class StoreDoc(ESBaseDocument):
     pk = es.Integer()
     name = es.Text()
     search_text = es.Text()
@@ -21,7 +31,7 @@ class StoreDoc(es.Document):
         }
 
 
-class ReservationDoc(es.Document):
+class ReservationDoc(ESBaseDocument):
     pk = es.Integer()
     period = es.Integer()
     status = es.Text()

@@ -47,6 +47,7 @@ class ReservationDocumentSerializer(serializers.ModelSerializer):
 
 
 class StoreFilterSerializer(serializers.Serializer):
+    pk = serializers.IntegerField(required=False)
     search_text = serializers.CharField(required=False)
     distance = serializers.IntegerField(required=False)
     lat = serializers.FloatField(required=False)
@@ -91,6 +92,7 @@ class StoreFilterSerializer(serializers.Serializer):
 
 
 class ReservationFilterSerializer(serializers.Serializer):
+    pk = serializers.IntegerField(required=False)
     store = serializers.IntegerField(required=False)
     city = serializers.IntegerField(required=False)
     township = serializers.IntegerField(required=False)

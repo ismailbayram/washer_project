@@ -20,6 +20,8 @@ class StoreSearchService:
         # TODO: cache by hashing query params: hash(data)
 
         query = StoreDoc.search()
+        if 'pk' in data:
+            query = query.filter('match', pk=data['pk'])
         if 'rating__gte' in data:
             query = query.filter('range', rating={'gte': data['rating__gte']})
         if 'city' in data:
@@ -80,6 +82,8 @@ class ReservationSearchService:
         # TODO: cache by hashing query params: hash(data)
         query = ReservationDoc.search()
 
+        if 'pk' in data:
+            query = query.filter('match', pk=data['pk'])
         if "store" in data:
             query = query.filter({
                 "match": {"store.pk": data["store"]}
