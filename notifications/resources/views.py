@@ -1,7 +1,7 @@
 from rest_framework import viewsets
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 
-from notifications.exceptions import BadUserProfileHeaderException
 from notifications.models import Notification
 from notifications.resources.serializers import NotificationSerializer
 
@@ -16,7 +16,8 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
         profile_type = self.request.META.get("HTTP_X_PROFILE_TYPE")
 
         if profile_type not in ('washer', 'customer', 'worker'):
-            raise BadUserProfileHeaderException
+            # TODO log here
+            raise NotFound()
 
         if profile_type == 'washer':
             queryset = queryset.filter(washer_profile=self.request.user.washer_profile)

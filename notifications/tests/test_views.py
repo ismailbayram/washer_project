@@ -86,4 +86,4 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         }
 
         response = self.client.get(url, content_type='application/json', **self.error_headers)
-        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
