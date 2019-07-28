@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import viewsets
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
@@ -16,15 +17,23 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = self.queryset
         profile_type = self.request.META.get("HTTP_X_PROFILE_TYPE")
 
-        if profile_type not in (GroupType.worker.value, GroupType.customer.value, GroupType.washer.value):
+        if profile_type == GroupType.washer.value:
+            object_id = self.request.user.washer_profile.pk
+            ct = ContentType.objects.get_for_model(self.request.user.washer_profile)
+            queryset = Notification.objects.filter(content_type=ct,
+                                                   object_id=object_id)
+        elif profile_type == GroupType.customer.value:
+            object_id = self.request.user.customer_profile.pk
+            ct = ContentType.objects.get_for_model(self.request.user.customer_profile)
+            queryset = Notification.objects.filter(content_type=ct,
+                                                   object_id=object_id)
+        elif profile_type == GroupType.worker.value:
+            object_id = self.request.user.worker_profile.pk
+            ct = ContentType.objects.get_for_model(self.request.user.worker_profile)
+            queryset = Notification.objects.filter(content_type=ct,
+                                                   object_id=object_id)
+        else:
             # TODO log here
             raise NotFound()
-
-        if profile_type == GroupType.washer.value:
-            queryset = queryset.filter(washer_profile=self.request.user.washer_profile)
-        elif profile_type == GroupType.customer.value:
-            queryset = queryset.filter(customer_profile=self.request.user.customer_profile)
-        elif profile_type == GroupType.worker.value:
-            queryset = queryset.filter(worker_profile=self.request.user.worker_profile)
 
         return super().filter_queryset(queryset)
