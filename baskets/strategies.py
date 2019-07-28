@@ -19,7 +19,9 @@ class BasePromotionStrategy:
 class OneFreeInNineStrategy(BasePromotionStrategy):
     def check(self, basket):
         # TODO: return campaign messages if campaign is not applicable
-        res_count = basket.customer_profile.reservation_set.filter(status=ReservationStatus.completed).count()
+        res_count = basket.customer_profile.reservation_set.filter(status__in=[ReservationStatus.completed,
+                                                                               ReservationStatus.started,
+                                                                               ReservationStatus.reserved]).count()
         if res_count != 0 and res_count % 9 == 0:
             return True
 
