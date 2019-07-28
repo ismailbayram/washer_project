@@ -43,44 +43,29 @@ class NotificationType(Enum):
 
 
     def get_sentence(self, data):
-        if self.value == 'you_are_moved_another_store':
-            return _('Your store is changed to {store_name}.'.format(**data))
+        tmp_data = {
+            "store_name": None,
+            "worker_name": None,
+        }
+        data = {**tmp_data, **data}
 
-        if self.value == 'you_moved_worker_to_store':
-            return _('You moved your {worker_name}orker to ({store_name}).'.format(**data))
+        sentenct_map = {
+            'you_are_moved_another_store': _('Your store is changed to {store_name}.'.format(**data)),
+            'you_moved_worker_to_store':   _('You moved your {worker_name}orker to ({store_name}).'.format(**data)),
+            'you_fired':                   _('You fired ({worker_name}).'.format(**data)),
+            'you_are_fired':               _('You are fired.'),
+            'you_has_new_worker':          _('You has a new worker. Wellcome {worker_name}.'.format(**data)),
+            'weekly_reservations_created': _('Your weekly reservations has been created.'),
+            'reservation_disabled':        _('Reservation disabled'),
+            'reservation_expired':         _('Reservation expired'),
+            'reservation_reserved':        _('Reservation reserved.'),
+            'reservation_started':         _('Reservation started.'),
+            'reservation_completed':       _('Reservation complated.'),
+            'reservation_canceled':        _('Reservation canceled.'),
+            'store_approved':              _('Store Approved.')
+        }
 
-        if self.value == 'you_fired':
-            return _('You fired ({worker_name}).'.format(**data))
-
-        if self.value == 'you_are_fired':
-            return _('You are fired.')
-
-        if self.value == 'you_has_new_worker':
-            return _('You has a new worker. Wellcome {worker_name}.'.format(**data))
-
-        if self.value == 'weekly_reservations_created':
-            return _('Your weekly reservations has been created.')
-
-        if self.value == 'reservation_disabled':
-            return _('Reservation disabled')
-
-        if self.value == 'reservation_expired':
-            return _('Reservation expired')
-
-        if self.value == 'reservation_reserved':
-            return _('Reservation reserved.')
-
-        if self.value == 'reservation_started':
-            return _('Reservation started.')
-
-        if self.value == 'reservation_completed':
-            return _('Reservation complated.')
-
-        if self.value == 'reservation_canceled':
-            return _('Reservation canceled.')
-
-        if self.value == 'store_approved':
-            return _('Store Approved.')
-
-
-        raise NotImplementedError()
+        try:
+            return sentenct_map[self.value]
+        except KeyError:
+            raise NotImplementedError()

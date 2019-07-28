@@ -43,8 +43,10 @@ class NotificationService:
                 "view": view,
             }
 
-        elif notif_type in [NotificationType.you_moved_worker_to_store,
-                            NotificationType.you_are_moved_another_store]:
+        elif notif_type in [
+                NotificationType.you_moved_worker_to_store,
+                NotificationType.you_are_moved_another_store
+        ]:
             view_id = instance.washer_profile.store.id
             data = {
                 "worker_name": "{} {}".format(instance.user.first_name, instance.user.last_name),
@@ -62,13 +64,15 @@ class NotificationService:
                 "view": view,
             }
 
-        elif notif_type in [NotificationType.weekly_reservations_created,
-                            NotificationType.reservation_disabled,
-                            NotificationType.reservation_expired,
-                            NotificationType.reservation_reserved,
-                            NotificationType.reservation_started,
-                            NotificationType.reservation_completed,
-                            NotificationType.reservation_canceled,]:
+        elif notif_type in [
+                NotificationType.weekly_reservations_created,
+                NotificationType.reservation_disabled,
+                NotificationType.reservation_expired,
+                NotificationType.reservation_reserved,
+                NotificationType.reservation_started,
+                NotificationType.reservation_completed,
+                NotificationType.reservation_canceled,
+        ]:
             data = {
                 "store_id": instance.id,
                 "view_id": view_id,
