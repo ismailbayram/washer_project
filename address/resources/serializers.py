@@ -22,7 +22,6 @@ class TownshipSerializer(serializers.ModelSerializer):
 
 
 class AddressSerializer(serializers.ModelSerializer):
-    # TODO: validate city and township here
     class Meta:
         model = Address
         fields = ('pk', 'country', 'city', 'township', 'line', 'postcode',)

@@ -1,7 +1,9 @@
 import datetime
+import pytz
 from decimal import Decimal
 
 from django.test import TestCase, override_settings
+from django.conf import settings
 from django.utils import timezone
 from model_mommy import mommy
 
@@ -29,6 +31,7 @@ from stores.exceptions import StoreNotAvailableException
 @override_settings(DEFAULT_PRODUCT_PRICE=Decimal('20.00'))
 class ReservationServiceTest(TestCase, BaseTestViewMixin):
     def setUp(self):
+        self.timezone = pytz.timezone(settings.TIME_ZONE)
         self.service = ReservationService()
         self.product_service = ProductService()
         self.car_service = CarService()
@@ -122,17 +125,25 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
 
     def test_create_day_from_config(self):
         dt = datetime.datetime(2019, 7, 18, 5, 51)  # Thursday
-        self.service.create_day_from_config(self.store, dt, 30)
+        res_pk_list = self.service.create_day_from_config(self.store, dt, 30)
+        self.assertIsInstance(res_pk_list, list)
+        self.assertEqual(len(res_pk_list), 8)
         self.assertEqual(self.store.reservation_set.count(), 8)
 
         dt = datetime.datetime(2019, 7, 21, 5, 51, 0, 0)  # Sunday
         dt2 = datetime.datetime(2019, 7, 21, 5, 51, 23, 59)  # Sunday
-        self.service.create_day_from_config(self.store, dt, 30)
+        res_pk_list = self.service.create_day_from_config(self.store, dt, 30)
+        self.assertIsInstance(res_pk_list, list)
+        self.assertEqual(len(res_pk_list), 0)
+        dt = self.timezone.localize(dt)
+        dt2 = self.timezone.localize(dt2)
         self.assertEqual(self.store.reservation_set.filter(start_datetime__gt=dt,
                                                            end_datetime__lt=dt2).count(), 0)
 
     def test_create_week_from_config(self):
-        self.service.create_week_from_config(self.store)
+        res_pk_list = self.service.create_week_from_config(self.store)
+        self.assertIsInstance(res_pk_list, set)
+        self.assertEqual(len(res_pk_list), 10)
         self.assertEqual(self.store.reservation_set.count(), 10)
 
     def test_occupy(self):
@@ -262,6 +273,7 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
 
 class CommentServiceTest(TestCase, BaseTestViewMixin):
     def setUp(self):
+        self.timezone = pytz.timezone(settings.TIME_ZONE)
         self.service = CommentService()
         self.reservation_service = ReservationService()
         self.product_service = ProductService()
@@ -283,6 +295,7 @@ class CommentServiceTest(TestCase, BaseTestViewMixin):
         self.reservation_service = ReservationService()
 
         dt = datetime.datetime(2019, 7, 18, 5, 51)
+        dt = self.timezone.localize(dt)
         dt2 = dt + datetime.timedelta(hours=-1)
         dt3 = dt2 + datetime.timedelta(hours=-1)
         self.reservation = self.reservation_service._create_reservation(self.store, dt, 40)

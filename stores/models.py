@@ -19,7 +19,7 @@ class Store(StarterModel):
     payment_options = JSONField(default=dict)
     latitude = models.FloatField(default=None, null=True)
     longitude = models.FloatField(default=None, null=True)
-    rating = models.FloatField(default=None, null=True)
+    rating = models.FloatField(default=0)
     logo = models.ImageField(null=True)
 
 
