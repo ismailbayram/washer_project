@@ -23,9 +23,7 @@ class NotificationTest(BaseTestViewMixin, TestCase):
     def test_create_notification(self):
         create_data = {
             "notification_type": NotificationType.you_fired.value,
-            "data": {"bir": "haha", "iki": "ha?"},
-            "view": "store",
-            "view_id": "1",
+            "data": {"bir": "haha", "iki": "ha?", 'view': 'naber', 'view_id': '24'},
             "receiver": self.washer.washer_profile
         }
         self.service._create_notification(**create_data)
@@ -33,8 +31,6 @@ class NotificationTest(BaseTestViewMixin, TestCase):
         db_notif = Notification.objects.last()
         self.assertEqual(db_notif.notification_type.value, create_data['notification_type'])
         self.assertEqual(db_notif.data, create_data['data'])
-        self.assertEqual(db_notif.view, create_data['view'])
-        self.assertEqual(db_notif.view_id, create_data['view_id'])
         self.assertEqual(db_notif.content_object, create_data['receiver'])
 
         create_data['receiver'] = self.customer.customer_profile
@@ -43,8 +39,6 @@ class NotificationTest(BaseTestViewMixin, TestCase):
 
         self.assertEqual(db_notif.notification_type.value, create_data['notification_type'])
         self.assertEqual(db_notif.data, create_data['data'])
-        self.assertEqual(db_notif.view, create_data['view'])
-        self.assertEqual(db_notif.view_id, create_data['view_id'])
         self.assertEqual(db_notif.content_object, create_data['receiver'])
 
         create_data['receiver'] = self.worker.worker_profile
@@ -53,20 +47,18 @@ class NotificationTest(BaseTestViewMixin, TestCase):
 
         self.assertEqual(db_notif.notification_type.value, create_data['notification_type'])
         self.assertEqual(db_notif.data, create_data['data'])
-        self.assertEqual(db_notif.view, create_data['view'])
-        self.assertEqual(db_notif.view_id, create_data['view_id'])
         self.assertEqual(db_notif.content_object, create_data['receiver'])
 
 
         # Test store
         create_data['receiver'] = self.store
-        create_data['view'] = "store2"
-        create_data['view_id'] = "15"
+        create_data['data']['view'] = "store2"
+        create_data['data']['view_id'] = "15"
         self.service._create_notification(**create_data)
 
         self.assertEqual(self.washer.washer_profile.notifications.count(), 2)
         self.assertEqual(self.worker.worker_profile.notifications.count(), 2)
         self.assertEqual(self.worker2.worker_profile.notifications.count(), 1)
 
-        self.assertEqual(self.washer.washer_profile.notifications.first().view, 'store2')
-        self.assertEqual(self.worker2.worker_profile.notifications.first().view_id, '15')
+        self.assertEqual(self.washer.washer_profile.notifications.first().data['view'], 'store2')
+        self.assertEqual(self.worker2.worker_profile.notifications.first().data['view_id'], '15')

@@ -11,7 +11,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ("pk", "sentence", 'view', 'view_id', 'notification_type')
+        fields = ("pk", "sentence", 'notification_type', 'data')
 
     def get_sentence(self, instance):
         return instance.notification_type.get_sentence(instance.data)

@@ -44,22 +44,20 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
 
         create_data = {
             "notification_type": NotificationType.you_fired.value,
-            "data": {"bir": "haha", "worker_name": "ha?"},
-            "view": "store",
-            "view_id": "1",
+            "data": {"bir": "haha", "worker_name": "ha?", "view": "/profile", "view_id": "1"},
             "receiver": self.washer.washer_profile
         }
 
 
         # Create 2 notification and retrive test
         self.notif_service._create_notification(**create_data)
-        create_data["view"] = 'sotre2'
+        create_data['data']["view"] = 'sotre2'
         self.notif_service._create_notification(**create_data)
 
         response = self.client.get(url, content_type='application/json', **self.washer_headers)
         self.assertEqual(response.data['count'], 2)
-        self.assertEqual(response.data['results'][0]['view_id'], "1")
-        self.assertNotEqual(response.data['results'][0]['view'], response.data['results'][1]['view'])
+        self.assertEqual(response.data['results'][0]['data']['view_id'], "1")
+        self.assertNotEqual(response.data['results'][0]['data']['view'], response.data['results'][1]['data']['view'])
 
         # Create store notfication and list control for stores personel
         create_data['receiver'] = self.store
@@ -73,7 +71,7 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
 
         response = self.client.get(url, content_type='application/json', **self.worker_headers)
         self.assertEqual(response.data['count'], 1)
-        self.assertEqual(response.data['results'][0]['view_id'], "1")
+        self.assertEqual(response.data['results'][0]['data']['view_id'], "1")
 
         response = self.client.get(url, content_type='application/json', **self.customer_headers)
         self.assertEqual(response.data['count'], 0)

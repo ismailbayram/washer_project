@@ -11,8 +11,6 @@ from notifications.enums import NotificationType
 class Notification(StarterModel):
     notification_type = EnumField(enum=NotificationType, max_length=32)
     data = JSONField(default=dict)
-    view = models.CharField(max_length=32)
-    view_id = models.CharField(max_length=32)
     read = models.BooleanField(default=False)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
