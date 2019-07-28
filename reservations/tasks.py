@@ -1,6 +1,8 @@
 from celery.schedules import crontab
 from celery.task import periodic_task
 
+from notifications.enums import NotificationType
+from notifications.service import NotificationService
 from washer_project.celery import app
 
 
@@ -33,7 +35,10 @@ def create_store_weekly_reservations(store_id):
     store_indexer.index_store(store)
     res_indexer = ReservationIndexer()
     res_indexer.index_reservations(reservation_queryset)
-    # NOTIFICATION
+    notif_service = NotificationService()
+    notif_service.send(instance=store, to=store.washer_profile,
+                       notif_type=NotificationType.weekly_reservations_created,)
+
 
 
 @periodic_task(run_every=(crontab(minute='*/30')), name="reservations.check_expired_reservations")

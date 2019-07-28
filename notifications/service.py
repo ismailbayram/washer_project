@@ -37,6 +37,8 @@ class NotificationService:
 
     def send(self, instance, notif_type, to, *args, **kwargs):
         view = notif_type.get_view()
+        view_id = instance.id
+
         if notif_type in [NotificationType.you_fired, NotificationType.you_are_fired]:
             data = {
                 "worker_name": "{} {}".format(instance.user.first_name, instance.user.last_name),
@@ -44,7 +46,6 @@ class NotificationService:
                 "worker_profile_id": instance.id,
                 "washer_profile_id": instance.washer_profile.id,
             }
-            view_id = instance.id
 
         elif notif_type in [NotificationType.you_moved_worker_to_store,
                             NotificationType.you_are_moved_another_store]:
@@ -54,15 +55,26 @@ class NotificationService:
                 "store_id": instance.washer_profile.store.id,
                 "worker_profile_id": instance.id,
             }
-            view_id = instance.washer_profile.store.id,
+            view_id = instance.washer_profile.store.id
 
         elif notif_type == NotificationType.you_has_new_worker:
-
             data = {
                 "worker_name": "{} {}".format(instance.user.first_name, instance.user.last_name),
                 "worker_profile_id": instance.id,
             }
-            view_id = instance.id,
+
+        elif notif_type in [NotificationType.weekly_reservations_created,
+                            NotificationType.reservation_disabled,
+                            NotificationType.reservation_expired,
+                            NotificationType.reservation_reserved,
+                            NotificationType.reservation_started,
+                            NotificationType.reservation_completed,
+                            NotificationType.reservation_canceled,]:
+            data = {"store_id": instance.id}
+
+        elif notif_type == NotificationType.store_approved:
+            data = {"store_id": instance.id}
+            view_id = instance.id
 
         else:
             raise NotImplementedError()
