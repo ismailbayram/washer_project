@@ -10,6 +10,8 @@ from products.resources.serializers import (ProductDetailedSerializer,
 from products.resources.filters import ProductFilterSet
 from products.models import Product, ProductPrice
 from products.service import ProductService
+from products.tasks import update_product_price
+from search.indexer import ReservationIndexer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -57,6 +59,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = ProductPriceSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.service.update_price(product_price, **serializer.validated_data)
+
+        update_product_price.delay(product.pk)
         return Response({}, status=status.HTTP_200_OK)
 
 
