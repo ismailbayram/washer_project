@@ -2,7 +2,7 @@ import datetime
 
 import pytz
 from django.conf import settings
-from django.db.models import F, Sum
+from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.db.transaction import atomic
 from django.utils.crypto import get_random_string
@@ -46,7 +46,6 @@ class ReservationService(object):
             reservation = Reservation.objects.create(store=store, start_datetime=start_datetime,
                                                      end_datetime=end_datetime, period=period,
                                                      number=self._generate_reservation_number())
-
         return reservation
 
     def create_day_from_config(self, store, day_datetime, period):
@@ -54,7 +53,7 @@ class ReservationService(object):
         :param store: Store
         :param day_datetime: DateTime
         :param period: int
-        :return: None
+        :return: list
         """
         timezone = pytz.timezone(settings.TIME_ZONE)
         config = store.config['reservation_hours']
@@ -63,7 +62,7 @@ class ReservationService(object):
         start = config[day]['start']
         end = config[day]['end']
         if start is None:
-            return
+            return []
 
         start_time = datetime.datetime.strptime(start, "%H:%M")
         end_time = datetime.datetime.strptime(end, "%H:%M")
@@ -71,23 +70,29 @@ class ReservationService(object):
         period_count = int(diff / period)
 
         start_datetime = day_datetime.replace(hour=start_time.hour, minute=start_time.minute,
-                                              second=0)
+                                              second=0, microsecond=0)
+        res_pk_list = []
         for p in range(period_count):
             start_dt = start_datetime + datetime.timedelta(minutes=(p * period))
             start_dt = timezone.localize(start_dt)
-            self._create_reservation(store=store, start_datetime=start_dt, period=period)
+            reservation = self._create_reservation(store=store, start_datetime=start_dt, period=period)
+            res_pk_list.append(reservation.pk)
+        return res_pk_list
 
     @atomic
     def create_week_from_config(self, store):
         """
         :param store: Store
-        :return: None
+        :return: set
         """
         period = store.product_set.filter(is_primary=True).order_by('-period').first().period
 
+        res_pk_list = []
         for k in range(1, 8):
             day_datetime = datetime.datetime.today() + datetime.timedelta(days=k)
-            self.create_day_from_config(store, day_datetime, period)
+            pk_list = self.create_day_from_config(store, day_datetime, period)
+            res_pk_list += pk_list
+        return set(res_pk_list)
 
     def occupy(self, reservation, customer_profile):
         """
@@ -222,6 +227,7 @@ class ReservationService(object):
         reservation.status = ReservationStatus.expired
         reservation.save(update_fields=['status'])
         return reservation
+
 
 class CommentService:
     def _update_store_rating(self, store, new_rating):

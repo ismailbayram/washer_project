@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'rest_framework_swagger',
+    'base',
     'users',
     'address',
     'stores',
@@ -48,7 +49,7 @@ INSTALLED_APPS = [
     'baskets',
     'reservations',
     'notifications',
-
+    'search',
 ]
 
 MIDDLEWARE = [
@@ -150,15 +151,13 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
+ES_HOST = {"host": "127.0.0.1", "port": 9200}
+ES_STORE_INDEX = 'stores'
+ES_RESERVATION_INDEX = 'reservations'
+
 AUTH_USER_MODEL = 'users.User'
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
-
 STATIC_URL = '/static/'
-
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

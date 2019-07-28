@@ -2,7 +2,6 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class IsAuthenticatedAndActivated(BasePermission):
-    # TODO: check is user is_active, return 411
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_authenticated \
                     and request.user.is_active)
