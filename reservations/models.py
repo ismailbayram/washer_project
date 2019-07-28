@@ -15,6 +15,7 @@ class Reservation(StarterModel):
     customer_profile = models.ForeignKey('users.CustomerProfile', null=True, default=None,
                                          on_delete=models.SET_NULL)
     total_amount = models.DecimalField(decimal_places=2, max_digits=6, null=True, default=None)
+    net_amount = models.DecimalField(decimal_places=2, max_digits=6, null=True, default=None)
     number = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
@@ -23,6 +24,7 @@ class Reservation(StarterModel):
     class Meta:
         unique_together = ('start_datetime', 'store', )
         ordering = ['-start_datetime']
+
 
 class Comment(StarterModel):
     rating = models.IntegerField(default=0)

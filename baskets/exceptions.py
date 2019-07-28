@@ -13,3 +13,7 @@ class BasketInvalidException(ProjectBaseException):
 class BasketEmptyException(ProjectBaseException):
     code = codes.baskets_100_2
 
+
+class BasketAmountLessThanZeroException(ProjectBaseException):
+    code = codes.baskets_100_3
+

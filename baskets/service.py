@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
 
 from django.db.models import Q, F
@@ -7,7 +8,8 @@ from baskets.models import Basket, BasketItem, Campaign
 from baskets.enums import BasketStatus
 from baskets.exceptions import (PrimaryProductsQuantityMustOne,
                                 BasketInvalidException,
-                                BasketEmptyException)
+                                BasketEmptyException,
+                                BasketAmountLessThanZeroException)
 from cars.exceptions import CustomerHasNoSelectedCarException
 
 
@@ -122,7 +124,8 @@ class BasketService:
         is_basket_valid = self._check_basket_items(basket)
         if not is_basket_valid:
             raise BasketInvalidException
-        # TODO: check amount less than 0
+        if basket.get_net_amount() < Decimal('0.00'):
+            raise BasketAmountLessThanZeroException
 
         for bi in basket.basketitem_set.all():
             bi.amount = bi.get_price()

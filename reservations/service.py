@@ -156,6 +156,7 @@ class ReservationService(object):
 
             reservation.basket = basket
             reservation.total_amount = basket.get_total_amount()
+            reservation.net_amount = basket.get_net_amount()
             reservation.status = ReservationStatus.reserved
             reservation.save()
             # NOTIFICATION

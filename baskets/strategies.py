@@ -1,4 +1,4 @@
-from baskets.models import DiscountItem
+from baskets.models import DiscountItem, BasketItem
 from reservations.enums import ReservationStatus
 
 
@@ -30,9 +30,11 @@ class OneFreeInNineStrategy(BasePromotionStrategy):
     def apply(self, basket):
         checked = self.check(basket)
         if checked:
-            qs = basket.basketitem_set.filter(product__is_primary=True)
-            basket_item = qs.first()
-            if basket_item and basket_item.discount_item:
+            try:
+                basket_item = basket.basketitem_set.get(product__is_primary=True)
+                if basket_item.discount_item:
+                    return
+            except BasketItem.DoesNotExist:
                 return
             DiscountItem.objects.create(name=self.name, basket=basket, basket_item=basket_item,
                                         amount=self.get_discount_amount(basket_item))
