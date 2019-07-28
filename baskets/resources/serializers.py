@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from api.fields import EnumField
-from baskets.models import Basket, BasketItem
+from baskets.models import Basket, BasketItem, DiscountItem
 from cars.resources.serializers import CarSerializer
 from products.resources.serializers import ProductSerializer
 from products.models import Product
@@ -12,6 +12,12 @@ class CreateBasketItemSerializer(serializers.Serializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.filter(is_active=True,
                                                                                  store__is_approved=True,
                                                                                  store__is_active=True))
+
+
+class DiscountItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DiscountItem
+        fields = ('name', 'amount')
 
 
 class BasketItemSerializer(serializers.ModelSerializer):
@@ -32,8 +38,9 @@ class BasketSerializer(serializers.ModelSerializer):
     car = CarSerializer()
     basketitem_set = BasketItemSerializer(many=True)
     warning_messages = serializers.ListField()
+    discountitem_set = DiscountItemSerializer(many=True)
 
     class Meta:
         model = Basket
         fields = ('currency', 'total_amount', 'total_quantity', 'car', 'basketitem_set',
-                  'warning_messages',)
+                  'discountitem_set', 'warning_messages',)

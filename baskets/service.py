@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q, F
 from django.db.transaction import atomic
 
-from baskets.models import Basket, BasketItem
+from baskets.models import Basket, BasketItem, Campaign
 from baskets.enums import BasketStatus
 from baskets.exceptions import (PrimaryProductsQuantityMustOne,
                                 BasketInvalidException,
@@ -28,6 +28,18 @@ class BasketService:
             basket = Basket.objects.create(customer_profile=customer_profile,
                                            status=BasketStatus.active,
                                            car=customer_profile.selected_car)
+        self.apply_discounts(basket)
+        return basket
+
+    def apply_discounts(self, basket):
+        """
+        :param basket: Basket
+        :return: Basket
+        """
+        campaigns = Campaign.objects.actives()
+        for campaign in campaigns:
+            strategy = campaign.promotion_type.get_strategy(name=campaign.name)
+            strategy.apply(basket)
         return basket
 
     def _check_basket_items(self, basket):
