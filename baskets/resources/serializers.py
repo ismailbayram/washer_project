@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from api.fields import EnumField
-from baskets.models import Basket, BasketItem, DiscountItem
+from baskets.models import Basket, BasketItem, DiscountItem, Campaign
+from baskets.enums import PromotionType
 from cars.resources.serializers import CarSerializer
 from products.resources.serializers import ProductSerializer
 from products.models import Product
@@ -15,6 +16,8 @@ class CreateBasketItemSerializer(serializers.Serializer):
 
 
 class DiscountItemSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='campaign.name')
+
     class Meta:
         model = DiscountItem
         fields = ('name', 'amount')
@@ -40,9 +43,18 @@ class BasketSerializer(serializers.ModelSerializer):
     car = CarSerializer()
     basketitem_set = BasketItemSerializer(many=True)
     warning_messages = serializers.ListField()
+    campaign_messages = serializers.ListField()
     discountitem_set = DiscountItemSerializer(many=True)
 
     class Meta:
         model = Basket
         fields = ('currency', 'total_amount', 'total_quantity', 'net_amount', 'car',
-                  'basketitem_set', 'discountitem_set', 'warning_messages',)
+                  'basketitem_set', 'discountitem_set', 'warning_messages', 'campaign_messages',)
+
+
+class CampaignSerializer(serializers.ModelSerializer):
+    promotion_type = EnumField(enum=PromotionType)
+
+    class Meta:
+        model = Campaign
+        fields = ('pk', 'name', 'promotion_type')

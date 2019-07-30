@@ -30,6 +30,7 @@ class BasketService:
             basket = Basket.objects.create(customer_profile=customer_profile,
                                            status=BasketStatus.active,
                                            car=customer_profile.selected_car)
+        self.apply_discounts(basket)
         return basket
 
     def apply_discounts(self, basket):
@@ -37,10 +38,16 @@ class BasketService:
         :param basket: Basket
         :return: Basket
         """
+        self.clean_discounts(basket)
         campaigns = Campaign.objects.actives()
         for campaign in campaigns:
-            strategy = campaign.promotion_type.get_strategy(name=campaign.name)
-            strategy.apply(basket)
+            strategy = campaign.promotion_type.get_strategy(campaign=campaign,
+                                                            basket=basket)
+            if strategy.check():
+                strategy.apply()
+            else:
+                message = campaign.message.format(**{'remaining': strategy.remaining})
+                basket.campaign_messages.append(message)
         return basket
 
     def _check_basket_items(self, basket):
@@ -92,6 +99,7 @@ class BasketService:
         :param basket: Basket
         :return: basket
         """
+        basket.campaign_messages = []
         basket.discountitem_set.all().delete()
         return basket
 

@@ -18,6 +18,7 @@ class Basket(StarterModel):
 
     def __init__(self, *args, **kwargs):
         self.warning_messages = []
+        self.campaign_messages = []
         super().__init__(*args, **kwargs)
 
     def __str__(self):
@@ -69,6 +70,7 @@ class BasketItem(StarterModel):
 
 class Campaign(StarterModel):
     name = models.CharField(max_length=128)
+    message = models.CharField(max_length=256)
     is_active = models.BooleanField(default=True)
     priority = models.PositiveSmallIntegerField()
     promotion_type = EnumField(enum=PromotionType, max_length=32)
@@ -86,5 +88,5 @@ class DiscountItem(StarterModel):
     basket = models.ForeignKey(to=Basket, on_delete=models.CASCADE)
     basket_item = models.OneToOneField(to=BasketItem, on_delete=models.CASCADE,
                                        related_name='discount_item', null=True)
-    name = models.CharField(max_length=128)
     amount = models.DecimalField(decimal_places=2, max_digits=6)
+    campaign = models.ForeignKey(to=Campaign, on_delete=models.PROTECT)

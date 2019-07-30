@@ -5,7 +5,7 @@ from address.resources.views import (CityViewSet, CountryViewSet,
                                      TownshipViewSet)
 
 from api.views import get_swagger_view
-from baskets.resources.views import BasketViewSet
+from baskets.resources.views import BasketViewSet, CampaignViewSet
 from cars.resources.views import CarViewSet
 from products.resources.views import ProductListViewSet, ProductViewSet
 from reservations.resources.views import (CommentListViewSet,
@@ -44,6 +44,7 @@ basket_view = BasketViewSet.as_view({
     'post': 'add_item',
     'delete': 'delete_item',
 })
+router.register('campaigns', CampaignViewSet, base_name='campaigns')
 
 # reservations
 router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store

@@ -5,8 +5,12 @@ from rest_framework.response import Response
 
 from api.permissions import HasGroupPermission
 from users.enums import GroupType
+from baskets.enums import PromotionType
+from baskets.models import Campaign
 from baskets.service import BasketService
-from baskets.resources.serializers import BasketSerializer, CreateBasketItemSerializer
+from baskets.resources.serializers import (BasketSerializer, CreateBasketItemSerializer,
+                                           CampaignSerializer)
+from reservations.enums import ReservationStatus
 
 
 class BasketViewSet(viewsets.ViewSet):
@@ -41,3 +45,19 @@ class BasketViewSet(viewsets.ViewSet):
         self.service.delete_basket_item(basket, **serializer.validated_data)
         serializer = BasketSerializer(instance=basket)
         return Response({'basket': serializer.data}, status=status.HTTP_204_NO_CONTENT)
+
+
+class CampaignViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Campaign.objects.filter(is_active=True)
+    serializer_class = CampaignSerializer
+    permission_classes = (HasGroupPermission,)
+    permission_groups = {
+        'retrieve': [GroupType.customer],
+    }
+
+    def retrieve(self, request, *args, **kwargs):
+        campaign = self.get_object()
+        customer_profile = request.user.customer_profile
+        res_count = customer_profile.reservation_set.filter(status=ReservationStatus.completed).count() % 9
+        if campaign.promotion_type == PromotionType.one_free_in_nine:
+            return Response({'remaining': res_count})
