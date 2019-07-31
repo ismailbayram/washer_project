@@ -46,6 +46,7 @@ class BasketViewSetTest(TestCase, BaseTestViewMixin):
         self.assertEqual(jresponse['basket']['total_quantity'], 0)
         self.assertEqual(jresponse['basket']['car']['pk'], self.car.pk)
         self.assertEqual(len(jresponse['basket']['basketitem_set']), 0)
+        self.assertEqual(len(jresponse['basket']['discountitem_set']), 0)
 
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.get(url, content_type='application/json', **headers)
