@@ -273,12 +273,15 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
             self.service.cancel(reservation)
 
         reservation.status = ReservationStatus.reserved
+        reservation.customer_profile = self.customer_profile
         reservation.save()
         reservation = self.service.cancel(reservation)
 
         # START notif test
         self.assertEqual(self.store.washer_profile.notifications.count(), 1)
         self.assertEqual(self.store.washer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_canceled)
+        self.assertEqual(self.customer_profile.notifications.last().notification_type,
                          NotificationType.reservation_canceled)
         # END notif test
 
