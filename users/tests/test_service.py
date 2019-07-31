@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 from model_mommy import mommy
 
+from notifications.enums import NotificationType
 from stores.exceptions import StoreDoesNotBelongToWasherException
 from users.enums import GroupType
 from users.exceptions import (SmsCodeIsInvalidException,
@@ -143,10 +144,31 @@ class WorkerProfileServiceTest(TestCase):
         self.assertEqual(worker_profile.washer_profile, self.washer2_profile)
         self.assertEqual(worker_profile.store, self.store3)
 
+        # notif tests
+        self.assertEqual(self.washer2_profile.workerprofile_set.count(), 2)
+        self.assertEqual(self.washer2_profile.notifications.count(), 2)
+        self.assertEqual(self.washer2_profile.notifications.first().data['worker_name'], "Ahmet Cetin")
+
     def test_fire_worker(self):
+        washer_profile = self.worker_profile.washer_profile
+
         worker_profile = self.service.fire_worker(self.worker_profile)
         self.assertIsNone(worker_profile.store)
         self.assertIsNone(worker_profile.washer_profile)
+
+        # noif tests
+        self.assertEqual(worker_profile.notifications.count(), 1)
+        self.assertEqual(worker_profile.notifications.first().notification_type,
+                         NotificationType.you_are_fired)
+        self.assertEqual(worker_profile.notifications.first().data['worker_name'],
+                         "{} {}".format(worker_profile.user.first_name,
+                                        worker_profile.user.last_name))
+
+        self.assertEqual(washer_profile.notifications.count(), 1)
+        self.assertEqual(washer_profile.notifications.first().notification_type,
+                         NotificationType.you_fired)
+
+
 
     def test_move_worker(self):
         with self.assertRaises(StoreDoesNotBelongToWasherException):
@@ -161,6 +183,12 @@ class WorkerProfileServiceTest(TestCase):
 
         worker_profile = self.service.move_worker(self.worker_profile, self.store2)
         self.assertEqual(worker_profile.store, self.store2)
+        self.assertEqual(worker_profile.washer_profile, self.store2.washer_profile)
+
+        # notif tests
+        self.assertEqual(worker_profile.notifications.count(), 2)
+        self.assertEqual(self.washer_profile.notifications.count(), 2)
+
 
 
 class SmsServiceTest(TestCase):

@@ -9,6 +9,8 @@ from django.utils.crypto import get_random_string
 
 from baskets.exceptions import BasketEmptyException
 from baskets.service import BasketService
+from notifications.enums import NotificationType
+from notifications.service import NotificationService
 from reservations.enums import ReservationStatus
 from reservations.exceptions import (ReservationAlreadyCommented,
                                      ReservationAlreadyReplyed,
@@ -158,7 +160,11 @@ class ReservationService(object):
             reservation.total_amount = basket.get_total_amount()
             reservation.status = ReservationStatus.reserved
             reservation.save()
-            # NOTIFICATION
+
+            notif_service = NotificationService()
+            notif_service.send(instance=reservation, to=reservation.store,
+                               notif_type=NotificationType.reservation_reserved,)
+
         return reservation
 
     def start(self, reservation):
@@ -173,7 +179,10 @@ class ReservationService(object):
         reservation.status = ReservationStatus.started
         reservation.save(update_fields=['status'])
 
-        # NOTIFICATION
+        notif_service = NotificationService()
+        notif_service.send(instance=reservation, to=reservation.store,
+                           notif_type=NotificationType.reservation_started,)
+
         return reservation
 
     def complete(self, reservation):
@@ -188,7 +197,10 @@ class ReservationService(object):
         reservation.status = ReservationStatus.completed
         reservation.save(update_fields=['status'])
 
-        # NOTIFICATION
+        notif_service = NotificationService()
+        notif_service.send(instance=reservation, to=reservation.store,
+                           notif_type=NotificationType.reservation_completed)
+
         return reservation
 
     def cancel(self, reservation):
@@ -202,7 +214,11 @@ class ReservationService(object):
         reservation.status = ReservationStatus.cancelled
         reservation.save(update_fields=['status'])
 
-        # NOTIFICATION
+        notif_service = NotificationService()
+        notif_service.send(instance=reservation, to=reservation.store,
+                           notif_type=NotificationType.reservation_canceled)
+        notif_service.send(instance=reservation, to=reservation.customer_profile,
+                           notif_type=NotificationType.reservation_canceled)
         return reservation
 
     def disable(self, reservation):
@@ -212,7 +228,11 @@ class ReservationService(object):
         """
         if not reservation.status == ReservationStatus.available:
             raise ReservationNotAvailableException
-        # notification to washer
+
+        notif_service = NotificationService()
+        notif_service.send(instance=reservation, to=reservation.store,
+                           notif_type=NotificationType.reservation_disabled)
+
 
         reservation.status = ReservationStatus.disabled
         reservation.save(update_fields=['status'])
@@ -223,7 +243,11 @@ class ReservationService(object):
         :param reservation: Reservation
         :return: reservation
         """
-        # notification to washer
+
+        notif_service = NotificationService()
+        notif_service.send(instance=reservation, to=reservation.store,
+                           notif_type=NotificationType.reservation_expired)
+
         reservation.status = ReservationStatus.expired
         reservation.save(update_fields=['status'])
         return reservation

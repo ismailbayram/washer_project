@@ -7,6 +7,7 @@ from address.resources.views import (CityViewSet, CountryViewSet,
 from api.views import get_swagger_view
 from baskets.resources.views import BasketViewSet
 from cars.resources.views import CarViewSet
+from notifications.resources.views import NotificationViewSet
 from products.resources.views import ProductListViewSet, ProductViewSet
 from reservations.resources.views import (CommentListViewSet,
                                           CustomerReservationViewSet,
@@ -49,6 +50,9 @@ basket_view = BasketViewSet.as_view({
 router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store
 router.register('reservations', CustomerReservationViewSet, base_name='reservations')  # for customers
 router.register('comments', CommentListViewSet, base_name='comments')
+
+# notifications
+router.register('notifications', NotificationViewSet, base_name='notifications')
 
 app_name = 'api'
 

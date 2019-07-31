@@ -8,6 +8,8 @@ from PIL import Image
 
 from base.utils import (compress_image, ordereddict_to_dict,
                         thumbnail_file_name_by_orginal_name)
+from notifications.enums import NotificationType
+from notifications.service import NotificationService
 from products.service import ProductService
 from stores.exceptions import (ImageDidNotDelete, StoreHasNoLogo,
                                StoreHasSoManyImageException)
@@ -95,9 +97,13 @@ class StoreService:
         :param instance: Store
         :return: Store
         """
-        # NOTIFICATION
         instance.is_approved = True
         instance.save(update_fields=['is_approved'])
+
+        notif_service = NotificationService()
+        notif_service.send(instance=instance, to=instance.washer_profile,
+                           notif_type=NotificationType.store_approved)
+
         return instance
 
     def decline_store(self, instance):

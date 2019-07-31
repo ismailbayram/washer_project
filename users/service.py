@@ -6,6 +6,8 @@ from django.db.transaction import atomic
 from django.utils import timezone
 from rest_framework_jwt.settings import api_settings as jwt_settings
 
+from notifications.enums import NotificationType
+from notifications.service import NotificationService
 from stores.exceptions import StoreDoesNotBelongToWasherException
 from users.enums import GroupType
 from users.exceptions import (SmsCodeExpiredException,
@@ -115,7 +117,6 @@ class WorkerProfileService:
         :param last_name: str
         :return: WorkerProfile
         """
-        # NOTIFICATION
         if not store.washer_profile == washer_profile:
             raise StoreDoesNotBelongToWasherException(params=(store, washer_profile))
         user_service = UserService()
@@ -130,6 +131,11 @@ class WorkerProfileService:
         worker_profile.store = store
         worker_profile.save()
 
+        notif_service = NotificationService()
+        notif_service.send(instance=worker_profile, to=worker_profile.washer_profile,
+                           notif_type=NotificationType.you_has_new_worker)
+
+
         return worker_profile
 
     def fire_worker(self, worker_profile):
@@ -137,10 +143,16 @@ class WorkerProfileService:
         :param worker_profile: WorkerProfile
         :return: WorkerProfile
         """
+        notif_service = NotificationService()
+        notif_service.send(instance=worker_profile, notif_type=NotificationType.you_are_fired,
+                           to=worker_profile)
+        notif_service.send(instance=worker_profile, notif_type=NotificationType.you_fired,
+                           to=worker_profile.washer_profile)
+
         worker_profile.store = None
         worker_profile.washer_profile = None
         worker_profile.save()
-        # NOTIFICATION
+
         return worker_profile
 
     def move_worker(self, worker_profile, store):
@@ -151,8 +163,16 @@ class WorkerProfileService:
         if worker_profile.washer_profile and not store.washer_profile == worker_profile.washer_profile:
             raise StoreDoesNotBelongToWasherException(params=(worker_profile, store.washer_profile))
         worker_profile.store = store
+        worker_profile.washer_profile = store.washer_profile
         worker_profile.save()
-        # NOTIFICATION
+
+        notif_service = NotificationService()
+        notif_service.send(instance=worker_profile, notif_type=NotificationType.you_are_fired,
+                           to=worker_profile)
+        notif_service.send(instance=worker_profile, notif_type=NotificationType.you_fired,
+                           to=worker_profile.washer_profile)
+
+
         return worker_profile
 
 

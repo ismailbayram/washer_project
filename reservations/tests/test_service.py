@@ -1,9 +1,9 @@
 import datetime
-import pytz
 from decimal import Decimal
 
-from django.test import TestCase, override_settings
+import pytz
 from django.conf import settings
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from model_mommy import mommy
 
@@ -12,6 +12,7 @@ from baskets.exceptions import BasketEmptyException
 from baskets.service import BasketService
 from cars.enums import CarType
 from cars.service import CarService
+from notifications.enums import NotificationType
 from products.service import ProductService
 from reservations.enums import ReservationStatus
 from reservations.exceptions import (ReservationAlreadyCommented,
@@ -200,6 +201,13 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         basket = self.basket_service.get_or_create_basket(self.customer_profile)
         self.basket_service.add_basket_item(basket, self.product1)
         reservation = self.service.reserve(reservation, self.customer_profile)
+
+        # START notif test
+        self.assertEqual(self.store.washer_profile.notifications.count(), 1)
+        self.assertEqual(self.store.washer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_reserved)
+        # END notif test
+
         self.assertEqual(reservation.status, ReservationStatus.reserved)
         self.assertEqual(reservation.total_amount, Decimal('20.00'))
 
@@ -223,6 +231,13 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         reservation.status = ReservationStatus.reserved
         reservation.save()
         self.service.start(reservation)
+
+        # START notif test
+        self.assertEqual(self.store.washer_profile.notifications.count(), 1)
+        self.assertEqual(self.store.washer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_started)
+        # END notif test
+
         self.assertEqual(reservation.status, ReservationStatus.started)
 
         with self.assertRaises(ReservationStartedException):
@@ -238,6 +253,13 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         reservation.status = ReservationStatus.started
         reservation.save()
         self.service.complete(reservation)
+
+        # START notif test
+        self.assertEqual(self.store.washer_profile.notifications.count(), 1)
+        self.assertEqual(self.store.washer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_completed)
+        # END notif test
+
         self.assertEqual(reservation.status, ReservationStatus.completed)
 
         with self.assertRaises(ReservationCompletedException):
@@ -251,8 +273,18 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
             self.service.cancel(reservation)
 
         reservation.status = ReservationStatus.reserved
+        reservation.customer_profile = self.customer_profile
         reservation.save()
         reservation = self.service.cancel(reservation)
+
+        # START notif test
+        self.assertEqual(self.store.washer_profile.notifications.count(), 1)
+        self.assertEqual(self.store.washer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_canceled)
+        self.assertEqual(self.customer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_canceled)
+        # END notif test
+
         self.assertEqual(reservation.status, ReservationStatus.cancelled)
 
     def test_disable(self):
@@ -261,6 +293,13 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         reservation = self.service.disable(reservation)
         self.assertEqual(reservation.status, ReservationStatus.disabled)
 
+        # START notif test
+        self.assertEqual(self.store.washer_profile.notifications.count(), 1)
+        self.assertEqual(self.store.washer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_disabled)
+        # END notif test
+
+
         with self.assertRaises(ReservationNotAvailableException):
             self.service.disable(reservation)
 
@@ -268,6 +307,13 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         dt = timezone.now()
         reservation = self.service._create_reservation(self.store, dt, 40)
         reservation = self.service.expire(reservation)
+
+        # START notif test
+        self.assertEqual(self.store.washer_profile.notifications.count(), 1)
+        self.assertEqual(self.store.washer_profile.notifications.last().notification_type,
+                         NotificationType.reservation_expired)
+        # END notif test
+
         self.assertEqual(reservation.status, ReservationStatus.expired)
 
 
