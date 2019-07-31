@@ -217,6 +217,8 @@ class ReservationService(object):
         notif_service = NotificationService()
         notif_service.send(instance=reservation, to=reservation.store,
                            notif_type=NotificationType.reservation_canceled)
+        notif_service.send(instance=reservation, to=reservation.customer_profile,
+                           notif_type=NotificationType.reservation_canceled)
         return reservation
 
     def disable(self, reservation):
