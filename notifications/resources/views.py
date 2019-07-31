@@ -1,17 +1,29 @@
 from django.contrib.contenttypes.models import ContentType
-from rest_framework import viewsets
 from rest_framework.exceptions import NotFound
+from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
 
 from notifications.models import Notification
 from notifications.resources.serializers import NotificationSerializer
+from notifications.service import NotificationService
 from users.enums import GroupType
 
 
-class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
+class NotificationViewSet(ListModelMixin, GenericViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = (IsAuthenticated, )
+    service = NotificationService()
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(self, request, *args, **kwargs)
+
+        queryset = self.filter_queryset().filter(read=False)
+        self.service.set_read_notifications(queryset)
+
+        return response
+
 
     def filter_queryset(self, *args, **kwargs):
         queryset = self.queryset

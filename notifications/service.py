@@ -94,4 +94,4 @@ class NotificationService:
         """
         :param notification: QuerySet<Notification>
         """
-        notifications.update(is_readed=True)
+        notifications.update(read=True)

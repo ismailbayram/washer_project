@@ -39,7 +39,7 @@ class NotificationType(Enum):
         try:
             return view_map[self.value]
         except KeyError:
-            raise NotImplementedError()
+            return None
 
 
     def get_sentence(self, data):
@@ -68,4 +68,4 @@ class NotificationType(Enum):
         try:
             return sentenct_map[self.value]
         except KeyError:
-            raise NotImplementedError()
+            return None
