@@ -329,6 +329,7 @@ class StoreReservationViewSetTest(TestCase, BaseTestViewMixin):
         response = self.client.post(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
 
+        self.reservation2.customer_profile = self.customer_profile
         self.reservation2.status = ReservationStatus.reserved
         self.reservation2.save()
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
