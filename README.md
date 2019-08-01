@@ -29,3 +29,7 @@ ES_STORE_INDEX = 'test_stores'
 ES_RESERVATION_INDEX = 'test_reservations'
 ```
 - `./manage.py test --settings=washer_project.settings_test`
+### Development
+- Run elasticsearch and redis.
+- Celery Worker: `celery -A washer_project worker -l info --concurrency 8` (Async tasks)
+- Celery Beat: `celery -A washer_project beat -l info` (Periodic tasks)
