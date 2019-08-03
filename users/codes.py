@@ -1,19 +1,19 @@
 from django.utils.translation import ugettext_lazy as _
 
-users_100_0 = {"code": "users_100_0", "message": _("Kullanıcı bulunamadı.")}
-users_100_1 = {"code": "users_100_1", "message": _("Kullanıcı grubu uygun değil.")}
+users_100_0 = {"code": "users_100_0", "message": _("User not found.")}
+users_100_1 = {"code": "users_100_1", "message": _("User group is not available.")}
 
 workers_100_0 = {"code": "workers_100_0",
-                 "message": _("Sizin çalışanınız değil.")}
+                 "message": _("He/She is not your worker.")}
 
 auth_100_0 = {"code": "auth_100_0",
-                 "message": _("Sms kodu oluşturulmamış.")}
+                 "message": _("SMS code could not generated.")}
 
 auth_100_1 = {"code": "auth_100_1",
-                 "message": _("Sms kodunun süresi geçmiş.")}
+                 "message": _("SMS code is expired.")}
 
 auth_100_2 = {"code": "auth_100_2",
-                 "message": _("Sms kodu hatalı.")}
+                 "message": _("SMS code is invalid.")}
 
 auth_100_3 = {"code": "auth_100_3",
-                 "message": _("Çalışanın bir yıkamacısı yok.")}
+                 "message": _("You are not working for any store.")}
