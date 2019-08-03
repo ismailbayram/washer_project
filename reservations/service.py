@@ -125,7 +125,7 @@ class ReservationService(object):
         if dt < now:
             raise ReservationExpiredException
 
-        occupy_timeout = 5
+        occupy_timeout = 60 * 4
         prevent_occupying_reservation.apply_async((reservation.pk, ), countdown=occupy_timeout)
         reservation.status = ReservationStatus.occupied
         reservation.customer_profile = customer_profile
