@@ -12,7 +12,7 @@ from products.resources.views import ProductListViewSet, ProductViewSet
 from reservations.resources.views import (CommentListViewSet,
                                           CustomerReservationViewSet,
                                           StoreReservationViewSet)
-from stores.resources.views import StoreViewSet
+from stores.resources.views import StoreViewSet, StoreDetailView
 from users.resources.views import (AuthView, SmsVerify, UserViewSet,
                                    WorkerProfileViewSet)
 from search.resources.views import (ReservationSearchView,
@@ -60,8 +60,9 @@ app_name = 'api'
 urlpatterns = [
     path('reservation_search/', ReservationSearchView.as_view(), name='reservation_search'),  # for everyone
     path('store_search/', StoreSearchView.as_view(), name='store_search'),  # for everyone
-    path('', include((router.urls, 'api'), namespace='router')),
+    path('store/<int:pk>', StoreDetailView.as_view(), name='store_detail'),  # for everyone
     path('basket/', basket_view, name='basket'),
+    path('', include((router.urls, 'api'), namespace='router')),
     path('auth/', AuthView.as_view(), name="auth"),
     path('sms_verify/', SmsVerify.as_view(), name="sms_verify"),
     path('docs/', schema_view),

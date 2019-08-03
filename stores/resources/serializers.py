@@ -144,7 +144,7 @@ class StoreSerializer(serializers.ModelSerializer):
         model = Store
         fields = ('pk', 'name', 'washer_profile', 'phone_number', 'latitude', 'longitude',
                   'tax_office', 'tax_number', 'address', 'rating', 'config', 'is_active',
-                  'is_approved', 'logo', 'payment_options')
+                  'is_approved', 'payment_options')
         extra_kwargs = {
             'rating': {'read_only': True},
             'is_active': {'read_only': True},
@@ -157,4 +157,4 @@ class StoreDetailedSerializer(StoreSerializer):
 
     class Meta(StoreSerializer.Meta):
         fields = StoreSerializer.Meta.fields + ('created_date', 'modified_date',
-                                                'images')
+                                                'images', 'logo', )

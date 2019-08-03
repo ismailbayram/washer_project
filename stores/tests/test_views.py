@@ -11,7 +11,7 @@ from base.test import BaseTestViewMixin
 from stores.models import Store
 
 
-class StoreViewSetTestView(TestCase, BaseTestViewMixin):
+class StoreViewSetTest(TestCase, BaseTestViewMixin):
     def setUp(self):
         super().setUp()
         self.init_users()
@@ -341,3 +341,27 @@ class StoreViewSetTestView(TestCase, BaseTestViewMixin):
         delete_url = reverse_lazy('api:router:my_stores-delete-image', args=[self.store.pk, image_pk])
         response = self.client.delete(delete_url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+
+class StoreDetailViewTest(TestCase, BaseTestViewMixin):
+    def setUp(self):
+        super().setUp()
+        self.init_users()
+        self.address = mommy.make('address.Address')
+        self.address2 = mommy.make('address.Address')
+        self.store = mommy.make('stores.Store', washer_profile=self.washer_profile,
+                                is_approved=False, is_active=False, address=self.address,
+                                latitude=35, longitude=34)
+        self.store2 = mommy.make('stores.Store', washer_profile=self.washer2_profile,
+                                 is_approved=True, address=self.address2,
+                                latitude=35, longitude=34)
+
+    def test_detail(self):
+        url = reverse_lazy('api:store_detail', args=[self.store.pk])
+
+        response = self.client.get(url, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        url = reverse_lazy('api:store_detail', args=[self.store2.pk])
+        response = self.client.get(url, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

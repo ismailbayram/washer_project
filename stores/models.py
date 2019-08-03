@@ -22,7 +22,6 @@ class Store(StarterModel):
     rating = models.FloatField(default=0)
     logo = models.ImageField(null=True)
 
-
     objects = StoreManager()
 
     def __str__(self):

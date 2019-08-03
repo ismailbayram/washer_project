@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, status, viewsets, views
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
 
 from address.resources.serializers import AddressSerializer
 from address.service import AddressService
@@ -134,3 +135,10 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
             service = StoreService()
             service.delete_logo(self.get_object())
             return Response({}, status=status.HTTP_202_ACCEPTED)
+
+
+class StoreDetailView(views.APIView):
+    def get(self, request, pk, *args, **kwargs):
+        store = get_object_or_404(Store, is_approved=True, is_active=True, pk=pk)
+        serializer = StoreDetailedSerializer(instance=store)
+        return Response(serializer.data, status=status.HTTP_200_OK)
