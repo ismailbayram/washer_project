@@ -125,7 +125,7 @@ class ReservationService(object):
         if dt < now:
             raise ReservationExpiredException
 
-        occupy_timeout = 60 * 4
+        occupy_timeout = 5
         prevent_occupying_reservation.apply_async((reservation.pk, ), countdown=occupy_timeout)
         reservation.status = ReservationStatus.occupied
         reservation.customer_profile = customer_profile
@@ -141,7 +141,8 @@ class ReservationService(object):
         """
         if reservation.status > ReservationStatus.occupied:
             raise ReservationNotAvailableException
-        if not customer_profile == reservation.customer_profile:
+        if reservation.customer_profile is not None and \
+                not customer_profile == reservation.customer_profile:
             raise ReservationOccupiedBySomeoneException
 
         basket_service = BasketService()
