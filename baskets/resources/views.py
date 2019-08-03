@@ -60,4 +60,4 @@ class CampaignViewSet(viewsets.ReadOnlyModelViewSet):
         customer_profile = request.user.customer_profile
         res_count = customer_profile.reservation_set.filter(status=ReservationStatus.completed).count() % 9
         if campaign.promotion_type == PromotionType.one_free_in_nine:
-            return Response({'remaining': res_count})
+            return Response({'completed': res_count})

@@ -184,6 +184,8 @@ class ReservationService(object):
         notif_service = NotificationService()
         notif_service.send(instance=reservation, to=reservation.store,
                            notif_type=NotificationType.reservation_started,)
+        notif_service.send(instance=reservation, to=reservation.customer_profile,
+                           notif_type=NotificationType.reservation_started)
 
         return reservation
 
@@ -201,6 +203,8 @@ class ReservationService(object):
 
         notif_service = NotificationService()
         notif_service.send(instance=reservation, to=reservation.store,
+                           notif_type=NotificationType.reservation_completed)
+        notif_service.send(instance=reservation, to=reservation.customer_profile,
                            notif_type=NotificationType.reservation_completed)
 
         return reservation

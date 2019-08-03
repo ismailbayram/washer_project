@@ -13,7 +13,7 @@ class NotificationType(Enum):
     reservation_expired = "reservation_expired" # [to store]
     reservation_reserved = "reservation_reserved" # [to store]
 
-    reservation_started = "reservation_reserved" # [to store]
+    reservation_started = "reservation_started" # [to store]
     reservation_completed = "reservation_completed" # [to store]
     reservation_canceled = "reservation_canceled" # [to store]
 
