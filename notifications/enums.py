@@ -49,7 +49,7 @@ class NotificationType(Enum):
         }
         data = {**tmp_data, **data}
 
-        sentenct_map = {
+        sentence_map = {
             'you_are_moved_another_store': _('Your store is changed to {store_name}.'.format(**data)),
             'you_moved_worker_to_store':   _('You moved your {worker_name}orker to ({store_name}).'.format(**data)),
             'you_fired':                   _('You fired ({worker_name}).'.format(**data)),
@@ -60,12 +60,12 @@ class NotificationType(Enum):
             'reservation_expired':         _('Reservation expired'),
             'reservation_reserved':        _('Reservation reserved.'),
             'reservation_started':         _('Reservation started.'),
-            'reservation_completed':       _('Reservation complated.'),
-            'reservation_canceled':        _('Reservation canceled.'),
+            'reservation_completed':       _('Reservation completed.'),
+            'reservation_canceled':        _('Reservation cancelled.'),
             'store_approved':              _('Store Approved.')
         }
 
         try:
-            return sentenct_map[self.value]
+            return sentence_map[self.value]
         except KeyError:
             return None
