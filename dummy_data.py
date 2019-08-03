@@ -170,6 +170,6 @@ for number in range(2000):
     print("{}/2000 washer completed".format(number + 1))
 
 print("indexing stores...")
-from search.service import StoreIndexService
-service = StoreIndexService()
+from search.indexer import StoreIndexer
+service = StoreIndexer()
 service.index_stores()
