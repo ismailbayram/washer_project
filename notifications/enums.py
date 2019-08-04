@@ -15,7 +15,7 @@ class NotificationType(Enum):
 
     reservation_started = "reservation_started" # [to store]
     reservation_completed = "reservation_completed" # [to store]
-    reservation_canceled = "reservation_canceled" # [to store]
+    reservation_cancelled = "reservation_cancelled" # [to store]
 
     store_approved = "store_approved" # [to washer]
 
@@ -32,7 +32,7 @@ class NotificationType(Enum):
             'reservation_reserved': 'reservation',
             'reservation_started': 'reservation',
             'reservation_completed': 'reservation',
-            'reservation_canceled': 'reservation',
+            'reservation_cancelled': 'reservation',
             'store_approved': 'store',
         }
 
@@ -61,7 +61,7 @@ class NotificationType(Enum):
             'reservation_reserved':        _('Reservation reserved.'),
             'reservation_started':         _('Reservation process started.'),
             'reservation_completed':       _('Reservation process completed.'),
-            'reservation_canceled':        _('Reservation cancelled by washer.'),
+            'reservation_cancelled':        _('Reservation cancelled by washer.'),
             'store_approved':              _('Your store has been approved.')
         }
 
