@@ -141,7 +141,8 @@ class ReservationService(object):
         """
         if reservation.status > ReservationStatus.occupied:
             raise ReservationNotAvailableException
-        if not customer_profile == reservation.customer_profile:
+        if reservation.customer_profile is not None and \
+                not customer_profile == reservation.customer_profile:
             raise ReservationOccupiedBySomeoneException
 
         basket_service = BasketService()

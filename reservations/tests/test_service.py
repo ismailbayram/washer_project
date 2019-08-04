@@ -182,7 +182,7 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         dt = timezone.now() + datetime.timedelta(minutes=40)
         reservation = self.service._create_reservation(self.store, dt, 40)
 
-        with self.assertRaises(ReservationOccupiedBySomeoneException):
+        with self.assertRaises(BasketEmptyException):
             self.service.reserve(reservation, self.customer_profile)
 
         reservation.status = ReservationStatus.completed
