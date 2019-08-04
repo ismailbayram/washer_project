@@ -17,3 +17,6 @@ auth_100_2 = {"code": "auth_100_2",
 
 auth_100_3 = {"code": "auth_100_3",
                  "message": _("You are not working for any store.")}
+
+auth_100_4 = {"code": "auth_100_4",
+              "message": _("There is a user with the phone number you provided")}
