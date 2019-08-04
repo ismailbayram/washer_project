@@ -19,7 +19,7 @@ class WorkerProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     first_name = serializers.CharField(write_only=True)
     last_name = serializers.CharField(write_only=True)
-    phone_number = serializers.CharField(write_only=True)
+    phone_number = serializers.CharField(write_only=True, validators=[is_valid_phone])
 
     class Meta:
         model = WorkerProfile

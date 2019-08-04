@@ -26,7 +26,7 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         self.worker2_profile.save()
         self.worker3, _ = self.user_service.get_or_create_user(first_name='Ahmet',
                                                                last_name='Cetin',
-                                                               phone_number='555226')
+                                                               phone_number='+905388197551')
         self.worker3_profile = self.worker3.worker_profile
 
     def test_list(self):
@@ -86,7 +86,7 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         data = {
             "first_name": "Ahmet",
             "last_name": "Cetin",
-            "phone_number": "555224",
+            "phone_number": "+905388197550",
             "store": self.store.pk
         }
 
@@ -123,6 +123,35 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
         response = self.client.post(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+    def test_create_phone_valid_test(self):
+        url = reverse_lazy("api:router:workers-list")
+        phones = {
+            "+905388197550": False,
+            "+905388197555": True,
+            "+908388197555": True,
+            "+903881975009": True,
+            "+95388197550": False,
+            "+90538819755": False,
+            "+953881975500": False,
+            "+9O3881975500": False,
+        }
+
+        data = {
+            "first_name": "Ahmet",
+            "last_name": "Cetin",
+            "phone_number": "+905388197550",
+            "store": self.store.pk
+        }
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+
+        for phone, expected_response in phones.items():
+            data["phone_number"] = phone
+            response = self.client.post(url, data=data, content_type='application/json', **headers)
+            if expected_response:
+                self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            else:
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_fire(self):
         url = reverse_lazy('api:router:workers-fire', args=[self.worker_profile.pk])
