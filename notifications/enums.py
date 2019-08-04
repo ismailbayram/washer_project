@@ -50,19 +50,19 @@ class NotificationType(Enum):
         data = {**tmp_data, **data}
 
         sentence_map = {
-            'you_are_moved_another_store': _('Your store is changed to {store_name}.'.format(**data)),
+            'you_are_moved_another_store': _('You have been moved to another store: {store_name}.'.format(**data)),
             'you_moved_worker_to_store':   _('You moved your {worker_name}orker to ({store_name}).'.format(**data)),
             'you_fired':                   _('You fired ({worker_name}).'.format(**data)),
             'you_are_fired':               _('You are fired.'),
-            'you_has_new_worker':          _('You has a new worker. Wellcome {worker_name}.'.format(**data)),
+            'you_has_new_worker':          _('You have a new worker. Welcome to {worker_name}.'.format(**data)),
             'weekly_reservations_created': _('Your weekly reservations has been created.'),
-            'reservation_disabled':        _('Reservation disabled'),
+            'reservation_disabled':        _('Reservation disabled by system.'),
             'reservation_expired':         _('Reservation expired'),
             'reservation_reserved':        _('Reservation reserved.'),
-            'reservation_started':         _('Reservation started.'),
-            'reservation_completed':       _('Reservation completed.'),
-            'reservation_canceled':        _('Reservation cancelled.'),
-            'store_approved':              _('Store Approved.')
+            'reservation_started':         _('Reservation process started.'),
+            'reservation_completed':       _('Reservation process completed.'),
+            'reservation_canceled':        _('Reservation cancelled by washer.'),
+            'store_approved':              _('Your store has been approved.')
         }
 
         try:
