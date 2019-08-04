@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from api.fields import EnumField
+from api.validators import is_valid_phone
 from users.enums import GroupType
 from users.models import User, WorkerProfile
 
@@ -18,7 +19,7 @@ class WorkerProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     first_name = serializers.CharField(write_only=True)
     last_name = serializers.CharField(write_only=True)
-    phone_number = serializers.CharField(write_only=True)
+    phone_number = serializers.CharField(write_only=True, validators=[is_valid_phone])
 
     class Meta:
         model = WorkerProfile
@@ -28,10 +29,11 @@ class WorkerProfileSerializer(serializers.ModelSerializer):
             'store': {'required': True},
         }
 
-
 class AuthFirstStepSerializer(serializers.Serializer):
-    phone_number = serializers.CharField()
+    phone_number = serializers.CharField(validators=[is_valid_phone])
     group_type = EnumField(enum=GroupType)
+
+
 
 
 class AuthSecondStepSerializer(serializers.Serializer):

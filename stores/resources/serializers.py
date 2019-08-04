@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 from address.resources.serializers import AddressDetailedSerializer
 from api.fields import Base64ImageField
+from api.validators import is_valid_phone
 from base.utils import thumbnail_file_name_by_orginal_name
 from stores.models import Store, StoreImageItem
 
@@ -149,6 +150,7 @@ class StoreSerializer(serializers.ModelSerializer):
             'rating': {'read_only': True},
             'is_active': {'read_only': True},
             'is_approved': {'read_only': True},
+            'phone_number': {'validators':[is_valid_phone]},
         }
 
 
