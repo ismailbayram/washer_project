@@ -124,10 +124,10 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         response = self.client.post(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
 
-    def test_create_phone_valid_test(self):
+    def test_create_washer_phone_valid_test(self):
         url = reverse_lazy("api:router:workers-list")
         phones = {
-            "+905388197550": False,
+            "+905388197550": True,
             "+905388197555": True,
             "+908388197555": True,
             "+903881975009": True,

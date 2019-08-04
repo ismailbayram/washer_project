@@ -244,6 +244,7 @@ class SmsService:
 
         try:
             sms_obj = SmsMessage.objects.get(phone_number=phone_number, is_expired=False)
+
         except SmsMessage.DoesNotExist:
             raise SmsCodeIsNotCreatedException
 
