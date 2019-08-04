@@ -50,10 +50,11 @@ class NotificationType(Enum):
         data = {**tmp_data, **data}
 
         sentenct_map = {
-            'you_are_moved_another_store': _('Your store is changed to {store_name}.'.format(**data)),
-            'you_moved_worker_to_store':   _('You moved your {worker_name}orker to ({store_name}).'.format(**data)),
-            'you_fired':                   _('You fired ({worker_name}).'.format(**data)),
-            'you_are_fired':               _('You are fired.'),
+            # TODO: fix here
+            'you_are_moved_another_store': _('You have been moved to {store_name}.'.format(**data)),
+            'you_moved_worker_to_store':   _('You have moved your worker "{worker_name}" to {store_name}.'.format(**data)),
+            'you_fired':                   _('You have fired a worker ({worker_name}).'.format(**data)),
+            'you_are_fired':               _('You have fired.'),
             'you_has_new_worker':          _('You has a new worker. Wellcome {worker_name}.'.format(**data)),
             'weekly_reservations_created': _('Your weekly reservations has been created.'),
             'reservation_disabled':        _('Reservation disabled'),
