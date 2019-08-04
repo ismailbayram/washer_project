@@ -76,8 +76,12 @@ class AuthView(APIView):
         serializer.is_valid(raise_exception=True)
         user_service = UserService()
         sms_service = SmsService()
-        user, _ = user_service.get_or_create_user(**serializer.validated_data)
-        sms_obj = sms_service.get_or_create_sms_code(user.phone_number)
+
+        sms_obj = sms_service.get_or_create_sms_code(
+            phone_number=serializer.validated_data.get('phone_number')
+        )
+
+        user_service.get_or_create_user(**serializer.validated_data)
 
         # TODO send real sms
         return Response({}, status=status.HTTP_200_OK)
@@ -120,35 +124,35 @@ class UserInfoView(APIView):
 
 
 class ChangePhoneNumberRequestView(APIView):
-    """
-    -> :token: (user)
-    -> :param: phone_number
-    """
     permission_classes = (IsAuthenticated, )
     serializer_class = ChangePhoneNumberSerializer
 
     def post(self, request, *args, **kwargs):
+        """
+        -> :token: (user)
+        -> :param: phone_number
+        """
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         sms_service = SmsService()
-        sms_instance = sms_service.get_or_create_sms_code(**serializer.validated_data)
-        # TODO if new_phone and user.phone is equal raise error
-
+        sms_instance = sms_service.get_or_create_sms_code(**serializer.validated_data,
+                                                          user_exist_control=True)
         # TODO send real sms
         return Response({}, status=status.HTTP_200_OK)
 
 
 class ChangePhoneNumberSmsVerifyView(APIView):
-    """
-    -> token
-    -> sms code
-    """
     permission_classes = (IsAuthenticated, )
     service = SmsService()
     serializer_class = ChangePhoneNumberVerifySerializer
 
     def post(self, request, *args, **kwargs):
+        """
+        -> :token: (user)
+        -> :param: phone_number
+        -> :param: sms_code
+        """
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -156,4 +160,4 @@ class ChangePhoneNumberSmsVerifyView(APIView):
         user_service = UserService()
         user, token = user_service.get_or_create_user(phone_number=serializer.validated_data.get('phone_number'))
 
-        return Response({'token':token, 'user': UserSerializer(user).data })
+        return Response({'token':token})

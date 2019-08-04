@@ -377,3 +377,74 @@ class SmsViewsTest(TestCase, BaseTestViewMixin):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
             else:
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class UserInfoTests(TestCase, BaseTestViewMixin):
+    def setUp(self):
+        super().setUp()
+        self.init_users()
+
+    def test_get_user_info(self):
+        url = reverse_lazy("api:user-info")
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.get(url, content_type='application/json', **headers)
+        expected={
+            "first_name": "Customer 1",
+            "last_name": "CusLast",
+            "phone_number": "555111",
+        }
+        for exp_key, exp_val in expected.items():
+            self.assertEqual(exp_val, response.data[exp_key])
+
+    def test_set_user_names(self):
+        url = reverse_lazy("api:user-info")
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        data = {
+            "first_name": "kadir",
+            "last_name": "cetin",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        response = self.client.get(url, content_type='application/json', **headers)
+        expected={
+            "first_name": "kadir",
+            "last_name": "cetin",
+            "phone_number": "555111",
+        }
+        for exp_key, exp_val in expected.items():
+            self.assertEqual(exp_val, response.data[exp_key])
+
+class UserChangePassword(TestCase):
+    def setUp(self):
+        super().setUp()
+        service = UserService()
+        data = {
+            "first_name": "Customer 1",
+            "last_name": "CusLast",
+            "phone_number": "+905382451184",
+            "group_type": GroupType.customer
+        }
+        self.customer, self.customer_token = service.get_or_create_user(**data)
+
+    def test_change_phone(self):
+        url = reverse_lazy("api:set-phone-request")
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        data = {"phone_number": self.customer.phone_number}
+
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+        data = {"phone_number": "+905382451188"}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        url = reverse_lazy("api:set-phone-verify")
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        data = {"phone_number": "+905382451188", "sms_code": "wrong"}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+        data = {"phone_number": "+905382451188", "sms_code": "000000"}
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

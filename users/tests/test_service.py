@@ -1,3 +1,4 @@
+import datetime
 from datetime import timedelta
 
 from django.contrib.auth.models import Group
@@ -10,10 +11,11 @@ from stores.exceptions import StoreDoesNotBelongToWasherException
 from users.enums import GroupType
 from users.exceptions import (SmsCodeIsInvalidException,
                               SmsCodeIsNotCreatedException,
+                              ThereIsUserGivenPhone,
                               UserGroupTypeInvalidException,
                               WorkerDoesNotBelongToWasherException,
                               WorkerHasNoStoreException)
-from users.models import CustomerProfile
+from users.models import CustomerProfile, SmsMessage, User
 from users.service import SmsService, UserService, WorkerProfileService
 
 
@@ -84,6 +86,32 @@ class UserServiceTest(TestCase):
     def test_activate_user(self):
         self.service.activate_user(self.user)
         self.assertEqual(self.user.is_active, True)
+
+    def test_change_user_names(self):
+        data = {
+            "phone_number": "555222",
+            "first_name": "ismail",
+            "last_name": "bayram",
+            "group_type": "washer"
+        }
+        user,_ = self.service.get_or_create_user(**data)
+
+        self.service.change_user_names(
+            user=user,
+            first_name="kadir",
+            last_name="cetin",
+        )
+        user.refresh_from_db()
+        self.assertEqual(user.first_name, "kadir")
+        self.assertEqual(user.last_name, "cetin")
+        self.service.change_user_names(
+            user=user,
+            first_name="kadir 2",
+            last_name="cetin 2",
+        )
+        user.refresh_from_db()
+        self.assertEqual(user.first_name, "kadir 2")
+        self.assertEqual(user.last_name, "cetin 2")
 
 
 class WorkerProfileServiceTest(TestCase):
@@ -190,7 +218,6 @@ class WorkerProfileServiceTest(TestCase):
         self.assertEqual(self.washer_profile.notifications.count(), 2)
 
 
-
 class SmsServiceTest(TestCase):
     def setUp(self):
         self.service = SmsService()
@@ -236,3 +263,19 @@ class SmsServiceTest(TestCase):
 
         with self.assertRaises(WorkerHasNoStoreException):
             self.service.verify_sms(self.worker.phone_number, sms_obj.code)
+
+
+        with self.assertRaises(ThereIsUserGivenPhone):
+            sms_obj = self.service.get_or_create_sms_code(self.worker.phone_number, True)
+
+    def test_verify_sms_when_change_phone(self):
+        user = User.objects.first()
+        now = timezone.now()
+        SmsMessage.objects.create(
+            expire_datetime=now+datetime.timedelta(minutes=5),
+            code="000000",
+            phone_number="+901111111111"
+        )
+        sms_obj = self.service.verify_sms_when_change_phone("+901111111111", "000000", user)
+
+        self.assertEqual(user.phone_number, "+901111111111")

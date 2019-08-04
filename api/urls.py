@@ -67,6 +67,6 @@ urlpatterns = [
     path('sms_verify/', SmsVerify.as_view(), name="sms_verify"),
     path('docs/', schema_view),
     path('user-info/', UserInfoView.as_view(), name="user-info"),
-    path('user-info/change-phone-number/', ChangePhoneNumberRequestView.as_view(), name="set-user-name"),
-    path('user-info/verify-phone-number/', ChangePhoneNumberSmsVerifyView.as_view(), name="set-user-name"),
+    path('user-info/change-phone-number/', ChangePhoneNumberRequestView.as_view(), name="set-phone-request"),
+    path('user-info/verify-phone-number/', ChangePhoneNumberSmsVerifyView.as_view(), name="set-phone-verify"),
 ]

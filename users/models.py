@@ -80,4 +80,4 @@ class SmsMessage(StarterModel):
     is_expired = models.BooleanField(default=False)
     expire_datetime = models.DateTimeField()
     code = models.CharField(max_length=6)
-    phone_number = models.CharField(max_length=255)  # it needs when user wants to change phone number
+    phone_number = models.CharField(max_length=255)

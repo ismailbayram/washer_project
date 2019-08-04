@@ -199,13 +199,15 @@ class SmsService:
         return sms_obj
 
     @atomic
-    def get_or_create_sms_code(self, phone_number):
+    def get_or_create_sms_code(self, phone_number, user_exist_control=False):
         """
         :param user: User
         :return: SmsMessage
         """
-        now = timezone.now()
+        if user_exist_control and User.objects.filter(phone_number=phone_number).exists():
+            raise ThereIsUserGivenPhone
 
+        now = timezone.now()
         create_new_obj = False
 
         try:
@@ -244,7 +246,6 @@ class SmsService:
 
         try:
             sms_obj = SmsMessage.objects.get(phone_number=phone_number, is_expired=False)
-
         except SmsMessage.DoesNotExist:
             raise SmsCodeIsNotCreatedException
 
@@ -262,7 +263,7 @@ class SmsService:
     @atomic
     def verify_sms(self, phone_number, sms_code, *args, **kwargs):
         """
-        :param user: User
+        :param phone_number: String
         :param sms_code: String
         """
 
@@ -283,16 +284,14 @@ class SmsService:
     @atomic
     def verify_sms_when_change_phone(self, phone_number, sms_code, user):
         """
-        :param user: User
+        :param phone_number: String
         :param sms_code: String
+        :param user: User
         """
         sms_obj = self._verify_controls(phone_number, sms_code)
 
-        try:
-            user.phone_number = phone_number
-            user.save()
-        except IntegrityError:
-            raise ThereIsUserGivenPhone
+        user.phone_number = phone_number
+        user.save()
 
         sms_obj.is_expired = True
         sms_obj.save(update_fields=['is_expired'])
