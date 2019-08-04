@@ -17,12 +17,8 @@ class CarViewSet(viewsets.ModelViewSet):
         'create': [GroupType.customer],
         'update': [GroupType.customer],
         'list': [GroupType.customer],
-        'partial_update': [GroupType.customer],
-        'deactivate': [GroupType.customer],
-        'activate': [GroupType.customer],
         'retrieve': [GroupType.customer],
-        'approve': [GroupType.customer],
-        'decline': [GroupType.customer],
+        'select': [GroupType.customer],
     }
 
     def list(self, request, *args, **kwargs):
@@ -48,7 +44,7 @@ class CarViewSet(viewsets.ModelViewSet):
         service = CarService()
         service.deactivate_car(instance)
 
-    @decorators.action(detail=True, methods=['GET'])
+    @decorators.action(detail=True, methods=['POST'])
     def select(self, request, *args, **kwargs):
         car = self.get_object()
         service = CarService()

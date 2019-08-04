@@ -75,7 +75,6 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         # response = self.client.post(url, data=data, content_type='application/json', **headers)
         # self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
 
-
     def test_retrieve_action(self):
         url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
 
@@ -94,7 +93,6 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
         response = self.client.get(url, **headers)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
 
     def test_update_action(self):
         url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
@@ -154,71 +152,22 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         response = self.client.get(url, **headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-
-class CarSelectViewSetTest(BaseTestViewMixin, TestCase):
-    def setUp(self):
-        self.init_users()
-        self.car1 = mommy.make(
-            'cars.Car',
-            licence_plate="09 TK 00",
-            car_type = CarType.normal,
-            customer_profile = self.customer.customer_profile
-        )
-        self.car2 = mommy.make(
-            'cars.Car',
-            licence_plate="09 TK 01",
-            car_type = CarType.normal,
-            customer_profile = self.customer.customer_profile
-        )
-        self.car3 = mommy.make(
-            'cars.Car',
-            licence_plate="09 TK 02",
-            car_type = CarType.normal,
-            customer_profile = self.customer.customer_profile
-        )
-        self.car4 = mommy.make(
-            'cars.Car',
-            licence_plate="09 TK 03",
-            car_type = CarType.normal,
-            customer_profile = self.customer.customer_profile
-        )
-
     def test_select_action(self):
-        # selected of 1 an 2 will false
-        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
-
-        url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
-        response = self.client.get(url, **headers)
-        self.assertEqual(response.data['is_selected'], False)
-
-        url = reverse_lazy('api:router:cars-detail', args=[self.car2.pk])
-        response = self.client.get(url, **headers)
-        self.assertEqual(response.data['is_selected'], False)
-
-        # i will select 1 and will selected
         url = reverse_lazy('api:router:cars-select', args=[self.car1.pk])
-        response = self.client.get(str(url), **headers)
-        self.assertEqual(response.data['is_selected'], True)
 
-        url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
-        response = self.client.get(url, **headers)
-        self.assertEqual(response.data['is_selected'], True)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        # 2 have to be un selected
-        url = reverse_lazy('api:router:cars-detail', args=[self.car2.pk])
-        response = self.client.get(url, **headers)
-        self.assertEqual(response.data['is_selected'], False)
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.post(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        jresponse = json.loads(response.content)
+        self.assertEqual(jresponse['is_selected'], True)
 
-        # i will select 2 and will selected
-        url = reverse_lazy('api:router:cars-select', args=[self.car2.pk])
-        response = self.client.get(str(url), **headers)
-        self.assertEqual(response.data['is_selected'], True)
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.post(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        url = reverse_lazy('api:router:cars-detail', args=[self.car2.pk])
-        response = self.client.get(url, **headers)
-        self.assertEqual(response.data['is_selected'], True)
-
-        # 1 have to be un selected
-        url = reverse_lazy('api:router:cars-detail', args=[self.car1.pk])
-        response = self.client.get(url, **headers)
-        self.assertEqual(response.data['is_selected'], False)
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        response = self.client.post(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
