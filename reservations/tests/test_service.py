@@ -229,6 +229,7 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
             self.service.start(reservation)
 
         reservation.status = ReservationStatus.reserved
+        reservation.customer_profile = self.customer_profile
         reservation.save()
         self.service.start(reservation)
 
@@ -251,6 +252,7 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
             self.service.complete(reservation)
 
         reservation.status = ReservationStatus.started
+        reservation.customer_profile = self.customer_profile
         reservation.save()
         self.service.complete(reservation)
 
@@ -280,9 +282,9 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         # START notif test
         self.assertEqual(self.store.washer_profile.notifications.count(), 1)
         self.assertEqual(self.store.washer_profile.notifications.last().notification_type,
-                         NotificationType.reservation_canceled)
+                         NotificationType.reservation_cancelled)
         self.assertEqual(self.customer_profile.notifications.last().notification_type,
-                         NotificationType.reservation_canceled)
+                         NotificationType.reservation_cancelled)
         # END notif test
 
         self.assertEqual(reservation.status, ReservationStatus.cancelled)

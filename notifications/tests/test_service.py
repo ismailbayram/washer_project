@@ -73,14 +73,14 @@ class NotificationTest(BaseTestViewMixin, TestCase):
 
 
         self.service.send(instance=self.worker_profile,
-                                notif_type=NotificationType.reservation_canceled,
+                                notif_type=NotificationType.reservation_cancelled,
                                 to=self.store)
         self.assertEqual(self.washer_profile.notifications.count(), 2)
         self.assertEqual(self.washer_profile.notifications.first().notification_type,
-                         NotificationType.reservation_canceled)
+                         NotificationType.reservation_cancelled)
         self.assertEqual(self.worker_profile.notifications.count(), 1)
         self.assertEqual(self.worker_profile.notifications.first().notification_type,
-                         NotificationType.reservation_canceled)
+                         NotificationType.reservation_cancelled)
 
         self.service.send(instance=self.worker_profile,
                                 notif_type=NotificationType.reservation_started,

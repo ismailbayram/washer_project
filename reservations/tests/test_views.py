@@ -357,6 +357,7 @@ class StoreReservationViewSetTest(TestCase, BaseTestViewMixin):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.reservation2.status = ReservationStatus.reserved
+        self.reservation2.customer_profile = self.customer_profile
         self.reservation2.save()
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
         response = self.client.post(url, content_type='application/json', **headers)
@@ -383,6 +384,7 @@ class StoreReservationViewSetTest(TestCase, BaseTestViewMixin):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         self.reservation2.status = ReservationStatus.started
+        self.reservation2.customer_profile = self.customer_profile
         self.reservation2.save()
         headers = {'HTTP_AUTHORIZATION': f'Token {self.washer2_token}'}
         response = self.client.post(url, content_type='application/json', **headers)

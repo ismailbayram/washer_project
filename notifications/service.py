@@ -71,7 +71,7 @@ class NotificationService:
                 NotificationType.reservation_reserved,
                 NotificationType.reservation_started,
                 NotificationType.reservation_completed,
-                NotificationType.reservation_canceled,
+                NotificationType.reservation_cancelled,
         ]:
             data = {
                 "store_id": instance.id,
