@@ -13,9 +13,9 @@ class NotificationType(Enum):
     reservation_expired = "reservation_expired" # [to store]
     reservation_reserved = "reservation_reserved" # [to store]
 
-    reservation_started = "reservation_reserved" # [to store]
+    reservation_started = "reservation_started" # [to store]
     reservation_completed = "reservation_completed" # [to store]
-    reservation_canceled = "reservation_canceled" # [to store]
+    reservation_cancelled = "reservation_cancelled" # [to store]
 
     store_approved = "store_approved" # [to washer]
 
@@ -32,7 +32,7 @@ class NotificationType(Enum):
             'reservation_reserved': 'reservation',
             'reservation_started': 'reservation',
             'reservation_completed': 'reservation',
-            'reservation_canceled': 'reservation',
+            'reservation_cancelled': 'reservation',
             'store_approved': 'store',
         }
 
@@ -49,24 +49,23 @@ class NotificationType(Enum):
         }
         data = {**tmp_data, **data}
 
-        sentenct_map = {
-            # TODO: fix here
-            'you_are_moved_another_store': _('You have been moved to {store_name}.'.format(**data)),
-            'you_moved_worker_to_store':   _('You have moved your worker "{worker_name}" to {store_name}.'.format(**data)),
-            'you_fired':                   _('You have fired a worker ({worker_name}).'.format(**data)),
-            'you_are_fired':               _('You have fired.'),
-            'you_has_new_worker':          _('You has a new worker. Wellcome {worker_name}.'.format(**data)),
+        sentence_map = {
+            'you_are_moved_another_store': _('You have been moved to another store: {store_name}.'.format(**data)),
+            'you_moved_worker_to_store':   _('You moved your {worker_name}orker to ({store_name}).'.format(**data)),
+            'you_fired':                   _('You fired ({worker_name}).'.format(**data)),
+            'you_are_fired':               _('You are fired.'),
+            'you_has_new_worker':          _('You have a new worker. Welcome to {worker_name}.'.format(**data)),
             'weekly_reservations_created': _('Your weekly reservations has been created.'),
-            'reservation_disabled':        _('Reservation disabled'),
+            'reservation_disabled':        _('Reservation disabled by system.'),
             'reservation_expired':         _('Reservation expired'),
             'reservation_reserved':        _('Reservation reserved.'),
-            'reservation_started':         _('Reservation started.'),
-            'reservation_completed':       _('Reservation complated.'),
-            'reservation_canceled':        _('Reservation canceled.'),
-            'store_approved':              _('Store Approved.')
+            'reservation_started':         _('Reservation process started.'),
+            'reservation_completed':       _('Reservation process completed.'),
+            'reservation_cancelled':        _('Reservation cancelled by washer.'),
+            'store_approved':              _('Your store has been approved.')
         }
 
         try:
-            return sentenct_map[self.value]
+            return sentence_map[self.value]
         except KeyError:
             return None
