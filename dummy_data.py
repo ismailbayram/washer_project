@@ -30,6 +30,8 @@ for id, towns in townships.items():
 """********************************************************************"""
 """******************** USER MIGRATION *****************************"""
 """********************************************************************"""
+STORE_NAMES = ["Kardeşler OtoYıkama", "İsmail otoyıkama", "Turan Otoyıkama", "Ceylan Oto yıkama",
+               "Kadircan Otoyıkama", "Güleç Yıkama", "Çelik Otoyıkama", "Ahmet Yıkama"]
 from users.service import UserService
 from users.enums import GroupType
 from address.service import AddressService
@@ -38,7 +40,7 @@ from cars.service import CarService
 from cars.enums import CarType
 
 
-for number in range(1000):
+for number in range(100):
     service = UserService()
     car_service = CarService()
     data = {
@@ -72,13 +74,13 @@ for number in range(2000):
 
     for number2 in range(randint(1, 3)):
         store_data = {
-            "name": "Washer {} Store {}".format(number, number2),
+            "name": STORE_NAMES[randint(0, 7)],
             "washer_profile": user.washer_profile,
             "phone_number": data["phone_number"],
             "tax_office": "Tax Washer {} Store {}".format(number, number2),
             "tax_number": randint(1000, 9999),
-            "latitude": randint(36, 45),
-            "longitude": randint(26, 42),
+            "latitude": randint(36, 42),
+            "longitude": randint(26, 45),
         }
         config_data = {
             "opening_hours": {
