@@ -1,9 +1,9 @@
-from model_mommy import mommy
 from django.test import TestCase
+from model_mommy import mommy
 
+from address.exceptions import CityNotValidException, TownshipNotValidException
 from address.models import Address
 from address.service import AddressService
-from address.exceptions import TownshipNotValidException, CityNotValidException
 
 
 class BaseLocationTestCase(TestCase):

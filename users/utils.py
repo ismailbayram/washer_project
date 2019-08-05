@@ -13,11 +13,6 @@ def jwt_payload_handler(user):
         'first_name': user.first_name,
         'last_name': user.last_name,
         'full_name': user.get_full_name(),
-        'is_superuser': user.is_superuser,
-        'is_customer': user.is_customer,
-        'is_washer': user.is_washer,
-        'is_worker': user.is_worker,
-        'is_active': user.is_active,
         'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA
     }
 
