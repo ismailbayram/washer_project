@@ -32,9 +32,17 @@ class StoreSearchService:
             query = query.filter('match', credit_card=data['credit_card'])
         if 'cash' in data:
             query = query.filter('match', cash=data['cash'])
-        if 'location' in data:
-            query = query.filter('geo_distance', distance=f'{data["distance"]}{serializer.distance_metric}',
-                                 location=data['location'])
+        if 'top_left_lat' in data:
+            query = query.filter('geo_bounding_box', location={
+                'top_left': {
+                    'lat': data['top_left_lat'],
+                    'lon': data['top_left_lon']
+                },
+                'bottom_right': {
+                    'lat': data['bottom_right_lat'],
+                    'lon': data['bottom_right_lon']
+                },
+            })
         if 'search_text' in data:
             query = query.query("match", search_text=data['search_text'])
 

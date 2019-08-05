@@ -50,9 +50,10 @@ class StoreFilterSerializer(serializers.Serializer):
     pk = serializers.IntegerField(required=False)
     search_text = serializers.CharField(required=False)
     distance = serializers.IntegerField(required=False)
-    lat = serializers.FloatField(required=False)
-    lon = serializers.FloatField(required=False)
-    location = serializers.ListField(read_only=True)
+    top_left_lat = serializers.FloatField(required=False)
+    top_left_lon = serializers.FloatField(required=False)
+    bottom_right_lat = serializers.FloatField(required=False)
+    bottom_right_lon = serializers.FloatField(required=False)
     city = serializers.IntegerField(required=False)
     township = serializers.IntegerField(required=False)
     rating__gte = serializers.FloatField(required=False)
@@ -61,10 +62,6 @@ class StoreFilterSerializer(serializers.Serializer):
     limit = serializers.IntegerField(default=settings.REST_FRAMEWORK['PAGE_SIZE'])
     page = serializers.IntegerField(default=1)
     sort = serializers.CharField(required=False)
-
-    def __init__(self, *args, **kwargs):
-        self.distance_metric = kwargs.get('distance_metric', 'm')
-        super().__init__(*args, **kwargs)
 
     def validate_page(self, page):
         if page < 1:
@@ -77,16 +74,16 @@ class StoreFilterSerializer(serializers.Serializer):
         return sort
 
     def validate(self, attrs):
-        lat = attrs.get('lat', None)
-        lon = attrs.get('lon', None)
-        distance = attrs.get('distance', None)
+        top_left_lat = attrs.get('top_left_lat', None)
+        top_left_lon = attrs.get('top_left_lon', None)
+        bottom_right_lat = attrs.get('bottom_right_lat', None)
+        bottom_right_lon = attrs.get('bottom_right_lon', None)
 
-        if not (lat and lon and distance):
-            attrs.pop('lat', None)
-            attrs.pop('lon', None)
-            attrs.pop('distance', None)
-        else:
-            attrs['location'] = [lon, lat]
+        if not (top_left_lat and top_left_lon and bottom_right_lat and bottom_right_lon):
+            attrs.pop('top_left_lat', None)
+            attrs.pop('top_left_lon', None)
+            attrs.pop('bottom_right_lat', None)
+            attrs.pop('bottom_right_lon', None)
 
         return attrs
 
