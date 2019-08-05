@@ -414,6 +414,24 @@ class UserInfoTests(TestCase, BaseTestViewMixin):
         for exp_key, exp_val in expected.items():
             self.assertEqual(exp_val, response.data[exp_key])
 
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        data = {
+            "first_name": "k",
+            "last_name": "cetin",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        data = {
+            "first_name": "kad",
+            "last_name": "",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
 class UserChangePassword(TestCase):
     def setUp(self):
         super().setUp()

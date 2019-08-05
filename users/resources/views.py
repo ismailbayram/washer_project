@@ -120,7 +120,9 @@ class UserInfoView(APIView):
         service = self.service()
         service.change_user_names(user=instance, **serializer.validated_data)
 
-        return Response(serializer.validated_data)
+        _, token = UserService().get_or_create_user(phone_number=instance.phone_number)
+
+        return Response({**serializer.validated_data, 'token': token})
 
 
 class ChangePhoneNumberRequestView(APIView):

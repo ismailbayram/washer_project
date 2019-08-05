@@ -47,8 +47,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields = ('pk', 'first_name', 'last_name', 'phone_number', )
         extra_kwargs = {
             'phone_number': {'read_only': True},
-            'last_name': {'required': True},
-            'first_name': {'required': True},
+            'last_name': {'required': True, 'min_length': 3, 'allow_blank': False},
+            'first_name': {'required': True, 'min_length': 3, 'allow_blank': False},
         }
 
 
