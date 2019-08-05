@@ -79,8 +79,8 @@ for number in range(2000):
             "phone_number": data["phone_number"],
             "tax_office": "Tax Washer {} Store {}".format(number, number2),
             "tax_number": randint(1000, 9999),
-            "latitude": randint(36, 42),
-            "longitude": randint(26, 45),
+            "latitude": randint(36, 42) + random(),
+            "longitude": randint(26, 45) + random(),
         }
         config_data = {
             "opening_hours": {
