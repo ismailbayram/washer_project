@@ -42,6 +42,7 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        # FIXME: remove staff control from here, move to admin app
         if self.request.user.is_staff:
             return queryset
         return queryset.filter(washer_profile=self.request.user.washer_profile)
