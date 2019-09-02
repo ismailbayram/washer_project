@@ -11,7 +11,7 @@ from products.resources.views import ProductListViewSet, ProductViewSet
 from reservations.resources.views import (CommentListViewSet,
                                           CustomerReservationViewSet,
                                           StoreReservationViewSet)
-from stores.resources.views import StoreViewSet, StoreDetailView
+from admin.stores.views import StoreAdminViewSet
 from users.resources.views import (AuthView, SmsVerify, UserViewSet,
                                    WorkerProfileViewSet)
 from search.resources.views import (ReservationSearchView,
@@ -25,6 +25,9 @@ router = DefaultRouter()
 router.register('countries', CountryViewSet, base_name='countries')
 router.register('cities', CityViewSet, base_name='cities')
 router.register('townships', TownshipViewSet, base_name='townships')
+
+# stores
+router.register('stores', StoreAdminViewSet, base_name='stores')
 
 
 app_name = 'admin_api'
