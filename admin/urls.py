@@ -35,5 +35,5 @@ app_name = 'admin_api'
 
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
-    path('auth/', LoginView.as_view()),
+    path('auth/', LoginView.as_view(), name="auth"),
 ]
