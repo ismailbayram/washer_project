@@ -5,10 +5,8 @@ from model_mommy import mommy
 from rest_framework import status
 from rest_framework.reverse import reverse_lazy
 
-from base.test import BaseTestViewMixin
 
-
-class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
+class AuthViewTest(TestCase):
     def setUp(self):
         self.user = mommy.make('users.User')
         self.user.set_password('123456')
