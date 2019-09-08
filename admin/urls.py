@@ -3,6 +3,8 @@ from rest_framework.routers import DefaultRouter
 
 from admin.address.views import (CityViewSet, CountryViewSet,
                                  TownshipViewSet)
+from admin.stores.views import StoreAdminViewSet
+from admin.users.views import LoginView
 
 from api.views import get_swagger_view
 from cars.resources.views import CarViewSet
@@ -11,7 +13,6 @@ from products.resources.views import ProductListViewSet, ProductViewSet
 from reservations.resources.views import (CommentListViewSet,
                                           CustomerReservationViewSet,
                                           StoreReservationViewSet)
-from admin.stores.views import StoreAdminViewSet
 from users.resources.views import (AuthView, SmsVerify, UserViewSet,
                                    WorkerProfileViewSet)
 from search.resources.views import (ReservationSearchView,
@@ -34,4 +35,5 @@ app_name = 'admin_api'
 
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
+    path('auth/', LoginView.as_view(), name="auth"),
 ]
