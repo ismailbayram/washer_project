@@ -13,7 +13,6 @@ from stores.resources.serializers import (StoreDetailedSerializer,
                                           StoreImageSerializer,
                                           StoreLogoSerializer, StoreSerializer)
 from stores.service import StoreService
-from reservations.tasks import create_store_weekly_reservations
 from users.enums import GroupType
 from search.indexer import StoreIndexer
 
@@ -33,8 +32,6 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
         'list': [GroupType.washer],
         'partial_update': [],
         'retrieve': [GroupType.washer],
-        'approve': [],
-        'decline': [],
         'activate': [GroupType.washer],
         'deactivate': [GroupType.washer],
         'address': [GroupType.washer],
@@ -45,6 +42,7 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        # FIXME: remove staff control from here, move to admin app
         if self.request.user.is_staff:
             return queryset
         return queryset.filter(washer_profile=self.request.user.washer_profile)
@@ -63,21 +61,6 @@ class StoreViewSet(MultiSerializerViewMixin, viewsets.GenericViewSet,
         serializer.instance = service.update_store(store, **serializer.validated_data)
         store_indexer = StoreIndexer()
         store_indexer.update_store_index(serializer.instance)
-
-    @action(detail=True, methods=['POST'])
-    def approve(self, request, *args, **kwargs):
-        service = StoreService()
-        instance = self.get_object()
-        instance = service.approve_store(instance)
-        create_store_weekly_reservations.delay(instance.id)  # TODO: test
-        return Response({}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['POST'])
-    def decline(self, request, *args, **kwargs):
-        service = StoreService()
-        instance = self.get_object()
-        service.decline_store(instance)
-        return Response({}, status=status.HTTP_200_OK)
 
     # @action(detail=True, methods=['POST'])
     # def activate(self, request, *args, **kwargs):
