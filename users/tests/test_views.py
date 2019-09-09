@@ -432,7 +432,7 @@ class UserInfoTests(TestCase, BaseTestViewMixin):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class UserChangePassword(TestCase):
+class UserChangePhone(TestCase):
     def setUp(self):
         super().setUp()
         service = UserService()

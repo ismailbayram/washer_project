@@ -185,7 +185,7 @@ class WorkerProfileService:
 
 
 class SmsService:
-    SMS_EXPIRE_TIME = 5 * 60 # sn
+    SMS_EXPIRE_TIME = 5 * 60  # sn
 
     def _create_sms_code(self, phone_number):
         # TODO randomize the code
@@ -201,7 +201,8 @@ class SmsService:
     @atomic
     def get_or_create_sms_code(self, phone_number, user_exist_control=False):
         """
-        :param user: User
+        :param phone_number: User
+        :param user_exist_control: Boolean
         :return: SmsMessage
         """
         if user_exist_control and User.objects.filter(phone_number=phone_number).exists():
@@ -210,16 +211,11 @@ class SmsService:
         now = timezone.now()
         create_new_obj = False
 
+        sms_obj = None
         try:
             sms_obj = SmsMessage.objects.get(phone_number=phone_number, is_expired=False)
-            if now > sms_obj.expire_datetime:
-                create_new_obj = True
-                sms_obj.is_expired = True
-                sms_obj.save(update_fields=['is_expired'])
-
         except SmsMessage.DoesNotExist:
             create_new_obj = True
-
         except SmsMessage.MultipleObjectsReturned:
             # There is no normal way to get this exception but if some anormal
             # things will happen, user can not login anyway. So this two lines
@@ -227,7 +223,14 @@ class SmsService:
             SmsMessage.objects.filter(phone_number=phone_number).update(is_expired=True)
             create_new_obj = True
 
-        if create_new_obj:
+        if sms_obj and now > sms_obj.expire_datetime:
+            # if sms_obj can get from DB but expired
+            create_new_obj = True
+            sms_obj.is_expired = True
+            sms_obj.save(update_fields=['is_expired'])
+
+        if create_new_obj or not sms_obj:
+            # if sms_obj is None  or create_new_obj is True
             sms_obj = self._create_sms_code(phone_number)
 
         return sms_obj
