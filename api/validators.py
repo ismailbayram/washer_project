@@ -10,5 +10,9 @@ def is_valid_phone(phone_number: str):
         return True
 
     raise ValidationError(
-        _('Please enter a correct phone number.'),
+        {
+            'message': _('Please enter a correct phone number.'),
+            'detail': _('Your phone number format should be like: 05xx xxx xx xx '),
+        },
+
     )
