@@ -13,7 +13,7 @@ from reservations.resources.views import (CommentListViewSet,
                                           CustomerReservationViewSet,
                                           StoreReservationViewSet)
 from stores.resources.views import StoreViewSet, StoreDetailView
-from users.resources.views import (AuthView, SmsVerify, UserViewSet,
+from users.resources.views import (AuthView, SmsVerify,
                                    WorkerProfileViewSet)
 from search.resources.views import (ReservationSearchView,
                                     StoreSearchView)
@@ -21,7 +21,6 @@ from search.resources.views import (ReservationSearchView,
 schema_view = get_swagger_view(title='Washer Project API')
 
 router = DefaultRouter()
-router.register('users', UserViewSet, 'users')
 router.register('workers', WorkerProfileViewSet, 'workers')
 
 # addresses

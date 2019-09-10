@@ -1,12 +1,26 @@
 from django.utils.translation import ugettext_lazy as _
 
+from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from admin.users.serializers import LoginSerializer
+from admin.users.serializers import LoginSerializer, UserSerializer
 from users.models import User
 from users.service import UserService
+from admin.users.filters import UserFilterSet
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.prefetch_related('groups').all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminUser, )
+    filter_class = UserFilterSet
+
+    def perform_destroy(self, instance):
+        service = UserService()
+        service.deactivate_user(instance)
 
 
 class LoginView(APIView):
@@ -24,7 +38,7 @@ class LoginView(APIView):
             user_service = UserService()
             token = user_service._create_token(user)
             return Response({
-                'token': token
+                'token': 'Token {}'.format(token)
             })
         except User.DoesNotExist:
             raise ValidationError({

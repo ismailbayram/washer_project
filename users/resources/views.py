@@ -1,98 +1,19 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from stores.models import Store
 from users.enums import GroupType
-from users.models import User, WorkerProfile
+from users.models import WorkerProfile
 from users.resources.filters import WorkerProfileFilterSet
 from users.resources.serializers import (AuthFirstStepSerializer,
                                          AuthSecondStepSerializer,
                                          UserSerializer,
                                          WorkerProfileSerializer)
 from users.service import SmsService, UserService, WorkerProfileService
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-       Users Resources
-
-       list:
-           Get a list of User Objects.
-           Sample list response body;
-           <br/>
-
-           {
-            "count": 1,
-            "next": null,
-            "previous": null,
-            "results": [
-                    {
-                        "pk": 1,
-                        "date_joined": "2019-06-19T23:27:24.392652+03:00",
-                        "last_login": null,
-                        "first_name": "ismail",
-                        "last_name": "bayram",
-                        "phone_number": "+905423037159",
-                        "is_active": true,
-                        "is_customer": true,
-                        "is_washer": false,
-                        "is_worker": false
-                    },
-                    ...
-                ]
-            }
-
-
-       retrieve:
-           Get a single User object with given id.
-           Successful retrieve response body sample;
-           <br/>
-
-           {
-                "pk": 1,
-                "date_joined": "2019-06-19T23:27:24.392652+03:00",
-                "last_login": null,
-                "first_name": "ismail",
-                "last_name": "bayram",
-                "phone_number": "+905423037159",
-                "is_active": true,
-                "is_customer": true,
-                "is_washer": false,
-                "is_worker": false
-            }
-
-       <br/>
-       If User object does not found with given id, then you will get
-       status code; **404_NOT_FOUND** and response body like;
-       <br/>
-
-           {
-               "detail": "Not found."
-           }
-
-       create:
-           Create a new User object with given json data.
-           If object successfully created, then you will get
-           status code; **201_CREATED** and created object in response body.
-
-       destroy:
-           Deactivate a given User object.
-           If object successfully deactivated, then you will get
-           status code; **204_NO_CONTENT**.
-
-       """
-    queryset = User.objects.exclude(is_superuser=True).prefetch_related('groups').all()
-    serializer_class = UserSerializer
-    permission_classes = (IsAdminUser, )
-
-    def perform_destroy(self, instance):
-        service = UserService()
-        service.deactivate_user(instance)
 
 
 class WorkerProfileViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin,
