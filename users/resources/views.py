@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from api.permissions import HasGroupPermission, IsWasherOrReadOnlyPermission
 from stores.models import Store
 from users.enums import GroupType
+from users.exceptions import ThereIsUserGivenPhone
 from users.models import User, WorkerProfile
 from users.resources.filters import WorkerProfileFilterSet
 from users.resources.serializers import (AuthFirstStepSerializer,
@@ -87,7 +88,7 @@ class AuthView(APIView):
         return Response({}, status=status.HTTP_200_OK)
 
 
-class SmsVerify(APIView):
+class SmsVerifyView(APIView):
     def post(self, request):
         serializer = AuthSecondStepSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -137,9 +138,12 @@ class ChangePhoneNumberRequestView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        if (User.objects.filter(phone_number=
+                                serializer.validated_data.get('phone_number')).exists()):
+            raise ThereIsUserGivenPhone
+
         sms_service = SmsService()
-        sms_instance = sms_service.get_or_create_sms_code(**serializer.validated_data,
-                                                          user_exist_control=True)
+        sms_instance = sms_service.get_or_create_sms_code(**serializer.validated_data)
         # TODO send real sms
         return Response({}, status=status.HTTP_200_OK)
 

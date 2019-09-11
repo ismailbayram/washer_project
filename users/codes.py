@@ -7,7 +7,7 @@ workers_100_0 = {"code": "workers_100_0",
                  "message": _("He/She is not your worker.")}
 
 auth_100_0 = {"code": "auth_100_0",
-                 "message": _("SMS code could not generated.")}
+                 "message": _("SMS code could not be generated.")}
 
 auth_100_1 = {"code": "auth_100_1",
                  "message": _("SMS code is expired.")}

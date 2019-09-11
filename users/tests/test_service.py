@@ -9,7 +9,8 @@ from model_mommy import mommy
 from notifications.enums import NotificationType
 from stores.exceptions import StoreDoesNotBelongToWasherException
 from users.enums import GroupType
-from users.exceptions import (SmsCodeIsInvalidException,
+from users.exceptions import (SmsCodeExpiredException,
+                              SmsCodeIsInvalidException,
                               SmsCodeIsNotCreatedException,
                               ThereIsUserGivenPhone,
                               UserGroupTypeInvalidException,
@@ -264,10 +265,6 @@ class SmsServiceTest(TestCase):
         with self.assertRaises(WorkerHasNoStoreException):
             self.service.verify_sms(self.worker.phone_number, sms_obj.code)
 
-
-        with self.assertRaises(ThereIsUserGivenPhone):
-            sms_obj = self.service.get_or_create_sms_code(self.worker.phone_number, True)
-
     def test_verify_sms_when_change_phone(self):
         user = User.objects.first()
         now = timezone.now()
@@ -279,3 +276,47 @@ class SmsServiceTest(TestCase):
         sms_obj = self.service.verify_sms_when_change_phone("+901111111111", "000000", user)
 
         self.assertEqual(user.phone_number, "+901111111111")
+
+    def test_verify_controls(self):
+        with self.assertRaises(SmsCodeIsNotCreatedException):
+            phone2 = "+905382451187"
+            self.service._verify_controls(phone_number=phone2, sms_code="1234")
+
+        phone1 = "+905382451188"
+        now = timezone.now()
+        expired_sms_code = SmsMessage.objects.create(
+            phone_number=phone1,
+            code="1234",
+            expire_datetime=(now - datetime.timedelta(minutes=1)),
+            is_expired=False
+        )
+
+        with self.assertRaises(SmsCodeExpiredException):
+            self.service._verify_controls(
+                phone_number=expired_sms_code.phone_number,
+                sms_code=expired_sms_code.code,
+            )
+
+        
+        phone3 = "+905382451181"
+
+        now = timezone.now()
+        not_expired_sms_code = SmsMessage.objects.create(
+            phone_number=phone3,
+            code="1234",
+            expire_datetime=(now + datetime.timedelta(minutes=1)),
+            is_expired=False
+        )
+
+        with self.assertRaises(SmsCodeIsInvalidException):
+            self.service._verify_controls(
+                phone_number=not_expired_sms_code.phone_number,
+                sms_code=(not_expired_sms_code.code + "wrong"),
+            )
+
+        ret = self.service._verify_controls(
+                phone_number=not_expired_sms_code.phone_number,
+                sms_code=not_expired_sms_code.code,
+            )
+
+        self.assertEqual(not_expired_sms_code, ret)

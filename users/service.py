@@ -14,7 +14,6 @@ from users.enums import GroupType
 from users.exceptions import (SmsCodeExpiredException,
                               SmsCodeIsInvalidException,
                               SmsCodeIsNotCreatedException,
-                              ThereIsUserGivenPhone,
                               UserGroupTypeInvalidException,
                               WorkerDoesNotBelongToWasherException,
                               WorkerHasNoStoreException)
@@ -199,15 +198,12 @@ class SmsService:
         return sms_obj
 
     @atomic
-    def get_or_create_sms_code(self, phone_number, user_exist_control=False):
+    def get_or_create_sms_code(self, phone_number):
         """
         :param phone_number: User
         :param user_exist_control: Boolean
         :return: SmsMessage
         """
-        if user_exist_control and User.objects.filter(phone_number=phone_number).exists():
-            raise ThereIsUserGivenPhone
-
         now = timezone.now()
         create_new_obj = False
 
