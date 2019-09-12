@@ -3,7 +3,6 @@ from rest_framework.routers import DefaultRouter
 
 from address.resources.views import (CityViewSet, CountryViewSet,
                                      TownshipViewSet)
-
 from api.views import get_swagger_view
 from baskets.resources.views import BasketViewSet, CampaignViewSet
 from cars.resources.views import CarViewSet
@@ -12,11 +11,12 @@ from products.resources.views import ProductListViewSet, ProductViewSet
 from reservations.resources.views import (CommentListViewSet,
                                           CustomerReservationViewSet,
                                           StoreReservationViewSet)
-from stores.resources.views import StoreViewSet, StoreDetailView
-from users.resources.views import (AuthView, SmsVerify, UserViewSet,
+from search.resources.views import ReservationSearchView, StoreSearchView
+from stores.resources.views import StoreDetailView, StoreViewSet
+from users.resources.views import (AuthView, ChangePhoneNumberRequestView,
+                                   ChangePhoneNumberSmsVerifyView,
+                                   SmsVerifyView, UserInfoView, UserViewSet,
                                    WorkerProfileViewSet)
-from search.resources.views import (ReservationSearchView,
-                                    StoreSearchView)
 
 schema_view = get_swagger_view(title='Washer Project API')
 
@@ -64,6 +64,9 @@ urlpatterns = [
     path('basket/', basket_view, name='basket'),
     path('', include((router.urls, 'api'), namespace='router')),
     path('auth/', AuthView.as_view(), name="auth"),
-    path('sms_verify/', SmsVerify.as_view(), name="sms_verify"),
+    path('sms_verify/', SmsVerifyView.as_view(), name="sms_verify"),
     path('docs/', schema_view),
+    path('user-info/', UserInfoView.as_view(), name="user-info"),
+    path('user-info/change-phone-number/', ChangePhoneNumberRequestView.as_view(), name="set-phone-request"),
+    path('user-info/verify-phone-number/', ChangePhoneNumberSmsVerifyView.as_view(), name="set-phone-verify"),
 ]
