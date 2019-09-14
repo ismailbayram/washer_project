@@ -27,7 +27,7 @@ class NotificationViewSet(ListModelMixin, GenericViewSet):
 
     def filter_queryset(self, *args, **kwargs):
         queryset = self.queryset
-        profile_type = self.request.META.get("HTTP_X_PROFILE_TYPE")
+        profile_type = self.request.META.get("HTTP_X_PROFILE_TYPE") # X-Profile-Type
 
         if profile_type == GroupType.washer.value:
             object_id = self.request.user.washer_profile.pk

@@ -3,14 +3,16 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.functional import cached_property
+from enumfields import EnumField
 
 from base.models import StarterModel
 from notifications.models import Notification
-from users.enums import GroupType
+from users.enums import GroupType, Gender
 
 
 class User(AbstractUser):
     phone_number = models.CharField(max_length=255, unique=True)
+    gender = EnumField(enum=Gender, null=True)
 
     def __str__(self):
         return self.get_full_name()

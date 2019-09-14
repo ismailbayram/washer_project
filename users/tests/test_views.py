@@ -427,13 +427,16 @@ class UserInfoTests(TestCase, BaseTestViewMixin):
         data = {
             "first_name": "kadir",
             "last_name": "cetin",
+            "gender": "male",
         }
         response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self.client.get(url, content_type='application/json', **headers)
         expected = {
             "first_name": "kadir",
             "last_name": "cetin",
             "phone_number": "555111",
+            "gender": "male",
         }
         for exp_key, exp_val in expected.items():
             self.assertEqual(exp_val, response.data[exp_key])
@@ -463,13 +466,16 @@ class UserInfoTests(TestCase, BaseTestViewMixin):
         data = {
             "first_name": "kadir",
             "last_name": "cetin",
+            "gender": "male",
         }
         response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self.client.get(url, content_type='application/json', **headers)
         expected = {
             "first_name": "kadir",
             "last_name": "cetin",
             "phone_number": "555222",
+            "gender": "male",
         }
         for exp_key, exp_val in expected.items():
             self.assertEqual(exp_val, response.data[exp_key])
@@ -498,13 +504,16 @@ class UserInfoTests(TestCase, BaseTestViewMixin):
         data = {
             "first_name": "kadir",
             "last_name": "cetin",
+            "gender": "male",
         }
         response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self.client.get(url, content_type='application/json', **headers)
         expected = {
             "first_name": "kadir",
             "last_name": "cetin",
             "phone_number": "555333",
+            "gender": "male",
         }
         for exp_key, exp_val in expected.items():
             self.assertEqual(exp_val, response.data[exp_key])

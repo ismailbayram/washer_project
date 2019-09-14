@@ -12,3 +12,12 @@ class GroupType(Enum):
         customer = _('Müşteri')
         washer = _('Yıkamacı')
         worker = _('Yıkama Çalışanı')
+
+
+class Gender(Enum):
+    male = 'male'
+    female = 'female'
+
+    class Labels:
+        male = _('Male')
+        female = _('Female')

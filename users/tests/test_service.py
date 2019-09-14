@@ -8,7 +8,7 @@ from model_mommy import mommy
 
 from notifications.enums import NotificationType
 from stores.exceptions import StoreDoesNotBelongToWasherException
-from users.enums import GroupType
+from users.enums import GroupType, Gender
 from users.exceptions import (SmsCodeExpiredException,
                               SmsCodeIsInvalidException,
                               SmsCodeIsNotCreatedException,
@@ -97,22 +97,26 @@ class UserServiceTest(TestCase):
         }
         user,_ = self.service.get_or_create_user(**data)
 
-        self.service.change_user_names(
+        self.service.update_user_info(
             user=user,
             first_name="kadir",
             last_name="cetin",
+            gender="male",
         )
         user.refresh_from_db()
         self.assertEqual(user.first_name, "kadir")
         self.assertEqual(user.last_name, "cetin")
-        self.service.change_user_names(
+        self.assertEqual(user.gender, Gender.male)
+        self.service.update_user_info(
             user=user,
             first_name="kadir 2",
             last_name="cetin 2",
+            gender="male",
         )
         user.refresh_from_db()
         self.assertEqual(user.first_name, "kadir 2")
         self.assertEqual(user.last_name, "cetin 2")
+        self.assertEqual(user.gender, Gender.male)
 
 
 class WorkerProfileServiceTest(TestCase):
