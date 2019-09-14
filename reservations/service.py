@@ -21,8 +21,7 @@ from reservations.exceptions import (ReservationAlreadyCommented,
                                      ReservationIsNotComplated,
                                      ReservationNotAvailableException,
                                      ReservationOccupiedBySomeoneException,
-                                     ReservationStartedException,
-                                     ReservationCancellationReasonIsNotActive)
+                                     ReservationStartedException)
 from reservations.models import Comment, Reservation
 from reservations.tasks import prevent_occupying_reservation
 from stores.exceptions import StoreNotAvailableException
@@ -218,9 +217,6 @@ class ReservationService(object):
         :param cancelation_reason: CancellationReason
         :return: reservation
         """
-        if not cancellation_reason.is_active:
-            raise ReservationCancellationReasonIsNotActive
-
         if not reservation.status == ReservationStatus.reserved:
             raise ReservationCanNotCancelledException
         reservation.status = ReservationStatus.cancelled

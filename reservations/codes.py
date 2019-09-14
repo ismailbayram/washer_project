@@ -12,4 +12,3 @@ reservations_100_7 = {"code": "reservations_100_7", "message": _("Reservation is
 reservations_100_8 = {"code": "reservations_100_8", "message": _("Reservation is not evaluated.")}
 reservations_100_9 = {"code": "reservations_100_9", "message": _("Reservation has been already evaluated.")}
 reservations_100_10 = {"code": "reservations_100_10", "message": _("Reservation comment has been already replied.")}
-reservations_100_11 = {"code": "reservations_100_11", "message": _("Reservation cancellation reason is not active.")}

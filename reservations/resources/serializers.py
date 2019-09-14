@@ -14,6 +14,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('pk', 'rating', 'comment', 'reservation', 'reply', )
         read_only_fields = ('reply', 'reservation',)
 
+
 class ReplySerializer(serializers.Serializer):
     reply = serializers.CharField(max_length=255)
 
@@ -32,17 +33,26 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reservation
-        fields = ('pk', 'number', 'comment', 'start_datetime', 'end_datetime', 'period', 'store', 'status', 'cancellation_reason', )
+        fields = (
+            'pk', 'number', 'comment', 'start_datetime', 'end_datetime',
+            'period', 'store', 'status', 'cancellation_reason',
+        )
 
 
 class CancelReservationSerializer(serializers.ModelSerializer):
     status = EnumField(enum=ReservationStatus, read_only=True)
     store = StoreSerializer(read_only=True)
     comment = CommentSerializer(read_only=True)
+    cancellation_reason = serializers.PrimaryKeyRelatedField(
+        queryset=CancellationReason.objects.filter(is_active=True)
+    )
 
     class Meta:
         model = Reservation
-        fields = ('pk', 'number', 'comment', 'start_datetime', 'end_datetime', 'period', 'store', 'status', 'cancellation_reason', 'cancellation_reason', )
+        fields = (
+            'pk', 'number', 'comment', 'start_datetime', 'end_datetime',
+            'period', 'store', 'status', 'cancellation_reason',
+        )
 
         extra_kwargs = {
             'cancellation_reason': {'required': True},
