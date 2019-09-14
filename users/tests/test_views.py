@@ -124,10 +124,10 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         response = self.client.post(url, data=data, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
 
-    def test_create_phone_valid_test(self):
+    def test_create_washer_phone_valid_test(self):
         url = reverse_lazy("api:router:workers-list")
         phones = {
-            "+905388197550": False,
+            "+905388197550": True,
             "+905388197555": True,
             "+908388197555": True,
             "+903881975009": True,
@@ -377,3 +377,222 @@ class SmsViewsTest(TestCase, BaseTestViewMixin):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
             else:
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class UserInfoTests(TestCase, BaseTestViewMixin):
+    def setUp(self):
+        super().setUp()
+        self.init_users()
+
+    def test_get_user_info(self):
+        url = reverse_lazy("api:user-info")
+
+        # For customer
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        response = self.client.get(url, content_type='application/json', **headers)
+        expected = {
+            "first_name": "Customer 1",
+            "last_name": "CusLast",
+            "phone_number": "555111",
+        }
+        for exp_key, exp_val in expected.items():
+            self.assertEqual(exp_val, response.data[exp_key])
+
+        # For worker
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        response = self.client.get(url, content_type='application/json', **headers)
+        expected = {
+            "first_name": "Worker 1",
+            "last_name": "WorkLast",
+            "phone_number": "555222",
+        }
+        for exp_key, exp_val in expected.items():
+            self.assertEqual(exp_val, response.data[exp_key])
+
+        # For washer
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        response = self.client.get(url, content_type='application/json', **headers)
+        expected = {
+            "first_name": "Washer 1",
+            "last_name": "WashLast",
+            "phone_number": "555333",
+        }
+        for exp_key, exp_val in expected.items():
+            self.assertEqual(exp_val, response.data[exp_key])
+
+
+    def test_set_user_name_customer(self):
+        url = reverse_lazy("api:user-info")
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        data = {
+            "first_name": "kadir",
+            "last_name": "cetin",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        response = self.client.get(url, content_type='application/json', **headers)
+        expected = {
+            "first_name": "kadir",
+            "last_name": "cetin",
+            "phone_number": "555111",
+        }
+        for exp_key, exp_val in expected.items():
+            self.assertEqual(exp_val, response.data[exp_key])
+
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        data = {
+            "first_name": "k",
+            "last_name": "cetin",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+        data = {
+            "first_name": "kad",
+            "last_name": "",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_set_user_name_worker(self):
+        url = reverse_lazy("api:user-info")
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        data = {
+            "first_name": "kadir",
+            "last_name": "cetin",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        response = self.client.get(url, content_type='application/json', **headers)
+        expected = {
+            "first_name": "kadir",
+            "last_name": "cetin",
+            "phone_number": "555222",
+        }
+        for exp_key, exp_val in expected.items():
+            self.assertEqual(exp_val, response.data[exp_key])
+
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        data = {
+            "first_name": "k",
+            "last_name": "cetin",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.worker_token}'}
+        data = {
+            "first_name": "kad",
+            "last_name": "",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_set_user_name_washer(self):
+        url = reverse_lazy("api:user-info")
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        data = {
+            "first_name": "kadir",
+            "last_name": "cetin",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        response = self.client.get(url, content_type='application/json', **headers)
+        expected = {
+            "first_name": "kadir",
+            "last_name": "cetin",
+            "phone_number": "555333",
+        }
+        for exp_key, exp_val in expected.items():
+            self.assertEqual(exp_val, response.data[exp_key])
+
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        data = {
+            "first_name": "k",
+            "last_name": "cetin",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        headers = {'HTTP_AUTHORIZATION': f'Token {self.washer_token}'}
+        data = {
+            "first_name": "kad",
+            "last_name": "",
+        }
+        response = self.client.post(url, data=data, content_type='application/json', **headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+
+class UserChangePhone(TestCase):
+    def setUp(self):
+        super().setUp()
+        service = UserService()
+        data = {
+            "first_name": "Customer 1",
+            "last_name": "CusLast",
+            "phone_number": "+905382451184",
+            "group_type": GroupType.customer
+        }
+        self.customer, self.customer_token = service.get_or_create_user(**data)
+
+        data = {
+            "first_name": "washer 12",
+            "last_name": "washer",
+            "phone_number": "+905382451186",
+            "group_type": GroupType.washer
+        }
+        self.washer, self.washer_token = service.get_or_create_user(**data)
+
+        data = {
+            "first_name": "Worker",
+            "last_name": "Worker",
+            "phone_number": "+905382451185",
+            "group_type": GroupType.worker
+        }
+        self.worker, self.worker_token = service.get_or_create_user(**data)
+
+    def test_change_phone(self):
+        test_cases = [
+            {
+                "token": self.customer_token,
+                "phone_number": self.customer.phone_number,
+                "phone_to": "+905382451188",
+            },
+            {
+                "token": self.washer_token,
+                "phone_number": self.washer.phone_number,
+                "phone_to": "+905382451189",
+            },
+            {
+                "token": self.worker_token,
+                "phone_number": self.worker.phone_number,
+                "phone_to": "+905382451187",
+            },
+        ]
+
+        for test_case in test_cases:
+            url = reverse_lazy("api:set-phone-request")
+            headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
+            data = {"phone_number": test_case['phone_number']}
+
+            response = self.client.post(url, data=data, content_type='application/json', **headers)
+            self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+            data = {"phone_number": test_case['phone_to']}
+            response = self.client.post(url, data=data, content_type='application/json', **headers)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+            url = reverse_lazy("api:set-phone-verify")
+            headers = {'HTTP_AUTHORIZATION': f'Token {test_case["token"]}'}
+            data = {"phone_number": test_case['phone_to'], "sms_code": "wrong"}
+            response = self.client.post(url, data=data, content_type='application/json', **headers)
+            self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
+
+            data = {"phone_number": test_case['phone_to'], "sms_code": "000000"}
+            response = self.client.post(url, data=data, content_type='application/json', **headers)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)

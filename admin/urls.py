@@ -1,8 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from admin.address.views import (CityViewSet, CountryViewSet,
-                                 TownshipViewSet)
+from admin.address.views import CityViewSet, CountryViewSet, TownshipViewSet
 from admin.stores.views import StoreAdminViewSet
 from admin.users.views import LoginView, UserViewSet
 

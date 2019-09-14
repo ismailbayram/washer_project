@@ -24,3 +24,6 @@ class SmsCodeIsInvalidException(ProjectBaseException):
 
 class WorkerHasNoStoreException(ProjectBaseException):
     code = codes.auth_100_3
+
+class ThereIsUserGivenPhone(ProjectBaseException):
+    code = codes.auth_100_4

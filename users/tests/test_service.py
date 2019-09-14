@@ -1,3 +1,4 @@
+import datetime
 from datetime import timedelta
 
 from django.contrib.auth.models import Group
@@ -8,12 +9,14 @@ from model_mommy import mommy
 from notifications.enums import NotificationType
 from stores.exceptions import StoreDoesNotBelongToWasherException
 from users.enums import GroupType
-from users.exceptions import (SmsCodeIsInvalidException,
+from users.exceptions import (SmsCodeExpiredException,
+                              SmsCodeIsInvalidException,
                               SmsCodeIsNotCreatedException,
+                              ThereIsUserGivenPhone,
                               UserGroupTypeInvalidException,
                               WorkerDoesNotBelongToWasherException,
                               WorkerHasNoStoreException)
-from users.models import CustomerProfile
+from users.models import CustomerProfile, SmsMessage, User
 from users.service import SmsService, UserService, WorkerProfileService
 
 
@@ -84,6 +87,32 @@ class UserServiceTest(TestCase):
     def test_activate_user(self):
         self.service.activate_user(self.user)
         self.assertEqual(self.user.is_active, True)
+
+    def test_change_user_names(self):
+        data = {
+            "phone_number": "555222",
+            "first_name": "ismail",
+            "last_name": "bayram",
+            "group_type": "washer"
+        }
+        user,_ = self.service.get_or_create_user(**data)
+
+        self.service.change_user_names(
+            user=user,
+            first_name="kadir",
+            last_name="cetin",
+        )
+        user.refresh_from_db()
+        self.assertEqual(user.first_name, "kadir")
+        self.assertEqual(user.last_name, "cetin")
+        self.service.change_user_names(
+            user=user,
+            first_name="kadir 2",
+            last_name="cetin 2",
+        )
+        user.refresh_from_db()
+        self.assertEqual(user.first_name, "kadir 2")
+        self.assertEqual(user.last_name, "cetin 2")
 
 
 class WorkerProfileServiceTest(TestCase):
@@ -190,48 +219,104 @@ class WorkerProfileServiceTest(TestCase):
         self.assertEqual(self.washer_profile.notifications.count(), 2)
 
 
-
 class SmsServiceTest(TestCase):
     def setUp(self):
         self.service = SmsService()
         user_service = UserService()
-        self.worker,_ = user_service.get_or_create_user(phone_number="worker",
-                                                      group_type=GroupType.worker.value)
-        self.customer,_ = user_service.get_or_create_user(phone_number="customer",
-                                                        group_type=GroupType.customer.value)
+        self.worker, _ = user_service.get_or_create_user(phone_number="worker",
+                                                        group_type=GroupType.worker.value)
+        self.customer, _ = user_service.get_or_create_user(phone_number="+905382451180",
+                                                           group_type=GroupType.customer.value)
         self.phone_number = "+905423037159"
+        self.phone_number2 = "+905382451188"
 
     def test_create_sms(self):
         now = timezone.now()
-        sms_obj = self.service._create_sms_code(self.customer)
+        sms_obj = self.service._create_sms_code(self.phone_number2)
 
         self.assertTrue(timedelta(seconds=self.service.SMS_EXPIRE_TIME+2) > sms_obj.expire_datetime-now)
         self.assertTrue(timedelta(seconds=self.service.SMS_EXPIRE_TIME-2) < sms_obj.expire_datetime-now)
-        self.assertEqual(sms_obj.user, self.customer)
+        self.assertEqual(sms_obj.phone_number, self.phone_number2)
 
     def test_create_and_verify_sms(self):
         with self.assertRaises(SmsCodeIsNotCreatedException):
-            self.service.verify_sms(self.customer, ".")
+            self.service.verify_sms(self.phone_number2, "tmpcode")
 
-        sms_obj = self.service.get_or_create_sms_code(self.customer)
+        sms_obj = self.service.get_or_create_sms_code(self.phone_number2)
         first_expire_time = sms_obj.expire_datetime
-        sms_obj = self.service.get_or_create_sms_code(self.customer)
+        sms_obj = self.service.get_or_create_sms_code(self.phone_number2)
         self.assertTrue(first_expire_time == sms_obj.expire_datetime)
-
         sms_obj.is_expired = True
         sms_obj.save()
-        sms_obj = self.service.get_or_create_sms_code(self.customer)
+        sms_obj = self.service.get_or_create_sms_code(self.phone_number2)
         self.assertNotEqual(first_expire_time, sms_obj.expire_datetime)
 
         with self.assertRaises(SmsCodeIsInvalidException):
-            self.service.verify_sms(self.customer, sms_obj.code+"wrong")
+            self.service.verify_sms(self.phone_number2, sms_obj.code+"wrong")
 
         self.assertEqual(sms_obj.is_expired, False)
 
-        self.service.verify_sms(self.customer, sms_obj.code)
+        self.service.verify_sms(self.phone_number2, sms_obj.code)
         sms_obj.refresh_from_db()
         self.assertEqual(sms_obj.is_expired, True)
 
-        sms_obj = self.service.get_or_create_sms_code(self.worker)
+        sms_obj = self.service.get_or_create_sms_code(self.worker.phone_number)
+
         with self.assertRaises(WorkerHasNoStoreException):
-            self.service.verify_sms(self.worker, sms_obj.code)
+            self.service.verify_sms(self.worker.phone_number, sms_obj.code)
+
+    def test_verify_sms_when_change_phone(self):
+        user = User.objects.first()
+        now = timezone.now()
+        SmsMessage.objects.create(
+            expire_datetime=now+datetime.timedelta(minutes=5),
+            code="000000",
+            phone_number="+901111111111"
+        )
+        sms_obj = self.service.verify_sms_when_change_phone("+901111111111", "000000", user)
+
+        self.assertEqual(user.phone_number, "+901111111111")
+
+    def test_verify_controls(self):
+        with self.assertRaises(SmsCodeIsNotCreatedException):
+            phone2 = "+905382451187"
+            self.service._verify_controls(phone_number=phone2, sms_code="1234")
+
+        phone1 = "+905382451188"
+        now = timezone.now()
+        expired_sms_code = SmsMessage.objects.create(
+            phone_number=phone1,
+            code="1234",
+            expire_datetime=(now - datetime.timedelta(minutes=1)),
+            is_expired=False
+        )
+
+        with self.assertRaises(SmsCodeExpiredException):
+            self.service._verify_controls(
+                phone_number=expired_sms_code.phone_number,
+                sms_code=expired_sms_code.code,
+            )
+
+        
+        phone3 = "+905382451181"
+
+        now = timezone.now()
+        not_expired_sms_code = SmsMessage.objects.create(
+            phone_number=phone3,
+            code="1234",
+            expire_datetime=(now + datetime.timedelta(minutes=1)),
+            is_expired=False
+        )
+
+        with self.assertRaises(SmsCodeIsInvalidException):
+            self.service._verify_controls(
+                phone_number=not_expired_sms_code.phone_number,
+                sms_code=(not_expired_sms_code.code + "wrong"),
+            )
+
+        ret = self.service._verify_controls(
+                phone_number=not_expired_sms_code.phone_number,
+                sms_code=not_expired_sms_code.code,
+            )
+
+        self.assertEqual(not_expired_sms_code, ret)

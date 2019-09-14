@@ -34,9 +34,28 @@ class AuthFirstStepSerializer(serializers.Serializer):
     group_type = EnumField(enum=GroupType)
 
 
-
-
 class AuthSecondStepSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
     sms_code = serializers.CharField()
     group_type = EnumField(enum=GroupType)
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('pk', 'first_name', 'last_name', 'phone_number', )
+        extra_kwargs = {
+            'phone_number': {'read_only': True},
+            'last_name': {'required': True, 'min_length': 3, 'allow_blank': False},
+            'first_name': {'required': True, 'min_length': 3, 'allow_blank': False},
+        }
+
+
+class ChangePhoneNumberSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(validators=[is_valid_phone])
+
+
+class ChangePhoneNumberVerifySerializer(serializers.Serializer):
+    sms_code = serializers.CharField()
+    phone_number = serializers.CharField(validators=[is_valid_phone])

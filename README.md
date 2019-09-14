@@ -18,7 +18,8 @@
 from search.indexer import StoreIndexer
 from reservations.tasks import create_store_weekly_reservations
 StoreIndexer().index_stores()
-create_store_weekly_reservations.delay()
+for store in Store.objects.all():
+    create_store_weekly_reservations.delay(store.id)
 ``` 
 ### Testing
 - touch another settings file in washer_project directory and write the below code into it.

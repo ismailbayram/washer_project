@@ -1,7 +1,7 @@
 from model_mommy import mommy
 
-from users.service import UserService
 from users.enums import GroupType
+from users.service import UserService
 
 
 class BaseTestViewMixin:

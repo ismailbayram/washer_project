@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.contrib.auth.models import Group, update_last_login
 from django.db.transaction import atomic
+from django.db.utils import IntegrityError
 from django.utils import timezone
 from rest_framework_jwt.settings import api_settings as jwt_settings
 
@@ -104,6 +105,12 @@ class UserService:
         user.save()
         return user
 
+    def change_user_names(self, user, first_name, last_name):
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save(update_fields=['first_name', 'last_name'])
+        return user
+
 
 class WorkerProfileService:
     @atomic
@@ -177,61 +184,67 @@ class WorkerProfileService:
 
 
 class SmsService:
-    SMS_EXPIRE_TIME = 5 * 60 # sn
+    SMS_EXPIRE_TIME = 5 * 60  # sn
 
-    def _create_sms_code(self, user):
+    def _create_sms_code(self, phone_number):
         # TODO randomize the code
         now = timezone.now()
         randomized_code = '000000'
         sms_obj = SmsMessage.objects.create(
-            user=user,
             code=randomized_code,
-            expire_datetime=now + datetime.timedelta(seconds=self.SMS_EXPIRE_TIME)
+            expire_datetime=now + datetime.timedelta(seconds=self.SMS_EXPIRE_TIME),
+            phone_number=phone_number,
         )
         return sms_obj
 
     @atomic
-    def get_or_create_sms_code(self, user):
+    def get_or_create_sms_code(self, phone_number):
         """
-        :param user: User
+        :param phone_number: User
+        :param user_exist_control: Boolean
         :return: SmsMessage
         """
         now = timezone.now()
-
         create_new_obj = False
 
+        sms_obj = None
         try:
-            sms_obj = user.sms_messages.get(is_expired=False)
-            if now > sms_obj.expire_datetime:
-                create_new_obj = True
-                sms_obj.is_expired = True
-                sms_obj.save(update_fields=['is_expired'])
-
+            sms_obj = SmsMessage.objects.get(phone_number=phone_number, is_expired=False)
         except SmsMessage.DoesNotExist:
             create_new_obj = True
-
         except SmsMessage.MultipleObjectsReturned:
             # There is no normal way to get this exception but if some anormal
             # things will happen, user can not login anyway. So this two lines
             # solve this problem.
-            user.sms_messages.update(is_expired=True)
+            SmsMessage.objects.filter(phone_number=phone_number).update(is_expired=True)
             create_new_obj = True
 
-        if create_new_obj:
-            sms_obj = self._create_sms_code(user)
+        if sms_obj and now > sms_obj.expire_datetime:
+            # if sms_obj can get from DB but expired
+            create_new_obj = True
+            sms_obj.is_expired = True
+            sms_obj.save(update_fields=['is_expired'])
+
+        if create_new_obj or not sms_obj:
+            # if sms_obj is None  or create_new_obj is True
+            sms_obj = self._create_sms_code(phone_number)
 
         return sms_obj
 
-    @atomic
-    def verify_sms(self, user, sms_code):
+
+    def _verify_controls(self, phone_number, sms_code):
         """
-        :param user: User
+        :param phone_number: String
         :param sms_code: String
+        :return: SmsMessage
+
+        check the is SMS is verifable from sms_code and phone_number
+        it checks expiration times and code is true or not
         """
         now = timezone.now()
 
         try:
-            sms_obj = SmsMessage.objects.get(user=user, is_expired=False)
+            sms_obj = SmsMessage.objects.get(phone_number=phone_number, is_expired=False)
         except SmsMessage.DoesNotExist:
             raise SmsCodeIsNotCreatedException
 
@@ -243,9 +256,43 @@ class SmsService:
         if sms_obj.code != sms_code:
             raise SmsCodeIsInvalidException
 
+        return sms_obj
+
+
+    @atomic
+    def verify_sms(self, phone_number, sms_code, *args, **kwargs):
+        """
+        :param phone_number: String
+        :param sms_code: String
+        """
+
+        sms_obj = self._verify_controls(phone_number, sms_code)
+
+        user_service = UserService()
+        user, _ = user_service.get_or_create_user(phone_number=phone_number)
+
         if user.is_worker and user.washer_profile is None:
             raise WorkerHasNoStoreException
 
-        # So sms is accepted
         sms_obj.is_expired = True
         sms_obj.save(update_fields=['is_expired'])
+
+        return sms_obj
+
+
+    @atomic
+    def verify_sms_when_change_phone(self, phone_number, sms_code, user):
+        """
+        :param phone_number: String
+        :param sms_code: String
+        :param user: User
+        """
+        sms_obj = self._verify_controls(phone_number, sms_code)
+
+        user.phone_number = phone_number
+        user.save()
+
+        sms_obj.is_expired = True
+        sms_obj.save(update_fields=['is_expired'])
+
+        return sms_obj
