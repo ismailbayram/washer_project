@@ -21,7 +21,8 @@ from reservations.exceptions import (ReservationAlreadyCommented,
                                      ReservationIsNotComplated,
                                      ReservationNotAvailableException,
                                      ReservationOccupiedBySomeoneException,
-                                     ReservationStartedException)
+                                     ReservationStartedException,
+                                     ReservationCancellationReasonIsNotActive)
 from reservations.models import Comment, Reservation
 from reservations.tasks import prevent_occupying_reservation
 from stores.exceptions import StoreNotAvailableException
@@ -211,16 +212,20 @@ class ReservationService(object):
 
         return reservation
 
-    def cancel(self, reservation):
+    def cancel(self, reservation, cancellation_reason):
         """
         :param reservation: Reservation
+        :param cancelation_reason: CancellationReason
         :return: reservation
         """
-        # TODO: CancellationReason
+        if not cancellation_reason.is_active:
+            raise ReservationCancellationReasonIsNotActive
+
         if not reservation.status == ReservationStatus.reserved:
             raise ReservationCanNotCancelledException
         reservation.status = ReservationStatus.cancelled
-        reservation.save(update_fields=['status'])
+        reservation.cancellation_reason = cancellation_reason
+        reservation.save(update_fields=['status', 'cancellation_reason'])
 
         notif_service = NotificationService()
         notif_service.send(instance=reservation, to=reservation.store,

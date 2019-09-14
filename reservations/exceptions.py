@@ -40,3 +40,6 @@ class ReservationAlreadyCommented(ProjectBaseException):
 
 class ReservationAlreadyReplyed(ProjectBaseException):
     code = codes.reservations_100_10
+
+class ReservationCancellationReasonIsNotActive(ProjectBaseException):
+    code = codes.reservations_100_11
