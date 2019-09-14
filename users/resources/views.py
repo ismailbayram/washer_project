@@ -1,7 +1,7 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -15,19 +15,9 @@ from users.resources.serializers import (AuthFirstStepSerializer,
                                          AuthSecondStepSerializer,
                                          ChangePhoneNumberSerializer,
                                          ChangePhoneNumberVerifySerializer,
-                                         UserInfoSerializer, UserSerializer,
+                                         UserInfoSerializer,
                                          WorkerProfileSerializer)
 from users.service import SmsService, UserService, WorkerProfileService
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.exclude(is_superuser=True).prefetch_related('groups').all()
-    serializer_class = UserSerializer
-    permission_classes = (IsAdminUser, )
-
-    def perform_destroy(self, instance):
-        service = UserService()
-        service.deactivate_user(instance)
 
 
 class WorkerProfileViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin,

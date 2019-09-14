@@ -15,13 +15,12 @@ from search.resources.views import ReservationSearchView, StoreSearchView
 from stores.resources.views import StoreDetailView, StoreViewSet
 from users.resources.views import (AuthView, ChangePhoneNumberRequestView,
                                    ChangePhoneNumberSmsVerifyView,
-                                   SmsVerifyView, UserInfoView, UserViewSet,
+                                   SmsVerifyView, UserInfoView,
                                    WorkerProfileViewSet)
 
 schema_view = get_swagger_view(title='Washer Project API')
 
 router = DefaultRouter()
-router.register('users', UserViewSet, 'users')
 router.register('workers', WorkerProfileViewSet, 'workers')
 
 # addresses
