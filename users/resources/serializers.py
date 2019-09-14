@@ -4,6 +4,7 @@ from api.fields import EnumField
 from api.validators import is_valid_phone
 from users.enums import GroupType
 from users.models import User, WorkerProfile
+from users.enums import Gender
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,10 +42,11 @@ class AuthSecondStepSerializer(serializers.Serializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    gender = EnumField(enum=Gender)
 
     class Meta:
         model = User
-        fields = ('pk', 'first_name', 'last_name', 'phone_number', )
+        fields = ('pk', 'first_name', 'last_name', 'phone_number', 'gender')
         extra_kwargs = {
             'phone_number': {'read_only': True},
             'last_name': {'required': True, 'min_length': 3, 'allow_blank': False},

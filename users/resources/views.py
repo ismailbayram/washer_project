@@ -104,16 +104,14 @@ class UserInfoView(APIView):
 
     def post(self, request, *args, **kwargs):
         instance = self.request.user
-
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         service = self.service()
-        service.change_user_names(user=instance, **serializer.validated_data)
-
+        service.update_user_info(user=instance, **serializer.validated_data)
         _, token = service.get_or_create_user(phone_number=instance.phone_number)
+        serializer = self.serializer_class(instance=_)
 
-        return Response({**serializer.validated_data, 'token': token})
+        return Response({**serializer.data, 'token': token})
 
 
 class ChangePhoneNumberRequestView(APIView):

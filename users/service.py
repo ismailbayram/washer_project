@@ -105,10 +105,18 @@ class UserService:
         user.save()
         return user
 
-    def change_user_names(self, user, first_name, last_name):
+    def update_user_info(self, user, first_name, last_name, gender):
+        """
+        :param user: User
+        :param first_name: str
+        :param last_name: str
+        :param gender: Gender
+        :return: User
+        """
         user.first_name = first_name
         user.last_name = last_name
-        user.save(update_fields=['first_name', 'last_name'])
+        user.gender = gender
+        user.save(update_fields=['first_name', 'last_name', 'gender'])
         return user
 
 
