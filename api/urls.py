@@ -51,7 +51,7 @@ router.register('campaigns', CampaignViewSet, base_name='campaigns')
 router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store
 router.register('reservations', CustomerReservationViewSet, base_name='reservations')  # for customers
 router.register('comments', CommentListViewSet, base_name='comments')
-router.register('cancellation_reasons', CancellationReasonViewSet, base_name='notifications')  # for getting cancellation reasons
+router.register('cancellation_reasons', CancellationReasonViewSet, base_name='cancellation_reason')  # for getting cancellation reasons
 # notifications
 router.register('notifications', NotificationViewSet, base_name='notifications')
 
