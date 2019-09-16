@@ -17,6 +17,7 @@ class Reservation(StarterModel):
     total_amount = models.DecimalField(decimal_places=2, max_digits=6, null=True, default=None)
     net_amount = models.DecimalField(decimal_places=2, max_digits=6, null=True, default=None)
     number = models.CharField(max_length=10, unique=True)
+    cancellation_reason = models.ForeignKey("CancellationReason", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f'{self.status.label}'
@@ -31,3 +32,11 @@ class Comment(StarterModel):
     comment = models.CharField(max_length=255)
     reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE, related_name='comment')
     reply = models.CharField(max_length=255, null=True)
+
+
+class CancellationReason(StarterModel):
+    reason = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.reason

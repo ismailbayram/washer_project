@@ -7,7 +7,7 @@ from admin.cars.filters import CarFilterSet
 
 
 class CarAdminViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Car.objects.filter(is_active=True)
+    queryset = Car.objects.all()
     serializer_class = CarSerializer
     permission_classes = (IsAdminUser, )
     filter_class = CarFilterSet

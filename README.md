@@ -11,6 +11,28 @@
 - `pip install -r reqirements.txt`
 - `./manage.py migrate`
 - install packages list in the `ubuntu_packages.txt` file
+- You should a file named `settings_local.py` in the settings directory and paste the below snippet into it.
+```
+DEBUG = True
+ALLOWED_HOSTS = ['*']
+
+SHELL_PLUS_PRE_IMPORTS = (
+    ('users.service', '*'),
+    ('users.enums', '*'),
+    ('address.service', '*'),
+    ('stores.service', '*'),
+    ('cars.service', '*'),
+    ('cars.enums', '*'),
+    ('products.enums', '*'),
+    ('products.service', '*'),
+    ('baskets.service', '*'),
+    ('baskets.enums', '*'),
+    ('reservations.enums', '*'),
+    ('reservations.service', '*'),
+    ('search.indexer', '*'),
+    ('search.service', '*'),
+)
+``` 
 ### Dummy data
 - Run `python dummy_data.py`
 - Run celery and write below comands at python shell; 

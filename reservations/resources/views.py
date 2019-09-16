@@ -1,15 +1,18 @@
 from rest_framework import mixins, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from api.permissions import HasGroupPermission, IsCustomerOrReadOnlyPermission
-from reservations.models import Comment, Reservation
+from api.views import MultiSerializerViewMixin
+from reservations.models import Comment, Reservation, CancellationReason
 from reservations.resources.filters import (CommentFilterSet,
                                             ReservationFilterSet)
 from reservations.resources.serializers import (CommentSerializer,
                                                 ReplySerializer,
-                                                ReservationSerializer)
+                                                ReservationSerializer,
+                                                CancellationReasonSerializer,
+                                                CancelReservationSerializer)
 from reservations.service import CommentService, ReservationService
 from users.enums import GroupType
 from search.indexer import ReservationIndexer, StoreIndexer
@@ -67,11 +70,14 @@ class CustomerReservationViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
+class StoreReservationViewSet(MultiSerializerViewMixin, viewsets.ReadOnlyModelViewSet):
     queryset = CustomerReservationViewSet.queryset
     serializer_class = ReservationSerializer
     service = ReservationService()
     permission_classes = (HasGroupPermission,)
+    action_serializers = {
+        'cancel': CancelReservationSerializer
+    }
     permission_groups = {
         'list': [GroupType.washer, GroupType.worker],
         'retrieve': [GroupType.washer, GroupType.worker],
@@ -104,7 +110,10 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
     def cancel(self, request, *args, **kwargs):
         reservation = self.get_object()
         self._check_object_permission(request, reservation)
-        reservation = self.service.cancel(reservation)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        reason = serializer.validated_data.get('cancellation_reason')
+        reservation = self.service.cancel(reservation, reason)
         serializer = self.get_serializer(instance=reservation)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -144,6 +153,12 @@ class StoreReservationViewSet(viewsets.ReadOnlyModelViewSet):
         elif washer_profile and not reservation.store.washer_profile == washer_profile:
             self.permission_denied(request)
         return True
+
+
+class CancellationReasonViewSet(ReadOnlyModelViewSet):
+    # TODO: cache it
+    queryset = CancellationReason.objects.filter(is_active=True)
+    serializer_class = CancellationReasonSerializer
 
 
 class CommentListViewSet(mixins.ListModelMixin,

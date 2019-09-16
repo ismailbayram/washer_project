@@ -10,7 +10,8 @@ from notifications.resources.views import NotificationViewSet
 from products.resources.views import ProductListViewSet, ProductViewSet
 from reservations.resources.views import (CommentListViewSet,
                                           CustomerReservationViewSet,
-                                          StoreReservationViewSet)
+                                          StoreReservationViewSet,
+                                          CancellationReasonViewSet)
 from search.resources.views import ReservationSearchView, StoreSearchView
 from stores.resources.views import StoreDetailView, StoreViewSet
 from users.resources.views import (AuthView, ChangePhoneNumberRequestView,
@@ -50,6 +51,7 @@ router.register('campaigns', CampaignViewSet, base_name='campaigns')
 router.register('my_reservations', StoreReservationViewSet, base_name='my_reservations')  # for store
 router.register('reservations', CustomerReservationViewSet, base_name='reservations')  # for customers
 router.register('comments', CommentListViewSet, base_name='comments')
+router.register('cancellation_reason', CancellationReasonViewSet, base_name='cancellation_reason')  # for getting cancellation reasons
 
 # notifications
 router.register('notifications', NotificationViewSet, base_name='notifications')

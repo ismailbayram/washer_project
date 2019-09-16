@@ -25,6 +25,7 @@ from reservations.exceptions import (ReservationAlreadyCommented,
                                      ReservationNotAvailableException,
                                      ReservationOccupiedBySomeoneException,
                                      ReservationStartedException)
+from reservations.models import CancellationReason
 from reservations.service import CommentService, ReservationService
 from stores.exceptions import StoreNotAvailableException
 
@@ -270,14 +271,18 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
     def test_cancel(self):
         dt = timezone.now()
         reservation = self.service._create_reservation(self.store, dt, 40)
+        reason = "canım istedi"
+
+        cancellation_reason = CancellationReason.objects.create(reason=reason)
 
         with self.assertRaises(ReservationCanNotCancelledException):
-            self.service.cancel(reservation)
+            self.service.cancel(reservation, cancellation_reason)
 
         reservation.status = ReservationStatus.reserved
         reservation.customer_profile = self.customer_profile
         reservation.save()
-        reservation = self.service.cancel(reservation)
+        reservation = self.service.cancel(reservation, cancellation_reason)
+        self.assertEqual(reservation.cancellation_reason.reason, reason)
 
         # START notif test
         self.assertEqual(self.store.washer_profile.notifications.count(), 1)
