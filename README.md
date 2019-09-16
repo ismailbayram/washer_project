@@ -32,7 +32,7 @@ SHELL_PLUS_PRE_IMPORTS = (
     ('search.indexer', '*'),
     ('search.service', '*'),
 )
-``` 
+``` 
 ### Dummy data
 - Run `python dummy_data.py`
 - Run celery and write below comands at python shell; 
