@@ -5,6 +5,8 @@ from admin.address.views import CityViewSet, CountryViewSet, TownshipViewSet
 from admin.stores.views import StoreAdminViewSet
 from admin.users.views import LoginView, UserViewSet
 from admin.reservations.views import ReservationCancellationAdminViewSet
+from admin.cars.views import CarAdminViewSet
+
 from api.views import get_swagger_view
 
 schema_view = get_swagger_view(title='Washer Project API')
@@ -21,6 +23,9 @@ router.register('users', UserViewSet, 'users')
 
 # stores
 router.register('stores', StoreAdminViewSet, base_name='stores')
+
+# cars
+router.register('cars', CarAdminViewSet, base_name='cars')
 
 # reservations
 router.register('cancellation_reason', ReservationCancellationAdminViewSet, base_name='cancellation_reason')

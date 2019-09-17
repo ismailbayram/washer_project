@@ -1,5 +1,4 @@
 from rest_framework.serializers import ModelSerializer
-from rest_framework.validators import UniqueTogetherValidator
 
 from cars.models import Car
 from cars.enums import CarType
@@ -11,4 +10,4 @@ class CarSerializer(ModelSerializer):
 
     class Meta:
         model = Car
-        fields = ('pk', 'licence_plate', 'car_type', 'is_selected')
+        fields = ('pk', 'licence_plate', 'car_type', 'is_selected', 'is_active')
