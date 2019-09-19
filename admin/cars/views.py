@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
 
-from cars.resources.serializers import CarSerializer
+from admin.cars.serializers import CarSerializer
 from cars.models import Car
 from admin.cars.filters import CarFilterSet
 
