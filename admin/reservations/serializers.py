@@ -6,4 +6,5 @@ from reservations.models import CancellationReason
 class CancellationReasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = CancellationReason
-        fields = "__all__"
+        fields = ('pk', 'reason', 'is_active',
+                  'created_date', 'modified_date', )
