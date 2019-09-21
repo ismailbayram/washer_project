@@ -28,7 +28,7 @@ router.register('stores', StoreAdminViewSet, base_name='stores')
 router.register('cars', CarAdminViewSet, base_name='cars')
 
 # reservations
-router.register('cancellation_reason', ReservationCancellationAdminViewSet, base_name='cancellation_reason')
+router.register('cancellation_reasons', ReservationCancellationAdminViewSet, base_name='cancellation_reasons')
 
 
 app_name = 'admin_api'
