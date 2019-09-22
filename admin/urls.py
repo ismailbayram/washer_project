@@ -6,6 +6,7 @@ from admin.stores.views import StoreAdminViewSet
 from admin.users.views import LoginView, UserViewSet
 from admin.reservations.views import ReservationCancellationAdminViewSet
 from admin.cars.views import CarAdminViewSet
+from admin.dashboard.views import DashboardViewSet
 from admin.campaigns.views import CampaignAdminViewSet
 
 from api.views import get_swagger_view
@@ -18,6 +19,9 @@ router = DefaultRouter()
 router.register('countries', CountryViewSet, base_name='countries')
 router.register('cities', CityViewSet, base_name='cities')
 router.register('townships', TownshipViewSet, base_name='townships')
+
+# dashboard
+router.register('dashboard', DashboardViewSet, base_name='dashboard')
 
 # users
 router.register('users', UserViewSet, 'users')
@@ -38,5 +42,5 @@ app_name = 'admin_api'
 
 urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
-    path('auth/', LoginView.as_view(), name="auth"),
+    path('auth/', LoginView.as_view(), name='auth'),
 ]

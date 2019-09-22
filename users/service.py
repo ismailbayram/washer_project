@@ -3,7 +3,6 @@ from uuid import uuid4
 
 from django.contrib.auth.models import Group, update_last_login
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError
 from django.utils import timezone
 from rest_framework_jwt.settings import api_settings as jwt_settings
 
