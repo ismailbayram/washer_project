@@ -33,11 +33,10 @@ class Base64FieldMixin(object):
         if base64_data in self.EMPTY_VALUES:
             if self.allow_empty_file:
                 return None
-            else:
-                raise ValidationError(
-                    _('Invalid type. This is not an base64 string: {}'.format(
-                        type(base64_data)))
-                )
+            raise ValidationError(
+                _('Invalid type. This is not an base64 string: {}'.format(
+                    type(base64_data)))
+            )
 
         if isinstance(base64_data, six.string_types):
             # Strip base64 header.
