@@ -1,4 +1,5 @@
 import imghdr
+import io
 import base64
 
 from django.utils.translation import ugettext_lazy as _
@@ -40,7 +41,12 @@ class Base64ImageField(Base64FieldMixin, ImageField):
     INVALID_FILE_MESSAGE = _("Please upload a valid image.")
     INVALID_TYPE_MESSAGE = _("The type of the image couldn't be determined.")
 
+
     def get_file_extension(self, filename, decoded_file):
+        try:
+            from PIL import Image
+        except ImportError:
+            raise ImportError("Pillow is not installed.")
         extension = imghdr.what(filename, decoded_file)
 
         # Try with PIL as fallback if format not detected due

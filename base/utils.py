@@ -48,7 +48,7 @@ def compress_image(image, do_square=False):
 
     f = BytesIO()
 
-    fill_color = '#ffffff'  # your background
+    fill_color = '#ffffff'
     if pil_image.mode in ('RGBA', 'LA'):
         background = Image.new(pil_image.mode[:-1], pil_image.size, fill_color)
         background.paste(pil_image, pil_image.split()[-1])
