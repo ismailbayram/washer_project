@@ -112,7 +112,7 @@ class ConfigSerializer(serializers.Serializer):
 
 
 class StoreImageSerializer(serializers.Serializer):
-    image = Base64ImageField(required=True)
+    image = Base64ImageField(required=True, allow_empty_file=False)
 
     class Meta:
         model = StoreImageItem
@@ -120,7 +120,7 @@ class StoreImageSerializer(serializers.Serializer):
 
 
 class StoreLogoSerializer(serializers.ModelSerializer):
-    logo = Base64ImageField(required=True)
+    logo = Base64ImageField(required=True, allow_empty_file=False)
 
     class Meta:
         model = Store
@@ -129,10 +129,17 @@ class StoreLogoSerializer(serializers.ModelSerializer):
 
 class StoreImagesWithSizesSerializer(serializers.RelatedField):
     def to_representation(self, obj):
-        images = {'full': obj.image.url}
+        request = self.context.get('request')
+
+        images = {
+            'full': request.build_absolute_uri(obj.image.url)
+        }
         for name, _ in settings.IMAGE_SIZES.items():
-            images[name] = thumbnail_file_name_by_orginal_name(obj.image.url, name)
-        return {"pk":obj.pk, "image":images}
+            images[name] = thumbnail_file_name_by_orginal_name(
+                request.build_absolute_uri(obj.image.url),
+                name
+            )
+        return {"pk": obj.pk, "image": images}
 
 
 class StoreSerializer(serializers.ModelSerializer):

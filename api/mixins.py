@@ -5,6 +5,7 @@ import uuid
 
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 
 class Base64FieldMixin(object):
@@ -30,7 +31,12 @@ class Base64FieldMixin(object):
     def to_internal_value(self, base64_data):
         # Check if this is a base64 string
         if base64_data in self.EMPTY_VALUES:
-            return None
+            if self.allow_empty_file:
+                return None
+            raise ValidationError(
+                _('Invalid type. This is not an base64 string: {}'.format(
+                    type(base64_data)))
+            )
 
         if isinstance(base64_data, six.string_types):
             # Strip base64 header.
@@ -58,7 +64,7 @@ class Base64FieldMixin(object):
         raise NotImplementedError
 
     def get_file_name(self, decoded_file):
-        return str(uuid.uuid4())[:12]  # 12 characters are more than enough.
+        return str(uuid.uuid4())
 
     def to_representation(self, file):
         if self.represent_in_base64:
