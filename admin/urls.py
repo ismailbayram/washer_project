@@ -8,6 +8,7 @@ from admin.reservations.views import ReservationCancellationAdminViewSet
 from admin.cars.views import CarAdminViewSet
 from admin.dashboard.views import DashboardViewSet
 from admin.campaigns.views import CampaignAdminViewSet
+from admin.products.views import ProductPriceAdminViewSet
 
 from api.views import get_swagger_view
 
@@ -37,6 +38,9 @@ router.register('cancellation_reasons', ReservationCancellationAdminViewSet, bas
 
 # campaigns
 router.register('campaigns', CampaignAdminViewSet, base_name='campaigns')
+
+# products
+router.register('product_prices', ProductPriceAdminViewSet, base_name='product_prices')
 
 app_name = 'admin_api'
 
