@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 from admin.address.views import CityViewSet, CountryViewSet, TownshipViewSet
 from admin.stores.views import StoreAdminViewSet
 from admin.users.views import LoginView, UserViewSet
-from admin.reservations.views import ReservationCancellationAdminViewSet
+from admin.reservations.views import ReservationCancellationAdminViewSet, \
+                                     ReservationAdminViewSet
 from admin.cars.views import CarAdminViewSet
 from admin.dashboard.views import DashboardViewSet
 from admin.campaigns.views import CampaignAdminViewSet
@@ -35,6 +36,7 @@ router.register('cars', CarAdminViewSet, base_name='cars')
 
 # reservations
 router.register('cancellation_reasons', ReservationCancellationAdminViewSet, base_name='cancellation_reasons')
+router.register('reservations', ReservationAdminViewSet, base_name='reservations')
 
 # campaigns
 router.register('campaigns', CampaignAdminViewSet, base_name='campaigns')
