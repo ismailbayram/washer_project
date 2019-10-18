@@ -9,7 +9,6 @@ from model_mommy import mommy
 from base.test import BaseTestViewMixin
 from base.utils import thumbnail_file_name_by_orginal_name
 from cars.enums import CarType
-from notifications.enums import NotificationType
 from stores.service import StoreService
 
 
@@ -88,21 +87,6 @@ class StoreServiceTest(BaseTestViewMixin, TestCase):
         self.assertEqual(store.latitude, data['latitude'])
         self.assertEqual(store.longitude, data['longitude'])
 
-    def test_approve(self):
-        store = mommy.make('stores.Store', is_approved=False)
-        store = self.service.approve_store(store)
-        self.assertTrue(store.is_approved)
-
-        # START notif test
-        self.assertEqual(store.washer_profile.notifications.count(), 1)
-        self.assertEqual(store.washer_profile.notifications.last().notification_type,
-                         NotificationType.store_approved)
-        # END notif test
-
-    def test_decline(self):
-        store = mommy.make('stores.Store', is_approved=True)
-        store = self.service.decline_store(store)
-        self.assertFalse(store.is_approved)
 
     # def test_active(self):
     #     store = mommy.make('stores.Store', is_active=False)

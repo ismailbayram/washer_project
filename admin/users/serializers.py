@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
-from users.models import User
+from api.validators import is_valid_phone
+from users.models import User, WasherProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ('pk', 'date_joined', 'last_login', 'first_name', 'last_name',
@@ -19,3 +19,15 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
+
+
+class BaseProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = WasherProfile
+        fields = ('pk', 'user',)
+
+
+class WasherProfileSerializer(BaseProfileSerializer):
+    pass

@@ -92,31 +92,6 @@ class StoreService:
 
         return store
 
-    def approve_store(self, instance):
-        """
-        :param instance: Store
-        :return: Store
-        """
-        instance.is_approved = True
-        instance.save(update_fields=['is_approved'])
-
-        notif_service = NotificationService()
-        notif_service.send(instance=instance, to=instance.washer_profile,
-                           notif_type=NotificationType.store_approved)
-
-        return instance
-
-    def decline_store(self, instance):
-        """
-        :param instance: Store
-        :return: Store
-        """
-        # TODO: check reservations
-        instance.is_approved = False
-        instance.save(update_fields=['is_approved'])
-        delete_store_index.delay(instance.id)
-        return instance
-
     # def activate_store(self, instance):
     #     """
     #     :param instance: Store
