@@ -8,7 +8,7 @@ from reservations.enums import ReservationStatus
 from reservations.models import Reservation
 from reservations.models import CancellationReason
 from reservations.resources.serializers import CommentSerializer
-from admin.cars.serializers import CustomerProfileSerializer
+from admin.users.serializers import CustomerProfileSerializer
 
 
 class CancellationReasonSerializer(serializers.ModelSerializer):

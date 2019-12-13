@@ -3,17 +3,7 @@ from rest_framework import serializers
 from cars.models import Car
 from cars.enums import CarType
 from api.fields import EnumField
-from users.models import User
-
-
-class CustomerProfileSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(source='user.first_name')
-    last_name = serializers.CharField(source='user.last_name')
-    phone_number = serializers.CharField(source='user.phone_number')
-
-    class Meta:
-        model = User
-        fields = ('pk', 'first_name', 'last_name', 'phone_number')
+from admin.users.serializers import CustomerProfileSerializer
 
 
 class CarSerializer(serializers.ModelSerializer):
