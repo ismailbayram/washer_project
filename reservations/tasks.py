@@ -40,7 +40,6 @@ def create_store_weekly_reservations(store_id):
                        notif_type=NotificationType.weekly_reservations_created,)
 
 
-
 @periodic_task(run_every=(crontab(minute='*/30')), name="reservations.check_expired_reservations")
 def check_expired_reservations():
     import pytz

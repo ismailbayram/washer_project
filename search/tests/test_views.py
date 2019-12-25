@@ -4,7 +4,7 @@ import datetime
 from rest_framework.reverse import reverse_lazy
 from model_mommy import mommy
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from base.test import BaseTestViewMixin
@@ -13,6 +13,7 @@ from products.service import ProductService
 from search.indexer import StoreIndexer, ReservationIndexer
 
 
+@override_settings(ES_STORE_INDEX='test_stores', ES_RESERVATION_INDEX='test_reservations')
 class StoreSearchViewTest(TestCase, BaseTestViewMixin):
     def setUp(self):
         self.init_users()
@@ -41,6 +42,7 @@ class StoreSearchViewTest(TestCase, BaseTestViewMixin):
         self.assertEqual(jresponse['count'], 2)
 
 
+@override_settings(ES_STORE_INDEX='test_stores', ES_RESERVATION_INDEX='test_reservations')
 class ReservationSearchViewTest(TestCase, BaseTestViewMixin):
     def setUp(self):
         self.init_users()
