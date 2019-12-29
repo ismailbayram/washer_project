@@ -3,6 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
+from django.utils.decorators import method_decorator
+
+from base.utils import cache_page
 from api.permissions import HasGroupPermission, IsCustomerOrReadOnlyPermission
 from api.views import MultiSerializerViewMixin
 from reservations.models import Comment, Reservation, CancellationReason
@@ -156,9 +159,12 @@ class StoreReservationViewSet(MultiSerializerViewMixin, viewsets.ReadOnlyModelVi
 
 
 class CancellationReasonViewSet(ReadOnlyModelViewSet):
-    # TODO: cache it
     queryset = CancellationReason.objects.filter(is_active=True)
     serializer_class = CancellationReasonSerializer
+
+    @method_decorator(cache_page())
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class CommentListViewSet(mixins.ListModelMixin,
