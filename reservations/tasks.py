@@ -37,7 +37,28 @@ def create_store_weekly_reservations(store_id):
     res_indexer.index_reservations(reservation_queryset)
     notif_service = NotificationService()
     notif_service.send(instance=store, to=store.washer_profile,
-                       notif_type=NotificationType.weekly_reservations_created,)
+                       notif_type=NotificationType.weekly_reservations_created, )
+
+
+@app.task(name="reservations.send_reminder_reservation_notification")
+def send_reminder_reservation_notification(customer_id, reservation_id):
+    from reservations.models import Reservation
+    from reservations.enums import ReservationStatus
+    from notifications.service import NotificationService
+    from notifications.enums import NotificationType
+
+    reservation = Reservation.objects.get(pk=reservation_id)
+    notif_service = NotificationService()
+
+    if not (reservation.status == ReservationStatus.reserved and \
+            reservation.customer_profile_id == customer_id):
+        return False
+
+    notif_service.send(instance=reservation, to=reservation.store,
+                       notif_type=NotificationType.reservation_reminder_s)
+    notif_service.send(instance=reservation, to=reservation.customer_profile,
+                       notif_type=NotificationType.reservation_reminder_c)
+    return True
 
 
 @periodic_task(run_every=(crontab(minute='*/30')), name="reservations.check_expired_reservations")

@@ -23,7 +23,8 @@ from reservations.exceptions import (ReservationAlreadyCommented,
                                      ReservationOccupiedBySomeoneException,
                                      ReservationStartedException)
 from reservations.models import Comment, Reservation
-from reservations.tasks import prevent_occupying_reservation
+from reservations.tasks import (prevent_occupying_reservation,
+                                send_reminder_reservation_notification)
 from stores.exceptions import StoreNotAvailableException
 
 
@@ -168,6 +169,11 @@ class ReservationService(object):
                                notif_type=NotificationType.reservation_reserved,)
             notif_service.send(instance=reservation, to=customer_profile,
                                notif_type=NotificationType.reservation_reserved,)
+
+            reminder_dt = reservation.start_datetime - datetime.timedelta(minutes=30)
+            send_reminder_reservation_notification.apply_async((customer_profile.pk,
+                                                                reservation.pk),
+                                                               eta=reminder_dt)
 
         return reservation
 

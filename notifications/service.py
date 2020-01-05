@@ -69,6 +69,8 @@ class NotificationService:
                 NotificationType.reservation_disabled,
                 NotificationType.reservation_expired,
                 NotificationType.reservation_reserved,
+                NotificationType.reservation_reminder_s,
+                NotificationType.reservation_reminder_c,
                 NotificationType.reservation_started,
                 NotificationType.reservation_completed,
                 NotificationType.reservation_cancelled,
