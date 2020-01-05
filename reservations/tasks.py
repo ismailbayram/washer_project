@@ -1,5 +1,4 @@
-from celery.schedules import crontab
-from celery.task import periodic_task
+from base.tasks import LockTask
 
 from notifications.enums import NotificationType
 from notifications.service import NotificationService
@@ -61,7 +60,7 @@ def send_reminder_reservation_notification(customer_id, reservation_id):
     return True
 
 
-@periodic_task(run_every=(crontab(minute='*/30')), name="reservations.check_expired_reservations")
+@app.task(base=LockTask)
 def check_expired_reservations():
     import pytz
     from datetime import datetime
@@ -82,7 +81,7 @@ def check_expired_reservations():
     res_indexer.delete_expired(dt)
 
 
-@periodic_task(run_every=(crontab(hour='4', minute='0')), name="reservations.create_next_week_day")
+@app.task(base=LockTask)
 def create_next_week_day():
     # every day at 4 am
     import datetime
