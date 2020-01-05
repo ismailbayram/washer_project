@@ -1,8 +1,11 @@
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.utils.decorators import method_decorator
+
+from base.utils import cache_page
 from stores.resources.serializers import StoreSerializer
 from stores.models import Store
 from admin.dashboard.enums import GroupTimeType
@@ -16,14 +19,15 @@ from reservations.models import Reservation
 class DashboardViewSet(viewsets.ViewSet):
     permission_classes = (IsAdminUser, )
     service = DashboardService()
-    # TODO: cache them all!!!
 
+    @method_decorator(cache_page())
     @action(methods=['GET'], detail=False)
     def stores_waiting_approve(self, request, *args, **kwargs):
         stores = self.service.get_stores_waiting_approve()
         serializer = StoreSerializer(instance=stores, many=True)
         return Response(serializer.data)
 
+    @method_decorator(cache_page())
     @action(methods=['GET'], detail=False)
     def total_counts_without_range(self, request, *args, **kwargs):
         data = self.service.get_total_users_on_grups_count(User.objects.all())
@@ -32,6 +36,7 @@ class DashboardViewSet(viewsets.ViewSet):
         })
         return Response(data)
 
+    @method_decorator(cache_page())
     @action(methods=['GET'], detail=False)
     def total_counts(self, request, *args, **kwargs):
         serializer = GroupTimeSerializer(data=request.GET)
@@ -41,13 +46,13 @@ class DashboardViewSet(viewsets.ViewSet):
             function=self.service.get_total_users_on_grups_count,
             queryset=User.objects.all(),
             lookup_field="date_joined",
-            **serializer.validated_data,
+            **serializer.validated_data
         )
         stores = self.service.grouping_with_time(
             function=self.service.get_total_store_count,
             queryset=Store.objects.all(),
             lookup_field="created_date",
-            **serializer.validated_data,
+            **serializer.validated_data
         )
 
         return_dict = {}
@@ -57,6 +62,7 @@ class DashboardViewSet(viewsets.ViewSet):
 
         return Response(return_dict)
 
+    @method_decorator(cache_page())
     @action(methods=['GET'], detail=False)
     def reservations(self, request, *args, **kwargs):
         serializer = GroupTimeSerializer(data=request.GET)

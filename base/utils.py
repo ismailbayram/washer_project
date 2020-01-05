@@ -1,8 +1,11 @@
 from io import BytesIO
 from uuid import uuid4
 
-from django.core.files.base import ContentFile
 from PIL import Image
+
+from django.core.files.base import ContentFile
+from django.conf import settings
+from django.views.decorators.cache import cache_page as dj_cache
 
 
 def ordereddict_to_dict(value):
@@ -60,3 +63,7 @@ def compress_image(image, do_square=False):
 
 
     return image
+
+
+def cache_page(timeout=settings.CACHE_TTL):
+    return dj_cache(timeout)

@@ -17,7 +17,6 @@ class StoreSearchService:
             print('LOG HERE!')
 
         data = serializer.validated_data
-        # TODO: cache by hashing query params: hash(data)
 
         query = StoreDoc.search()
         if 'pk' in data:
@@ -87,7 +86,6 @@ class ReservationSearchService:
             print('LOG HERE!')
 
         data = serializer.validated_data
-        # TODO: cache by hashing query params: hash(data)
         query = ReservationDoc.search()
 
         if 'pk' in data:

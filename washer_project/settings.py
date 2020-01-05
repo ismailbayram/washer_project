@@ -176,6 +176,19 @@ IMAGE_SIZES = {
 DEFAULT_PRODUCT_PRICE = Decimal('30.00')
 MINIMUM_PRODUCT_PRICE = Decimal('0.99')
 
+CACHE_TTL = 60 * 5  # 5 minutes
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "TIMEOUT": CACHE_TTL, # 5 minutes
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "_aracyika_"
+    }
+}
+
 
 try:
     from washer_project.settings_local import *
