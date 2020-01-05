@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from api.validators import is_valid_phone
-from users.models import User, WasherProfile
+from users.models import User, WasherProfile, CustomerProfile, WorkerProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,9 +24,19 @@ class BaseProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 
     class Meta:
-        model = WasherProfile
         fields = ('pk', 'user',)
 
 
 class WasherProfileSerializer(BaseProfileSerializer):
-    pass
+    class Meta(BaseProfileSerializer.Meta):
+        model = WasherProfile
+
+
+class WorkerProfileSerializer(BaseProfileSerializer):
+    class Meta(BaseProfileSerializer.Meta):
+        model = WorkerProfile
+
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    class Meta(BaseProfileSerializer.Meta):
+        model = CustomerProfile
