@@ -1,4 +1,5 @@
 import sys
+import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -13,12 +14,17 @@ class Command(BaseCommand):
     requires_system_checks = False
     test_runner = None
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'washer_project.settings_test'
+
     def run_from_argv(self, argv):
         """
         Pre-parse the command line to extract the value of the --testrunner
         option. This allows a test runner to define additional command line
         arguments.
         """
+        argv.append('--settings=washer_project.settings_test')
         self.test_runner = get_command_line_option(argv, '--testrunner')
         super().run_from_argv(argv)
 
@@ -40,7 +46,6 @@ class Command(BaseCommand):
             help='Tells Django to use specified test runner class instead of '
                  'the one specified by the TEST_RUNNER setting.',
         )
-
         test_runner_class = get_runner(settings, self.test_runner)
 
         if hasattr(test_runner_class, 'add_arguments'):

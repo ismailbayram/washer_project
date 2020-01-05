@@ -12,7 +12,6 @@ from search.documents import StoreDoc, ReservationDoc
 from search.indexer import StoreIndexer, ReservationIndexer
 
 
-@override_settings(ES_STORE_INDEX='test_stores', ES_RESERVATION_INDEX='test_reservations')
 class StoreIndexerTest(TestCase, BaseTestViewMixin):
     def setUp(self):
         self.init_users()
@@ -79,7 +78,6 @@ class StoreIndexerTest(TestCase, BaseTestViewMixin):
         self.assertEqual(response[0].store.name, "new name")
 
 
-@override_settings(ES_STORE_INDEX='test_stores', ES_RESERVATION_INDEX='test_reservations')
 class ReservationIndexerTest(TestCase, BaseTestViewMixin):
     def setUp(self):
         self.init_users()
