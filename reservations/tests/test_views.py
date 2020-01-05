@@ -414,7 +414,7 @@ class StoreReservationViewSetTest(TestCase, BaseTestViewMixin):
         )
         cancellation_reason = mommy.make('reservations.CancellationReason', reason="sebebi çok")
 
-        url = reverse_lazy('api:router:cancellation_reason-list')
+        url = reverse_lazy('api:router:cancellation_reasons-list')
         response = self.client.get(url, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -422,12 +422,12 @@ class StoreReservationViewSetTest(TestCase, BaseTestViewMixin):
         response = self.client.get(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        url = reverse_lazy('api:router:cancellation_reason-detail', args=[cancellation_reason.id])
+        url = reverse_lazy('api:router:cancellation_reasons-detail', args=[cancellation_reason.id])
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         response = self.client.get(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        url = reverse_lazy('api:router:cancellation_reason-detail', args=[cancellation_reason_not_active.id])
+        url = reverse_lazy('api:router:cancellation_reasons-detail', args=[cancellation_reason_not_active.id])
         headers = {'HTTP_AUTHORIZATION': f'Token {self.customer_token}'}
         response = self.client.get(url, content_type='application/json', **headers)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
