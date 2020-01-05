@@ -158,6 +158,7 @@ class BasketDiscountedTest(TestCase, BaseTestViewMixin):
     def test_one_free_in_nine(self):
         basket = self.service.get_or_create_basket(customer_profile=self.customer_profile)
         self.service.add_basket_item(basket, self.product1)
+        self.service.apply_discounts(basket)
         self.assertEqual(DiscountItem.objects.filter(basket=basket).count(), 0)
         self.assertEqual(basket.get_total_amount(), Decimal('20.00'))
         self.assertEqual(basket.get_net_amount(), Decimal('20.00'))
@@ -165,11 +166,13 @@ class BasketDiscountedTest(TestCase, BaseTestViewMixin):
         self._create_reservation_and_complete(self.customer_profile)
         basket = self.service.get_or_create_basket(self.customer_profile)
         self.service.add_basket_item(basket, self.product1)
+        self.service.apply_discounts(basket)
         self.assertEqual(DiscountItem.objects.filter(basket=basket).count(), 1)
         self.assertEqual(basket.get_total_amount(), Decimal('20.00'))
         self.assertEqual(basket.get_net_amount(), Decimal('0.00'))
 
         self.service.add_basket_item(basket, self.product2)
+        self.service.apply_discounts(basket)
         self.assertEqual(DiscountItem.objects.filter(basket=basket).count(), 1)
         self.assertEqual(basket.discountitem_set.first().campaign, self.campaign)
         self.assertEqual(basket.get_total_amount(), Decimal('40.00'))
@@ -182,11 +185,13 @@ class BasketDiscountedTest(TestCase, BaseTestViewMixin):
 
         basket = self.service.clean_basket(basket)
         self.service.add_basket_item(basket, self.product1)
+        self.service.apply_discounts(basket)
         self.assertEqual(DiscountItem.objects.filter(basket=basket).count(), 1)
         self.assertEqual(basket.get_total_amount(), Decimal('20.00'))
         self.assertEqual(basket.get_net_amount(), Decimal('0.00'))
 
         self.service.add_basket_item(basket, self.product2)
+        self.service.apply_discounts(basket)
         self.assertEqual(DiscountItem.objects.filter(basket=basket).count(), 1)
         self.assertEqual(basket.get_total_amount(), Decimal('40.00'))
         self.assertEqual(basket.get_net_amount(), Decimal('20.00'))

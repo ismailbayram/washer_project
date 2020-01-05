@@ -30,7 +30,6 @@ class BasketService:
             basket = Basket.objects.create(customer_profile=customer_profile,
                                            status=BasketStatus.active,
                                            car=customer_profile.selected_car)
-        self.apply_discounts(basket)
         return basket
 
     def apply_discounts(self, basket):
@@ -91,7 +90,6 @@ class BasketService:
             basket_item = BasketItem.objects.create(basket=basket, product=product)
 
         self._check_basket_items(basket)
-        self.apply_discounts(basket)
         return basket_item
 
     def clean_discounts(self, basket):
