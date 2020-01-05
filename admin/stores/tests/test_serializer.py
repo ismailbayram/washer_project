@@ -9,9 +9,8 @@ from base.test import BaseTestViewMixin
 from products.models import Product
 from products.service import ProductService
 from reservations.enums import ReservationStatus
-from reservations.models import Reservation
 from reservations.service import CommentService, ReservationService
-from stores.models import Store
+from reservations.resources.serializers import CommentSerializer
 
 
 class StoreSerializerTest(BaseTestViewMixin, TestCase):
@@ -111,11 +110,20 @@ class StoreSerializerTest(BaseTestViewMixin, TestCase):
         )
         reservation.status = ReservationStatus.completed
         reservation.save()
-        
+
         # print(reservation.rating)
+        self.comment1 = CommentService().comment(
+            rating=10, comment="naber", reservation=reservation
+        )
 
-        CommentService().comment(rating=10, comment="naber", reservation=reservation)
-
+        reservation = ReservationService()._create_reservation(
+            self.store, timezone.now(), 40
+        )
+        reservation.status = ReservationStatus.completed
+        reservation.save()
+        self.comment2 = CommentService().comment(
+            rating=8, comment="iyi", reservation=reservation
+        )
 
     def _recursive_equal_control(self, comming_data, expected_data, date_fields):
         """
@@ -130,7 +138,16 @@ class StoreSerializerTest(BaseTestViewMixin, TestCase):
         check the difference has 60 second or not
         """
         for expected_key, expected_val in expected_data.items():
-            if expected_key not in date_fields:
+            if expected_key == 'last_comments':
+                self._recursive_equal_control(
+                    comming_data[expected_key][1], CommentSerializer(self.comment1).data, []
+                )
+
+                self._recursive_equal_control(
+                    comming_data[expected_key][0], CommentSerializer(self.comment2).data, []
+                )
+
+            elif expected_key not in date_fields:
                 if isinstance(expected_val, dict):
                     self._recursive_equal_control(
                         comming_data[expected_key],
@@ -173,7 +190,7 @@ class StoreSerializerTest(BaseTestViewMixin, TestCase):
             "longitude": 34,
             "tax_office": "1",
             "tax_number": "2",
-            "rating": 10,
+            "rating": 9,
             "is_active": False,
             "is_approved": True,
             "weekly_reservation_count": 10,
@@ -195,7 +212,6 @@ class StoreSerializerTest(BaseTestViewMixin, TestCase):
 
         self._recursive_equal_control(comming_data, expected_data, dates)
 
-        ##
         self.store.config["reservation_hours"]["monday"] = {
             "start": "10:00",
             "end": "12:00",
