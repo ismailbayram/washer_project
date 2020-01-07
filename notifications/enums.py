@@ -1,5 +1,9 @@
+import logging
+
 from django.utils.translation import ugettext_lazy as _
 from enumfields import Enum
+
+logger = logging.getLogger(__name__)
 
 
 class NotificationType(Enum):
@@ -41,7 +45,8 @@ class NotificationType(Enum):
 
         try:
             return view_map[self.value]
-        except KeyError:
+        except KeyError as e:
+            logger.exception(e)
             return None
 
     def get_sentence(self, data):
@@ -71,6 +76,6 @@ class NotificationType(Enum):
 
         try:
             return sentence_map[self.value]
-        except KeyError:
-            # TODO: log here
+        except KeyError as e:
+            logger.exception(e)
             return None

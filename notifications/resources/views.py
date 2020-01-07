@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.exceptions import NotFound
 from rest_framework.mixins import ListModelMixin
@@ -8,6 +10,8 @@ from notifications.models import Notification
 from notifications.resources.serializers import NotificationSerializer
 from notifications.service import NotificationService
 from users.enums import GroupType
+
+logger = logging.getLogger(__name__)
 
 
 class NotificationViewSet(ListModelMixin, GenericViewSet):
@@ -45,7 +49,11 @@ class NotificationViewSet(ListModelMixin, GenericViewSet):
             queryset = Notification.objects.filter(content_type=ct,
                                                    object_id=object_id)
         else:
-            # TODO log here
+            logger.warning(
+                "Wrong x-profile-type on notifications with args:{} kwargs:{}".format(
+                    args, kwargs
+                )
+            )
             raise NotFound()
 
         return super().filter_queryset(queryset)

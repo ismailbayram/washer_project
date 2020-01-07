@@ -1,8 +1,12 @@
+import logging
+
 from django.conf import settings
 
 from search.documents import StoreDoc, ReservationDoc
 from search.resources.serializers import (StoreFilterSerializer,
                                           ReservationFilterSerializer)
+
+logger = logging.getLogger(__name__)
 
 
 class StoreSearchService:
@@ -13,8 +17,9 @@ class StoreSearchService:
         """
         serializer = StoreFilterSerializer(data=query_params)
         if not serializer.is_valid():
-            # TODO: Log here
-            print('LOG HERE!')
+            logger.error("Non valid store searhing with: {}.".format(
+                query_params
+            ))
 
         data = serializer.validated_data
 
@@ -82,8 +87,9 @@ class ReservationSearchService:
         """
         serializer = ReservationFilterSerializer(data=query_params)
         if not serializer.is_valid():
-            # TODO: Log here
-            print('LOG HERE!')
+            logger.error("Non valid reservation searhing with: {}".format(
+                query_params
+            ))
 
         data = serializer.validated_data
         query = ReservationDoc.search()

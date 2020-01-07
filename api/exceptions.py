@@ -1,8 +1,12 @@
 # coding=utf-8
 from __future__ import unicode_literals
+import logging
+
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import exception_handler as rest_exception_handler
+
+logger = logging.getLogger(__name__)
 
 
 class ProjectBaseException(Exception):
@@ -30,7 +34,7 @@ class ProjectBaseException(Exception):
 
 
 def _custom_exception_handler(exc, context):
-    # TODO: logger.exception(exc)
+    logger.warning(exc)
     if isinstance(exc, ProjectBaseException):
         msg = exc.message
         data = {"non_field_errors": [msg],

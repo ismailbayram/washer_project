@@ -136,7 +136,7 @@ SWAGGER_SETTINGS = {
 LANGUAGE_CODE = 'tr-tr'
 
 LANGUAGES = [
-  ('tr-tr', 'Turkish'),
+    ('tr-tr', 'Turkish'),
 ]
 
 TIME_ZONE = 'Europe/Istanbul'
@@ -163,11 +163,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 IMAGE_SIZES = {
     # To get the full size "full"
-    "100x100":{
+    "100x100": {
         "height": 100,
         "width": 100,
     },
-    "250x250":{
+    "250x250": {
         "height": 250,
         "width": 250,
     },
@@ -175,6 +175,31 @@ IMAGE_SIZES = {
 
 DEFAULT_PRODUCT_PRICE = Decimal('30.00')
 MINIMUM_PRODUCT_PRICE = Decimal('0.99')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'app_log_formatter': {
+            'format': '{levelname} {asctime} :: {message}\n',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'log_file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/app.log',
+            'formatter': 'app_log_formatter',
+        },
+    },
+    'loggers': {},
+    'root': {
+        'handlers': ['log_file'],
+        'level': 'DEBUG',
+        'propagate': False,
+    }
+}
 
 CACHE_TTL = 60 * 5  # 5 minutes
 CACHES = {
@@ -188,7 +213,6 @@ CACHES = {
         "KEY_PREFIX": "_aracyika_"
     }
 }
-
 
 try:
     from washer_project.settings_local import *

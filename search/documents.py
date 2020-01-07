@@ -1,6 +1,9 @@
-import elasticsearch_dsl as es
+import logging
 
+import elasticsearch_dsl as es
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 class ESBaseDocument(es.Document):
@@ -9,7 +12,11 @@ class ESBaseDocument(es.Document):
         try:
             super().save(*args, **kwargs)
         except KeyError:
-            # TODO: log here with args and kwargs
+            logger.error(
+                "Elastic search saving error. args: {}, kwargs: {}".format(
+                    args, kwargs
+                )
+            )
             return None
 
 

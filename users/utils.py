@@ -6,7 +6,7 @@ from rest_framework_jwt.settings import api_settings
 
 def jwt_payload_handler(user):
     payload = {
-        # TODO delete user name and is's
+        # TODO: delete user name and is's
         'user_id': user.pk,
         'username': user.username,
         'phone_number': user.phone_number,
