@@ -10,9 +10,11 @@ class NotificationType(Enum):
     you_fired = 'you_fired'  # [to washer] you fired someone
     you_are_fired = 'you_are_fired'  # [to worker]
     you_are_moved_another_store = 'you_are_moved_another_store'  # [to worker]
+
     you_moved_worker_to_store = 'you_moved_worker_to_store'  # [to washer]
     you_has_new_worker = 'you_has_new_worker'  # [to washer]
     weekly_reservations_created = 'weekly_reservations_created'  # [to washer]
+
     reservation_disabled = 'reservation_disabled'  # [to store]
     reservation_expired = 'reservation_expired'  # [to store]
     reservation_reserved = 'reservation_reserved'  # [to store]
@@ -21,10 +23,13 @@ class NotificationType(Enum):
     reservation_started = 'reservation_started'  # [to store]
     reservation_completed = 'reservation_completed'  # [to store]
     reservation_cancelled = 'reservation_cancelled'  # [to store]
+    so_reservation_want_increase = 'so_reservation_want_increase'  # [to store]
 
-    store_approved = "store_approved" # [to washer]
+    store_approved = "store_approved"  # [to washer]
 
     def get_view(self):
+        """with views (and view_id which set on services set() method, mobile
+        app will know the redirection of page"""
         view_map = {
             'you_fired': 'profile',
             'you_are_fired': 'profile',
@@ -40,6 +45,7 @@ class NotificationType(Enum):
             'reservation_started': 'reservation',
             'reservation_completed': 'reservation',
             'reservation_cancelled': 'reservation',
+            'so_reservation_want_increase': 'store',
             'store_approved': 'store',
         }
 
@@ -71,7 +77,9 @@ class NotificationType(Enum):
             'reservation_started':         _('Reservation process started.'),
             'reservation_completed':       _('Reservation process completed.'),
             'reservation_cancelled':       _('Reservation cancelled by washer.'),
+            'so_reservation_want_increase': _('Your store filled 80% of appointments in this week. Don\'t you think increase reservation hours?'),
             'store_approved':              _('Your store has been approved.')
+
         }
 
         try:

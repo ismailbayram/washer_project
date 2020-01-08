@@ -157,7 +157,7 @@ class StoreSerializer(serializers.ModelSerializer):
             'rating': {'read_only': True},
             'is_active': {'read_only': True},
             'is_approved': {'read_only': True},
-            'phone_number': {'validators':[is_valid_phone]},
+            'phone_number': {'validators': [is_valid_phone]},
         }
 
 

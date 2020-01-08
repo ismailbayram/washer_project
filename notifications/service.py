@@ -1,3 +1,5 @@
+import logging
+
 from notifications.enums import NotificationType
 from stores.models import Store
 from users.models import WorkerProfile
@@ -74,6 +76,7 @@ class NotificationService:
                 NotificationType.reservation_started,
                 NotificationType.reservation_completed,
                 NotificationType.reservation_cancelled,
+                NotificationType.so_reservation_want_increase,
         ]:
             data = {
                 "store_id": instance.id,
@@ -85,7 +88,9 @@ class NotificationService:
             data = {"store_id": instance.id, "view_id": view_id}
 
         else:
-            raise NotImplementedError()
+            logging.error(f"Notification trying to send with:{notif_type} "
+                          "but it is not implemented on service's send() method.")
+            # raise NotImplementedError()
 
         self._create_notification(notification_type=notif_type, data=data, receiver=to)
 

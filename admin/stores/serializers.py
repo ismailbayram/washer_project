@@ -3,6 +3,7 @@ import datetime
 from rest_framework import serializers
 
 from address.resources.serializers import AddressDetailedSerializer
+from admin.stores.service import AdminStoreService
 from admin.users.serializers import WasherProfileSerializer
 from reservations.enums import ReservationStatus
 from reservations.models import Comment
@@ -47,28 +48,7 @@ class StoreAdminDetailedSerializer(StoreSerializer):
         }
 
     def get_weekly_reservation_count(self, obj):
-        period = obj.get_primary_product().period
-
-        count = 0
-        for day_name in ('monday', 'sunday', 'tuesday', 'wednesday',
-                         'thursday', 'friday', 'saturday'):
-            try:
-                start = obj.config['reservation_hours'][day_name]['start']
-                end = obj.config['reservation_hours'][day_name]['end']
-            except KeyError:
-                continue
-
-            if start and end:
-                start_delta = datetime.timedelta(
-                    hours=int(start.split(":")[0]), minutes=int(start.split(":")[1])
-                )
-                end_delta = datetime.timedelta(
-                    hours=int(end.split(":")[0]), minutes=int(end.split(":")[1])
-                )
-                total_minute = ((end_delta - start_delta).total_seconds())/60
-                count += total_minute//period
-
-        return count
+        return AdminStoreService().get_weekly_reservation_count(obj)
 
     def get_last_comments(self, obj):
         last_five_comment = Comment.objects.filter(

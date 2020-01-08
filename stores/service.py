@@ -8,13 +8,10 @@ from PIL import Image
 
 from base.utils import (compress_image, ordereddict_to_dict,
                         thumbnail_file_name_by_orginal_name)
-from notifications.enums import NotificationType
-from notifications.service import NotificationService
 from products.service import ProductService
 from stores.exceptions import (ImageDidNotDelete, StoreHasNoLogo,
                                StoreHasSoManyImageException)
 from stores.models import Store, StoreImageItem
-from stores.tasks import delete_store_index
 
 
 class StoreService:
