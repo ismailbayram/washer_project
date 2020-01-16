@@ -12,7 +12,7 @@ pipelines:
           services:
             - database
             - caching
-	    - elastic
+            - elastic
 definitions:
   services:
     database:
