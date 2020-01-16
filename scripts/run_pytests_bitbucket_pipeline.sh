@@ -1,7 +1,7 @@
 .sh
 #!/usr/bin/env bash
 
-file="oms_project/settings_local.py"
+file="washer_project/settings_test.py"
 if [ -f "$file" ]; then
     echo "settings_test exists..."
 else
