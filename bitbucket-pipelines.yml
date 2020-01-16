@@ -12,9 +12,12 @@ pipelines:
           services:
             - database
             - caching
+	    - elastic
 definitions:
   services:
     database:
       image: postgres:10-alpine
     caching:
       image: redis:4.0.14-alpine
+    elastic:
+      image: elasticsearch:7.2.0-alpine
