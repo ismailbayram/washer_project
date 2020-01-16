@@ -1,0 +1,20 @@
+image: python:3.7.3
+
+pipelines:
+  pull-requests:
+    issue-*:
+      - step:
+          caches:
+            - pip
+          script:
+            - pip install -r requirements.txt
+            - sh scripts/run_pytests_bitbucket_pipeline.sh
+          services:
+            - database
+            - caching
+definitions:
+  services:
+    database:
+      image: postgres:10-alpine
+    caching:
+      image: redis:4.0.14-alpine
