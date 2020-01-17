@@ -1,7 +1,7 @@
 # Washer Project
 ### Requirements
-- python3.7
-- postgresql
+- python@3.7
+- postgresql@11
 - elasticsearch@7.2
 - redis@5.0
 - celery@4.3
@@ -11,7 +11,7 @@
 - `pip install -r reqirements.txt`
 - `./manage.py migrate`
 - install packages list in the `ubuntu_packages.txt` file
-- You should a file named `settings_local.py` in the settings directory and paste the below snippet into it.
+- You should create a file named `settings_local.py` in the settings directory and paste the below snippet into it.
 ```
 DEBUG = True
 ALLOWED_HOSTS = ['*']
