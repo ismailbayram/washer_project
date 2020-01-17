@@ -8,6 +8,7 @@ from enumfields import EnumField
 from base.models import StarterModel
 from notifications.models import Notification
 from users.enums import GroupType, Gender
+from stores.models import Store
 
 
 class User(AbstractUser):
@@ -83,3 +84,10 @@ class SmsMessage(StarterModel):
     expire_datetime = models.DateTimeField()
     code = models.CharField(max_length=6)
     phone_number = models.CharField(max_length=255)
+
+
+class WorkerJobLog(StarterModel):
+    worker_profile = models.ForeignKey(to=WorkerProfile, on_delete=models.PROTECT, related_name='worker_profile')
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True)
+    store = models.ForeignKey(to=Store, on_delete=models.PROTECT, related_name='store')

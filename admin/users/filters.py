@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 from django.db.models import Q
-from users.models import User
+from users.models import User, WorkerJobLog
 from users.enums import GroupType
 
 
@@ -30,3 +30,22 @@ class UserFilterSet(filters.FilterSet):
         if bool(value):
             return qs.filter(groups__name=GroupType.washer.value)
         return qs.filter(~Q(groups__name=GroupType.washer.value))
+
+
+class WorkerJobLogFilterSet(filters.FilterSet):
+    start_date = filters.IsoDateTimeFromToRangeFilter()
+    end_date = filters.IsoDateTimeFromToRangeFilter()
+    first_name = filters.CharFilter(field_name='worker_profile__user__first_name',
+                                    lookup_expr='icontains')
+    last_name = filters.CharFilter(field_name='worker_profile__user__last_name',
+                                   lookup_expr='icontains')
+    store_name = filters.CharFilter(field_name='store__name', lookup_expr='icontains')
+    phone_number = filters.CharFilter(field_name='worker_profile__phone_number',
+                                      lookup_expr='exact')
+    worker_profile = filters.NumberFilter()
+    store = filters.NumberFilter()
+
+    class Meta:
+        model = WorkerJobLog
+        fields = ('worker_profile', 'store', 'start_date', 'end_date',
+                  'first_name', 'last_name', 'store_name', 'phone_number')

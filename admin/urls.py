@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from admin.address.views import CityViewSet, CountryViewSet, TownshipViewSet
 from admin.stores.views import StoreAdminViewSet
-from admin.users.views import LoginView, UserViewSet
+from admin.users.views import LoginView, UserViewSet, WorkerJobLogViewSet
 from admin.reservations.views import ReservationCancellationAdminViewSet, \
                                      ReservationAdminViewSet
 from admin.cars.views import CarAdminViewSet
@@ -43,6 +43,9 @@ router.register('campaigns', CampaignAdminViewSet, base_name='campaigns')
 
 # products
 router.register('product_prices', ProductPriceAdminViewSet, base_name='product_prices')
+
+# worker job log
+router.register('worker_job_log', WorkerJobLogViewSet, base_name='worker_job_log')
 
 app_name = 'admin_api'
 

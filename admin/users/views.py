@@ -6,10 +6,10 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from admin.users.serializers import LoginSerializer, UserSerializer
-from users.models import User
+from admin.users.serializers import LoginSerializer, UserSerializer, WorkerJobLogSerializer
+from users.models import User, WorkerJobLog
 from users.service import UserService
-from admin.users.filters import UserFilterSet
+from admin.users.filters import UserFilterSet, WorkerJobLogFilterSet
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -44,3 +44,10 @@ class LoginView(APIView):
             raise ValidationError({
                 "non_field_errors": [_('Username or password is incorrect')]
             })
+
+
+class WorkerJobLogViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = WorkerJobLog.objects.all()
+    serializer_class = WorkerJobLogSerializer
+    permission_classes = (IsAdminUser, )
+    filter_class = WorkerJobLogFilterSet

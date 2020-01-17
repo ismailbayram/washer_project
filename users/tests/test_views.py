@@ -7,12 +7,13 @@ from rest_framework.reverse import reverse_lazy
 
 from base.test import BaseTestViewMixin
 from users.enums import GroupType
-from users.service import SmsService, UserService
+from users.service import SmsService, UserService, WorkerJobLogService
 
 
 class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
     def setUp(self):
         self.user_service = UserService()
+        worker_job_log_service = WorkerJobLogService()
         super().setUp()
         self.init_users()
         self.store = mommy.make('stores.Store', washer_profile=self.washer_profile)
@@ -27,6 +28,7 @@ class WorkerProfileViewSetTestView(TestCase, BaseTestViewMixin):
         self.worker3, _ = self.user_service.get_or_create_user(first_name='Ahmet',
                                                                last_name='Cetin',
                                                                phone_number='+905388197551')
+        worker_job_log_service.start_job(self.worker_profile, self.worker_profile.store)
         self.worker3_profile = self.worker3.worker_profile
 
     def test_list(self):

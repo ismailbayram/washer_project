@@ -17,7 +17,7 @@ from users.exceptions import (SmsCodeExpiredException,
                               WorkerDoesNotBelongToWasherException,
                               WorkerHasNoStoreException)
 from users.models import CustomerProfile, SmsMessage, User
-from users.service import SmsService, UserService, WorkerProfileService
+from users.service import SmsService, UserService, WorkerProfileService, WorkerJobLogService
 
 
 class UserServiceTest(TestCase):
@@ -123,6 +123,7 @@ class WorkerProfileServiceTest(TestCase):
     def setUp(self):
         user_service = UserService()
         self.service = WorkerProfileService()
+        worker_job_log_service = WorkerJobLogService()
         washer, _ = user_service.get_or_create_user("555111", group_type=GroupType.washer)
         self.washer_profile = washer.washer_profile
         washer2, _ = user_service.get_or_create_user("555112", group_type=GroupType.washer)
@@ -135,6 +136,7 @@ class WorkerProfileServiceTest(TestCase):
         self.worker_profile.store = self.store
         self.worker_profile.washer_profile = self.washer_profile
         self.worker_profile.save()
+        worker_job_log_service.start_job(self.worker_profile, self.store)
 
     def test_create_worker(self):
         data = {
@@ -324,3 +326,38 @@ class SmsServiceTest(TestCase):
             )
 
         self.assertEqual(not_expired_sms_code, ret)
+
+class WorkerJobLogServiceTest(TestCase):
+    def setUp(self):
+        self.service = WorkerJobLogService()
+        user_service = UserService()
+        worker, _ = user_service.get_or_create_user(phone_number="+901111111111",
+                                                    group_type=GroupType.worker)
+        washer, _ = user_service.get_or_create_user(phone_number="+901111111112",
+                                                    group_type=GroupType.washer)
+        self.washer_profile = washer.washer_profile
+        self.store = mommy.make('stores.Store', washer_profile=self.washer_profile)
+        self.worker_profile = worker.worker_profile
+        self.worker_profile.store = self.store
+        self.worker_profile.washer_profile = self.washer_profile
+        self.worker_profile.save()
+
+    def test_start_job(self):
+        worker_job_log = self.service.start_job(worker_profile=self.worker_profile,
+                                                store= self.store)
+        d1 = timezone.now()
+        d2 = worker_job_log.start_date
+        self.assertTrue(abs(d1 - d2) < datetime.timedelta(seconds=1))
+        self.assertEqual(worker_job_log.worker_profile, self.worker_profile)
+        self.assertEqual(worker_job_log.store, self.store)
+        self.assertEqual(worker_job_log.end_date, None)
+
+    def test_end_job(self):
+        self.service.start_job(worker_profile=self.worker_profile,
+                               store= self.store)
+        worker_job_log = self.service.end_job(worker_profile=self.worker_profile)
+        d1 = timezone.now()
+        d2 = worker_job_log.end_date
+        self.assertTrue(abs(d1 - d2) < datetime.timedelta(seconds=1))
+        self.assertEqual(worker_job_log.worker_profile, self.worker_profile)
+        self.assertEqual(worker_job_log.store, self.store)

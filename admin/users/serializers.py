@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from users.models import User, WasherProfile, CustomerProfile, WorkerProfile
+from users.models import User, WasherProfile, CustomerProfile, WorkerProfile, WorkerJobLog
+from stores.resources.serializers import StoreSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,3 +41,13 @@ class WorkerProfileSerializer(BaseProfileSerializer):
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta(BaseProfileSerializer.Meta):
         model = CustomerProfile
+
+
+class WorkerJobLogSerializer(serializers.ModelSerializer):
+    worker_profile = WorkerProfileSerializer(read_only=True)
+    store = StoreSerializer(read_only=True)
+
+    class Meta:
+        model = WorkerJobLog
+        fields = ('pk', 'worker_profile', 'store', 'start_date',
+                  'end_date',)

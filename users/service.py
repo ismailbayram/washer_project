@@ -17,7 +17,7 @@ from users.exceptions import (SmsCodeExpiredException,
                               WorkerDoesNotBelongToWasherException,
                               WorkerHasNoStoreException)
 from users.models import (CustomerProfile, SmsMessage, User, WasherProfile,
-                          WorkerProfile)
+                          WorkerProfile, WorkerJobLog)
 
 
 class UserService:
@@ -149,9 +149,12 @@ class WorkerProfileService:
         notif_service.send(instance=worker_profile, to=worker_profile.washer_profile,
                            notif_type=NotificationType.you_has_new_worker)
 
+        worker_job_log_service = WorkerJobLogService()
+        worker_job_log_service.start_job(worker_profile, store)
 
         return worker_profile
 
+    @atomic
     def fire_worker(self, worker_profile):
         """
         :param worker_profile: WorkerProfile
@@ -162,6 +165,9 @@ class WorkerProfileService:
                            to=worker_profile)
         notif_service.send(instance=worker_profile, notif_type=NotificationType.you_fired,
                            to=worker_profile.washer_profile)
+
+        worker_job_log_service = WorkerJobLogService()
+        worker_job_log_service.end_job(worker_profile)
 
         worker_profile.store = None
         worker_profile.washer_profile = None
@@ -176,9 +182,15 @@ class WorkerProfileService:
         """
         if worker_profile.washer_profile and not store.washer_profile == worker_profile.washer_profile:
             raise StoreDoesNotBelongToWasherException(params=(worker_profile, store.washer_profile))
+
+        worker_job_log_service = WorkerJobLogService()
+        worker_job_log_service.end_job(worker_profile)
+
         worker_profile.store = store
         worker_profile.washer_profile = store.washer_profile
         worker_profile.save()
+
+        worker_job_log_service.start_job(worker_profile, store)
 
         notif_service = NotificationService()
         notif_service.send(instance=worker_profile, notif_type=NotificationType.you_are_fired,
@@ -303,3 +315,34 @@ class SmsService:
         sms_obj.save(update_fields=['is_expired'])
 
         return sms_obj
+
+
+class WorkerJobLogService:
+    def start_job(self, worker_profile, store):
+        """
+        :param worker_profile: WorkerProfile
+        :param store: Store
+        :return: WorkerJobLog
+        """
+        now = timezone.now()
+
+        worker_job_log = WorkerJobLog.objects.create(
+            worker_profile=worker_profile,
+            start_date=now,
+            store=store,
+        )
+
+        return worker_job_log
+
+    def end_job(self, worker_profile):
+        """
+        :param worker_profile: WorkerProfile
+        :return: WorkerJobLog
+        """
+        now = timezone.now()
+
+        worker_job_log = WorkerJobLog.objects.filter(worker_profile=worker_profile).order_by('pk').last()
+        worker_job_log.end_date = now
+        worker_job_log.save()
+
+        return worker_job_log
