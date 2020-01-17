@@ -2,6 +2,7 @@ image: "python:3.7"
 
 services:
   - postgres:latest
+  - redis:latest
   - name: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
     alias: elasticsearch-unit
     command: [ "bin/elasticsearch", "-Ediscovery.type=single-node" ]
@@ -9,6 +10,9 @@ services:
 variables:
   ELASTICSEARCH_HOST: elasticsearch-unit
   ELASTICSEARCH_PORT: 9200
+  POSTGRES_DB: test
+  POSTGRES_USER: test
+  POSTGRES_PASSWORD: "test"
 
 
 before_script:
@@ -19,7 +23,7 @@ before_script:
 test:
   stage: test
   script:
-    - python manage.py test --settings=washer_project.settings
-
-only:
-  - tags
+    - python manage.py test --settings=washer_project.settings_gitlab_ci
+  only:
+    - tags
+    - merge_requests
