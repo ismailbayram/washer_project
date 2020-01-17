@@ -25,7 +25,7 @@ class BasketViewSetTest(TestCase, BaseTestViewMixin):
         self.product2 = self.product_service.create_product(name='Parfume', store=self.store,
                                                             washer_profile=self.store.washer_profile)
         self.product3 = self.product_service.create_primary_product(self.store2)
-        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.normal,
+        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.sedan,
                                                customer_profile=self.customer_profile)
 
     def test_view_basket(self):

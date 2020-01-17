@@ -28,7 +28,7 @@ class ReservationTaskTestCase(BaseTestViewMixin, TransactionTestCase):
         self.product_service = ProductService()
         self.product1 = self.product_service.create_primary_product(self.store)
         self.car_service = CarService()
-        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.normal,
+        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.sedan,
                                                customer_profile=self.customer_profile)
         dt = timezone.now() + datetime.timedelta(minutes=30)
         self.res_service = ReservationService()

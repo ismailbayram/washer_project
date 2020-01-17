@@ -22,12 +22,12 @@ class CarServiceTest(TestCase):
 
         self.car1 = self.service.create_car(
             licence_plate="09 TK 40",
-            car_type=CarType.normal,
+            car_type=CarType.sedan,
             customer_profile=self.customer.customer_profile
         )
         self.car2 = self.service.create_car(
             licence_plate="09 TK 41",
-            car_type=CarType.normal,
+            car_type=CarType.sedan,
             customer_profile=self.customer.customer_profile
         )
         self.car3 = self.service.create_car(
@@ -39,7 +39,7 @@ class CarServiceTest(TestCase):
     def test_create_car(self):
         data = {
             'licence_plate': "07 Z 8686",
-            'car_type': CarType.normal,
+            'car_type': CarType.sedan,
             'customer_profile': self.customer.customer_profile
         }
         self.customer.customer_profile.cars.all().delete()
@@ -105,12 +105,12 @@ class CarServiceTest(TestCase):
         self.customer.customer_profile.cars.all().delete()
         car1 = self.service.create_car(
             licence_plate="09 TK 40",
-            car_type=CarType.normal,
+            car_type=CarType.sedan,
             customer_profile=self.customer.customer_profile
         )
         car2 = self.service.create_car(
             licence_plate="09 TK 41",
-            car_type=CarType.normal,
+            car_type=CarType.sedan,
             customer_profile=self.customer.customer_profile
         )
         self.service.deactivate_car(car1)

@@ -37,7 +37,7 @@ class BasketServiceTest(TestCase, BaseTestViewMixin):
         self.product4 = self.product_service.create_product(name='Parfume', store=self.store,
                                                             washer_profile=self.store.washer_profile,
                                                             is_primary=True)
-        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.normal,
+        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.sedan,
                                                customer_profile=self.customer_profile)
 
     def test_get_or_create_basket(self):
@@ -137,7 +137,7 @@ class BasketDiscountedTest(TestCase, BaseTestViewMixin):
         self.product1 = self.product_service.create_primary_product(self.store)
         self.product2 = self.product_service.create_product(name='Parfume', store=self.store,
                                                             washer_profile=self.store.washer_profile)
-        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.normal,
+        self.car = self.car_service.create_car(licence_plate="34FH3773", car_type=CarType.sedan,
                                                customer_profile=self.customer_profile)
         self.campaign = mommy.make('baskets.Campaign', name='1FreeIn9',
                                    promotion_type=PromotionType.one_free_in_nine, priority=0)

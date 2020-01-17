@@ -14,18 +14,18 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
         self.car1 = mommy.make(
             'cars.Car',
             licence_plate="09 TK 40",
-            car_type=CarType.normal,
+            car_type=CarType.sedan,
             customer_profile=self.customer_profile
         )
         self.car2 = mommy.make(
             'cars.Car',
             licence_plate="09 TK 41",
-            car_type=CarType.normal,
+            car_type=CarType.sedan,
         )
         self.car3 = mommy.make(
             'cars.Car',
             licence_plate="09 TK 43",
-            car_type=CarType.normal,
+            car_type=CarType.sedan,
             customer_profile=self.customer_profile
         )
 
@@ -44,7 +44,7 @@ class CarViewSetTest(BaseTestViewMixin, TestCase):
     def test_create_action(self):
         url = reverse_lazy('api:router:cars-list')
         test_licence_plate = "09 DN 01"
-        test_car_type = 'normal'
+        test_car_type = 'sedan'
         data = {
             'licence_plate': test_licence_plate,
             'car_type': test_car_type,

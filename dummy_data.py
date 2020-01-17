@@ -51,7 +51,7 @@ for number in range(100):
     }
     customer, _ = service.get_or_create_user(**data)
     customer_profile = customer.customer_profile
-    car_types = [CarType.normal, CarType.suv, CarType.commercial]
+    car_types = [CarType.sedan, CarType.suv, CarType.commercial]
     for k in range(3):
         car_data = {
             "licence_plate": f"34A00{k}",
