@@ -11,7 +11,7 @@ from products.exceptions import (PeriodIsRequiredException,
                                  ProductPriceCanNotLessThanException)
 
 PRIMARY_PRODUCT = {
-    'name': _('İç-Dış Yıkama'),
+    'name': _('In N Out Washing'),
     'price': settings.DEFAULT_PRODUCT_PRICE,
     'period': 45
 }

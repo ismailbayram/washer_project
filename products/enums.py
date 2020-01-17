@@ -17,6 +17,6 @@ class ProductType(Enum):
     other = 'other'
 
     class Labels:
-        periodic = _('Süreli')
-        # indefinite = _('Süresi Belirsiz')
-        other = _('Diğer')
+        periodic = _('Periodic')
+        # indefinite = _('Indefinite')
+        other = _('Other')

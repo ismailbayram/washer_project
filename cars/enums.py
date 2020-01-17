@@ -4,13 +4,13 @@ from enumfields import Enum
 
 
 class CarType(Enum):
-    normal = 'normal'
+    sedan = 'sedan'
+    hatchback = 'hatchback'
     suv = 'suv'
     commercial = 'commercial'
-    minibus = 'minibus'
 
     class Labels:
-        normal = _('Binek Araç')
+        sedan = _('Sedan')
+        hatchback = _('Hatchback')
         suv = _('Suv')
         commercial = _('Ticari Araç')
-        minibus = _('Minibus')

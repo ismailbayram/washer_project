@@ -21,17 +21,17 @@ class DaySerializer(serializers.Serializer):
         end = attrs.get('end', None)
 
         if (start and not end) or (not start and end):
-            raise ValidationError(_('Başlangıç ve bitiş saatleri birlikte verilmeli.'))
+            raise ValidationError(_('You have to input start and end times together'))
 
         if start and end:
             if start >= end:
-                raise ValidationError(_('Başlangıç saati bitiş saatinden önce olmalı.'))
+                raise ValidationError(_('Start time must be before the end time.'))
             start_time = datetime.datetime.strptime(start, "%H:%M")
             end_time = datetime.datetime.strptime(end, "%H:%M")
             diff = (end_time - start_time).seconds / 60
 
             if diff <= 59:
-                raise ValidationError(_('Başlangıç saati bitiş saati arasında en az 1 saat olmalı.'))
+                raise ValidationError(_('The start time must be at least 1 hour between the end time.'))
 
         return attrs
 
@@ -81,7 +81,7 @@ class PaymentOptionsSerializer(serializers.Serializer):
         cash = attrs.get('cash')
 
         if not (credit_card or cash):
-            raise ValidationError(_("One of payment options must be available."))
+            raise ValidationError(_("At least one of payment options must be available."))
 
         return attrs
 
@@ -102,11 +102,11 @@ class ConfigSerializer(serializers.Serializer):
             if reservation_hours[day]["start"] is None and hours['start'] is None:
                 continue
             if reservation_hours[day]["start"] is not None and hours['start'] is None:
-                raise ValidationError(_('Dükkanın kapalı olduğu günlerde randevu açılamaz.'))
+                raise ValidationError(_('Reservations cannot be opened on the days when the car wash is closed.'))
             if reservation_hours[day]["start"] < hours["start"]:
-                raise ValidationError(_('Randevu saatleri dükkan açılış saatinden sonra olmalı.'))
+                raise ValidationError(_('Reservation hours must be between opening and closing hours.'))
             if reservation_hours[day]["end"] > hours["end"]:
-                raise ValidationError(_('Randevu saatleri dükkan kapanış saatinden önce olmalı.'))
+                raise ValidationError(_('Reservation hours must be between opening and closing hours.'))
 
         return attrs
 

@@ -7,4 +7,4 @@ class CityNotValidException(ProjectBaseException):
 
 
 class TownshipNotValidException(ProjectBaseException):
-    code = codes.address_100_0
+    code = codes.address_100_1
