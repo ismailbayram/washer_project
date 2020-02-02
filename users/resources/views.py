@@ -68,7 +68,7 @@ class AuthView(APIView):
         user_service = UserService()
         sms_service = SmsService()
 
-        sms_obj = sms_service.get_or_create_sms_code(
+        sms_service.get_or_create_sms_code(
             phone_number=serializer.validated_data.get('phone_number')
         )
 
@@ -131,7 +131,7 @@ class ChangePhoneNumberRequestView(APIView):
             raise ThereIsUserGivenPhone
 
         sms_service = SmsService()
-        sms_instance = sms_service.get_or_create_sms_code(**serializer.validated_data)
+        sms_service.get_or_create_sms_code(**serializer.validated_data)
         # TODO: send real sms
         return Response({}, status=status.HTTP_200_OK)
 

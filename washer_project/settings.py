@@ -214,6 +214,9 @@ CACHES = {
     }
 }
 
+
+SMS_CODE_CACHE_KEY_FORMAT = 'SMS_CODE:{}'
+
 try:
     from washer_project.settings_local import *
 except ImportError:
