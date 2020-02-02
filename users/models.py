@@ -79,13 +79,6 @@ class WorkerProfile(StarterModel):
         return f'{self.user.get_full_name()}'
 
 
-class SmsMessage(StarterModel):
-    is_expired = models.BooleanField(default=False)
-    expire_datetime = models.DateTimeField()
-    code = models.CharField(max_length=6)
-    phone_number = models.CharField(max_length=255)
-
-
 class WorkerJobLog(StarterModel):
     worker_profile = models.ForeignKey(to=WorkerProfile, on_delete=models.PROTECT, related_name='worker_profile')
     start_date = models.DateTimeField()

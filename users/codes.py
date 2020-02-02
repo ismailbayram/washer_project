@@ -6,9 +6,6 @@ users_100_1 = {"code": "users_100_1", "message": _("User group is not available.
 workers_100_0 = {"code": "workers_100_0",
                  "message": _("This worker is not your employee.")}
 
-auth_100_0 = {"code": "auth_100_0",
-                 "message": _("SMS code could not be generated.")}
-
 auth_100_1 = {"code": "auth_100_1",
                  "message": _("SMS code is expired.")}
 
