@@ -48,7 +48,7 @@ class AdminStoreService:
             except KeyError:
                 continue
 
-            if start and end:
+            if start and end and end > start:
                 start_delta = datetime.timedelta(
                     hours=int(start.split(":")[0]), minutes=int(start.split(":")[1])
                 )
