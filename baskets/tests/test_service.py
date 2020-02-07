@@ -143,10 +143,10 @@ class BasketDiscountedTest(TestCase, BaseTestViewMixin):
                                    promotion_type=PromotionType.one_free_in_nine, priority=0)
 
     def _create_reservation_and_complete(self, customer):
-        dt = timezone.now() + datetime.timedelta(minutes=30)
+        dt = timezone.now() + datetime.timedelta(minutes=70)
         for k in range(9):
-            dt = dt + datetime.timedelta(minutes=30)
-            res = self.res_service._create_reservation(self.store, start_datetime=dt, period=30)
+            dt = dt + datetime.timedelta(minutes=70)
+            res = self.res_service._create_reservation(self.store, start_datetime=dt, period=70)
             basket = self.service.get_or_create_basket(customer_profile=customer)
             self.service.clean_basket(basket)
             self.service.add_basket_item(basket, self.product1)

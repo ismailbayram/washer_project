@@ -21,7 +21,7 @@ from reservations.exceptions import (ReservationAlreadyCommented,
                                      ReservationIsNotComplated,
                                      ReservationNotAvailableException,
                                      ReservationOccupiedBySomeoneException,
-                                     ReservationStartedException)
+                                     ReservationStartedException, ReservationAlreadyExist)
 from reservations.models import Comment, Reservation
 from reservations.tasks import (prevent_occupying_reservation,
                                 send_reminder_reservation_notification)
@@ -120,6 +120,12 @@ class ReservationService(object):
         if not (reservation.store.is_active and reservation.store.is_approved):
             raise StoreNotAvailableException
 
+        reservation_exist = customer_profile.reservation_set.filter(
+            start_datetime__gte=reservation.start_datetime - datetime.timedelta(hours=1),
+            end_datetime__lte=reservation.end_datetime + datetime.timedelta(hours=1)
+        )
+        if reservation_exist:
+            raise ReservationAlreadyExist
         timezone = pytz.timezone(settings.TIME_ZONE)
         dt = reservation.start_datetime
         now = timezone.localize(datetime.datetime.now())

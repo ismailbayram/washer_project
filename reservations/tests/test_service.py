@@ -24,7 +24,7 @@ from reservations.exceptions import (ReservationAlreadyCommented,
                                      ReservationIsNotComplated,
                                      ReservationNotAvailableException,
                                      ReservationOccupiedBySomeoneException,
-                                     ReservationStartedException)
+                                     ReservationStartedException, ReservationAlreadyExist)
 from reservations.models import CancellationReason
 from reservations.service import CommentService, ReservationService
 from stores.exceptions import StoreNotAvailableException
@@ -179,6 +179,16 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         with self.assertRaises(StoreNotAvailableException):
             self.service.occupy(reservation, self.customer2_profile)
 
+        dt = dt + datetime.timedelta(minutes=40)
+        reservation3 = self.service._create_reservation(self.store2, dt, 40)
+        reservation3.customer_profile = self.customer_profile
+        reservation3.status = ReservationStatus.reserved
+        reservation3.save()
+        dt = dt + datetime.timedelta(minutes=40)
+        reservation4 = self.service._create_reservation(self.store2, dt, 40)
+        with self.assertRaises(ReservationAlreadyExist):
+            self.service.occupy(reservation4, self.customer_profile)
+
     def test_reserve(self):
         dt = timezone.now() + datetime.timedelta(minutes=40)
         reservation = self.service._create_reservation(self.store, dt, 40)
@@ -212,7 +222,7 @@ class ReservationServiceTest(TestCase, BaseTestViewMixin):
         self.assertEqual(reservation.status, ReservationStatus.reserved)
         self.assertEqual(reservation.total_amount, Decimal('20.00'))
 
-        dt = timezone.now() + datetime.timedelta(minutes=40)
+        dt = timezone.now() + datetime.timedelta(minutes=140)
         reservation2 = self.service._create_reservation(self.store, dt, 40)
         self.service.occupy(reservation2, self.customer_profile)
         basket = self.basket_service.get_or_create_basket(self.customer_profile)
