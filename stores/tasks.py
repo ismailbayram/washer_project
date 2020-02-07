@@ -28,7 +28,9 @@ def notify_stores_for_increasing():
             status__gte=ReservationStatus.reserved,
         ).count()
 
-        if current_reservation_count/max_reservation >= 0.8:
+        # todo: algoritma degismesi gerekebilir. haftanin kalan gunleri uzerinden bir hesap yapilabilir.
+        # bu sekilde yaniltici olabilir.
+        if max_reservation and current_reservation_count/max_reservation >= 0.8:
             notif_service = NotificationService()
             notif_service.send(instance=store, to=store,
                                notif_type=NotificationType.so_reservation_want_increase)
