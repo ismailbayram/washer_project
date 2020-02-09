@@ -35,12 +35,13 @@ SHELL_PLUS_PRE_IMPORTS = (
 ``` 
 ### Dummy data
 - Run `python dummy_data.py`
-- Run celery and write below comands at python shell; 
+- Write below comands at python shell after running celery; 
 ```
+Store.objecs.all().update(is_approved=True)
 from search.indexer import StoreIndexer
 from reservations.tasks import create_store_weekly_reservations
 StoreIndexer().index_stores()
-for store in Store.objects.all():
+for store in Store.objects.actives():
     create_store_weekly_reservations.delay(store.id)
 ``` 
 
