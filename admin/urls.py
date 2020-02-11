@@ -11,9 +11,6 @@ from admin.dashboard.views import DashboardViewSet
 from admin.campaigns.views import CampaignAdminViewSet
 from admin.products.views import ProductPriceAdminViewSet
 
-from api.views import get_swagger_view
-
-schema_view = get_swagger_view(title='Washer Project API')
 
 router = DefaultRouter()
 

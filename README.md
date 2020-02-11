@@ -33,6 +33,8 @@ SHELL_PLUS_PRE_IMPORTS = (
     ('search.service', '*'),
 )
 ``` 
+### Documentation
+`/api/v1/docs/`
 ### Dummy data
 - Run `python dummy_data.py`
 - Write below comands at python shell after running celery; 

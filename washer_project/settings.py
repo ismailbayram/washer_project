@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_filters',
     'rest_framework',
-    'rest_framework_swagger',
     'base',
     'users',
     'address',
@@ -113,7 +112,7 @@ JWT_AUTH = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -125,10 +124,6 @@ TEMPLATES = [
         },
     },
 ]
-
-SWAGGER_SETTINGS = {
-    'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'patch', 'put', 'options'],
-}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

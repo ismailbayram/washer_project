@@ -1,9 +1,9 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from api.views import APIDocView
 from address.resources.views import (CityViewSet, CountryViewSet,
                                      TownshipViewSet)
-from api.views import get_swagger_view
 from baskets.resources.views import BasketViewSet, CampaignViewSet
 from cars.resources.views import CarViewSet
 from notifications.resources.views import NotificationViewSet
@@ -18,8 +18,6 @@ from users.resources.views import (AuthView, ChangePhoneNumberRequestView,
                                    ChangePhoneNumberSmsVerifyView,
                                    SmsVerifyView, UserInfoView,
                                    WorkerProfileViewSet)
-
-schema_view = get_swagger_view(title='Washer Project API')
 
 router = DefaultRouter()
 router.register('workers', WorkerProfileViewSet, 'workers')
@@ -66,8 +64,8 @@ urlpatterns = [
     path('', include((router.urls, 'api'), namespace='router')),
     path('auth/', AuthView.as_view(), name="auth"),
     path('sms_verify/', SmsVerifyView.as_view(), name="sms_verify"),
-    path('docs/', schema_view),
     path('user-info/', UserInfoView.as_view(), name="user-info"),
     path('user-info/change-phone-number/', ChangePhoneNumberRequestView.as_view(), name="set-phone-request"),
     path('user-info/verify-phone-number/', ChangePhoneNumberSmsVerifyView.as_view(), name="set-phone-verify"),
+    path('docs/', APIDocView.as_view(), name='api_doc_view'),
 ]
