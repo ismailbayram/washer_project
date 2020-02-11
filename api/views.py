@@ -1,47 +1,22 @@
-from rest_framework import exceptions
-from rest_framework.permissions import AllowAny
-from rest_framework.renderers import CoreJSONRenderer
-from rest_framework.views import APIView
+import os
+import json
+
+from django.conf import settings
+
 from rest_framework.response import Response
-from api.generators import SchemaGenerator
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.views import APIView
 
 
-from rest_framework_swagger import renderers
+class APIDocView(APIView):
+    template_name = 'docs/index.html'
+    renderer_classes = (TemplateHTMLRenderer, JSONRenderer)
 
-
-def get_swagger_view(title=None, url=None, patterns=None, urlconf=None):
-    """
-    Returns schema view which renders Swagger/OpenAPI.
-    """
-
-    class SwaggerSchemaView(APIView):
-        _ignore_model_permissions = True
-        exclude_from_schema = True
-        permission_classes = [AllowAny]
-        renderer_classes = [
-            CoreJSONRenderer,
-            renderers.OpenAPIRenderer,
-            renderers.SwaggerUIRenderer
-        ]
-        http_method_names = ['get']
-
-        def get(self, request):
-            generator = SchemaGenerator(
-                title=title,
-                url=url,
-                patterns=patterns,
-                urlconf=urlconf
-            )
-            schema = generator.get_schema(request=request)
-
-            if not schema:
-                raise exceptions.ValidationError(
-                    'The schema generator did not return a schema Document'
-                )
-
-            return Response(schema)
-
-    return SwaggerSchemaView.as_view()
+    def get(self, request, *args, **kwargs):
+        with open(os.path.join(settings.BASE_DIR, 'templates/docs/doc.json')) as doc_file:
+            return Response({
+                'doc_file': json.dumps(json.load(doc_file))
+            })
 
 
 class MultiSerializerViewMixin(object):
@@ -50,5 +25,4 @@ class MultiSerializerViewMixin(object):
     def get_serializer_class(self):
         if self.action in self.action_serializers:
             return self.action_serializers.get(self.action, None)
-        else:
-            return super().get_serializer_class()
+        return super().get_serializer_class()

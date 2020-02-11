@@ -9,4 +9,4 @@ def is_valid_phone(phone_number: str):
     if res and res.group() == phone_number:
         return True
 
-    raise ValidationError(_('Your phone number format should be like: 05xx xxx xx xx '))
+    raise ValidationError(_('Your phone number format should be like: 05xxxxxxxxx '))

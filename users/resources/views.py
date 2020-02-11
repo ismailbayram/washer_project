@@ -74,7 +74,6 @@ class AuthView(APIView):
 
         user_service.get_or_create_user(**serializer.validated_data)
 
-        # TODO: send real sms
         return Response({}, status=status.HTTP_200_OK)
 
 
