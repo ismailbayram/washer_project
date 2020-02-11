@@ -2,7 +2,7 @@ from cars.models import Car
 
 
 class CarService:
-    def create_car(self, licence_plate, car_type, customer_profile):
+    def create_car(self, licence_plate, car_type, customer_profile, **kwargs):
         """
         :param license_plate: str
         :param car_type: CarType
