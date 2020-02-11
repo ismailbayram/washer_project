@@ -8,11 +8,19 @@ from stores.resources.serializers import StoreSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(min_value=1, max_value=10)
+    protected_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ('pk', 'rating', 'comment', 'reservation', 'reply', )
+        fields = ('pk', 'rating', 'comment', 'reservation', 'reply', 'protected_name')
         read_only_fields = ('reply', 'reservation',)
+
+    def get_protected_name(self, obj):
+        try:
+            protected_name = obj.reservation.customer_profile.user.protected_name
+        except AttributeError:
+            protected_name = ''
+        return protected_name
 
 
 class ReplySerializer(serializers.Serializer):

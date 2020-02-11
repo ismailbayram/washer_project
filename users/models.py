@@ -26,8 +26,8 @@ class User(AbstractUser):
 
     @property
     def protected_name(self):
-        # TODO: check IndexError
-        return f'{self.first_name} {self.last_name[0]}.'
+        return '{}. {}.'.format(self.first_name[0].capitalize() if len(self.first_name) > 0 else ' ',
+                             self.last_name[0].capitalize() if len(self.last_name) > 0 else ' ')
 
     @cached_property
     def user_groups(self):
