@@ -170,6 +170,6 @@ class CancellationReasonViewSet(ReadOnlyModelViewSet):
 class CommentListViewSet(mixins.ListModelMixin,
                          mixins.RetrieveModelMixin,
                          GenericViewSet):
-    queryset = Comment.objects.all()
+    queryset = Comment.objects.all().select_related('reservation__customer_profile__user')
     serializer_class = CommentSerializer
     filter_class = CommentFilterSet
