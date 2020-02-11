@@ -1,0 +1,128 @@
+{
+  "paths": {
+    "/notifications/": {
+      "get": {
+        "tags": [
+          "Bildirimler"
+        ],
+        "description": "Şu profil tipine sahip kullanıcılar için açıktır: `customer`, `washer`, `worker`. NOT: Header'da mutlaka `X-Profile-Type` bilgisi gönderilmelidir.",
+        "summary": "Bildirimleri listeleme",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {}
+        ],
+        "responses": {
+          "200": {
+            "description": "Doğrulama kodu gönderildi.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "name": "count",
+                  "description": "Toplam obje sayısı",
+                  "type": "integer"
+                },
+                "next": {
+                  "name": "next",
+                  "description": "Sonraki sayfa URL'i. `nullable`",
+                  "type": "string"
+                },
+                "previous": {
+                  "name": "previous",
+                  "description": "Önceki sayfa URL'i. `nullable`",
+                  "type": "string"
+                },
+                "results": {
+                  "name": "results",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pk": {
+                        "name": "pk",
+                        "description": "ID",
+                        "type": "integer"
+                      },
+                      "created_date": {
+                        "name": "created_date",
+                        "description": "Oluşturulma zamanı. Örnek: 2020-02-10T19:52:50.881068+03:00",
+                        "type": "datetime"
+                      },
+                      "sentence": {
+                        "name": "sentence",
+                        "description": "Bildirim cümlesi",
+                        "type": "string"
+                      },
+                      "notification_type": {
+                        "name": "notification_type",
+                        "description": "Bildirim Tipi",
+                        "type": "string",
+                        "enum": [
+                          "you_fired",
+                          "you_are_fired",
+                          "you_are_moved_another_store",
+                          "you_moved_worker_to_store",
+                          "you_has_new_worker",
+                          "weekly_reservations_created",
+                          "reservation_disabled",
+                          "reservation_expired",
+                          "reservation_reserved",
+                          "reservation_reminder_c",
+                          "reservation_reminder_s",
+                          "reservation_started",
+                          "reservation_completed",
+                          "reservation_cancelled",
+                          "so_reservation_want_increase",
+                          "store_approved"
+                        ]
+                      },
+                      "data": {
+                        "name": "data",
+                        "description": "Bildirim hakkında ek bilgiler.",
+                        "type": "object",
+                        "properties": {
+                          "view": {
+                            "name": "view",
+                            "description": "Tıklayınca yönlendirilecek `view`.",
+                            "type": "string",
+                            "enum": [
+                              "profile",
+                              "reservation",
+                              "store",
+                              "store-reservations"
+                            ]
+                          },
+                          "view_id": {
+                            "name": "view_id",
+                            "description": "Tıklayınca yönlendirilecek `view`'in ID'si.",
+                            "type": "integer"
+                          }
+                        }
+                      },
+                      "read": {
+                        "name": "read",
+                        "description": "Bildirimin görüntülenme durumu",
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bulunamadı.",
+            "schema": {
+              "$ref": "#/definitions/notfound"
+            }
+          }
+        }
+      }
+    }
+  }
+}

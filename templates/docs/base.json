@@ -1,0 +1,103 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "AraçYıka API Dökümantasyon",
+    "x-logo": {
+      "url": null
+    },
+    "description": "Sistem genelinde token gereken endpointlere token olmadan istek atıldığında `401` döner. İzni olmayan endpointlere istek atıldığında da `403` döner"
+  },
+  "tags": [
+    {
+      "name": "Login",
+      "description": "Login işlemi için şifre veya e-posta adresine ihtiyaç yoktur. Tıpkı WhatsApp gibi sadece telefon numarası ile giriş yapılabilir. Girilen telefon numarasına SMS olarak gelen doğrulama kodunu göndermek yeterlidir."
+    },
+    {
+      "name": "Bildirimler",
+      "description": "Sistemde bazı durumlarda herhangi bir kullanıcıya o hareket hakkında bildirim gönderilmektedir. Kullanıcı bildirim verisi içinde gelen `viewname` bilgisine göre ilgili objenin sayfasına yönlendirilebilir."
+    },
+    {
+      "name": "Araçlar",
+      "description": "Araç sahiplerinin araçlarını yönetebileceği endpointler. Sistemdeki hizmetlerin ücreti kullanıcının seçili aracının kasa tipine göre değişiklik gösterir."
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+  },
+  "securityDefinitions": {
+    "Token": {
+      "description": "JWT Token",
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "X-ProfileType": {
+      "description": "Kullanıcının hangi profil tipi için istek attığı. Sadece `notifications/` endpointi için geçerli. `customer`, `washer`, `worker`",
+      "type": "apiKey",
+      "name": "X-Profile-Type",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "GroupType": {
+      "type": "string",
+      "description": "Grup Tipi",
+      "enum": [
+        "customer",
+        "washer",
+        "worker"
+      ],
+      "xml": {
+        "name": "GroupType"
+      }
+    },
+    "notfound": {
+      "type": "object",
+      "properties": {
+        "detail": {
+          "name": "detail",
+          "type": "string"
+        }
+      }
+    },
+    "car": {
+      "type": "object",
+      "properties": {
+        "pk": {
+          "name": "pk",
+          "description": "ID",
+          "type": "integer"
+        },
+        "licence_plate": {
+          "name": "licence_plate",
+          "description": "Araç plakası/adı",
+          "type": "string"
+        },
+        "car_type": {
+          "name": "car_type",
+          "description": "Araç Tipi",
+          "type": "string",
+          "enum": [
+            "sedan",
+            "suv",
+            "hatchback",
+            "commercial"
+          ]
+        },
+        "is_selected": {
+          "name": "is_selected",
+          "description": "Bir kullanıcının sadece 1 aracı için bu değer `true` olabilir.",
+          "type": "boolean"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

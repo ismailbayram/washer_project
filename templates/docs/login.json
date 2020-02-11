@@ -1,0 +1,218 @@
+{
+  "paths": {
+    "/auth/": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "description": "Şu profil tipine sahip kullanıcılar için açıktır: `customer`, `washer`, `worker`",
+        "summary": "Login 1. Adım",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "name",
+                "photoUrls"
+              ],
+              "properties": {
+                "phone_number": {
+                  "name": "phone_number",
+                  "description": "Örnek: +905553334455",
+                  "required": true,
+                  "type": "string"
+                },
+                "group_type": {
+                  "name": "group_type",
+                  "required": true,
+                  "type": "string",
+                  "enum": [
+                    "customer",
+                    "washer",
+                    "worker"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Doğrulama kodu gönderildi.",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Input hatası",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "name": "phone_number",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "group_type": {
+                  "name": "group_type",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Input hatası",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "non_field_errors": {
+                  "name": "non_field_errors",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "error_code": {
+                  "name": "error_code",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sms_verify/": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "description": "Şu profil tipine sahip kullanıcılar için açıktır: `customer`, `washer`, `worker`",
+        "summary": "Login 2. Adım",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "name",
+                "photoUrls"
+              ],
+              "properties": {
+                "phone_number": {
+                  "name": "phone_number",
+                  "description": "Örnek: +905553334455",
+                  "required": true,
+                  "type": "string"
+                },
+                "sms_code": {
+                  "name": "sms_code",
+                  "description": "6 haneli doğrulama kodu",
+                  "required": true,
+                  "type": "string"
+                },
+                "group_type": {
+                  "name": "group_type",
+                  "required": true,
+                  "type": "string",
+                  "enum": [
+                    "customer",
+                    "washer",
+                    "worker"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Doğrulama kodu gönderildi.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "name": "token",
+                  "description": "JWT Token",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input hatası",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone_number": {
+                  "name": "phone_number",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "group_type": {
+                  "name": "group_type",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "sms_code": {
+                  "name": "sms_code",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Input hatası",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "non_field_errors": {
+                  "name": "non_field_errors",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "error_code": {
+                  "name": "error_code",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
