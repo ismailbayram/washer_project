@@ -33,7 +33,7 @@ def create_store_weekly_reservations(store_id):
     store_indexer = StoreIndexer()
     store_indexer.index_store(store)
     res_indexer = ReservationIndexer()
-    res_indexer.index_reservations(reservation_queryset)
+    res_indexer.index_reservations(reservation_queryset, silence=True)
     notif_service = NotificationService()
     notif_service.send(instance=store, to=store.washer_profile,
                        notif_type=NotificationType.weekly_reservations_created, )
@@ -100,4 +100,4 @@ def create_next_week_day():
 
     reservation_queryset = Reservation.objects.filter(pk__in=res_pk_list)
     res_indexer = ReservationIndexer()
-    res_indexer.index_reservations(reservation_queryset)
+    res_indexer.index_reservations(reservation_queryset, silence=True)
