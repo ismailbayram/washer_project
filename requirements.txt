@@ -6,7 +6,7 @@ django-filter==2.1.0
 djangorestframework-jwt==1.11.0
 django-enumfields==1.0.0
 django-extensions==2.1.9
-psycopg2==2.8.4
+psycopg2-binary==2.8.4
 requests==2.22.0
 model-mommy==1.6.0
 uuid==1.30
