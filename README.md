@@ -1,4 +1,5 @@
 # Washer Project
+![Product Design](all_images.jpg?raw=true "Product Design")
 ### Requirements
 - python@3.7
 - postgresql@11
